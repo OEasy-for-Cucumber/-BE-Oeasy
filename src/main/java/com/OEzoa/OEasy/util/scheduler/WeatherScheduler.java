@@ -14,7 +14,6 @@ import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 
 @Service
 public class WeatherScheduler {
@@ -29,19 +28,14 @@ public class WeatherScheduler {
     public void fetchWeatherData() throws IOException {
         // 현재 시간을 기준으로 baseDate와 baseTime 설정
         LocalDateTime now = LocalDateTime.now();
-
-        String baseDate = now.format(DateTimeFormatter.ofPattern("yyyyMMdd"));
-        String baseTime = now.format(DateTimeFormatter.ofPattern("HH")) + "30";
-        System.out.println("asdsadasd");
         URL url = new URL("https://apis.data.go.kr/1360000/VilageFcstInfoService_2.0/getUltraSrtNcst"
                 + "?serviceKey=QhhPZjW98BBHDmzZBQQilJa0z5bJiECMwZD7Q8A5KwvZtnBCJj39Jr05DeK3AWIsLZToDLIjdFsa3V4LiId%2B5g%3D%3D"
                 + "&pageNo=1"
                 + "&numOfRows=100"
                 + "&dataType=JSON"
                 + "&base_date=" + now.getYear() + now.getMonthValue() + now.getDayOfMonth()
-                + "&base_time=" + now.getHour() + 30
+                + "&base_time=" + String.format("%02d",now.getHour()) + 30
                 + "&nx=59&ny=125");
-
         // URL 객체를 통해 HTTP 연결을 설정하고 HttpURLConnection 객체로 캐스팅
         HttpURLConnection con = (HttpURLConnection) url.openConnection();
 
