@@ -15,15 +15,15 @@ public class SwaggerConfig {
     public OpenAPI customOpenAPI() {
         return new OpenAPI()
                 .info(new Info()
-                        .title("springdoc-openapi")
+                        .title("OEasy-API")
                         .version("1.0")
-                        .description("화면~"));
+                        .description("오이려좋아의 OEasy Project"));
     }
 
     @Bean
     public GroupedOpenApi groupedOpenApi() {
-        String[] paths = {"/api/v1/**"};
-        String[] packagesToScan = {"com.kafka","com.weather.kafka.controller"};
+        String[] paths = {"/api/**"};
+        String[] packagesToScan = {"com.OEzoa.OEasy.api"};
         return GroupedOpenApi.builder()
                 .group("springdoc-openapi")
                 .pathsToMatch(paths)
