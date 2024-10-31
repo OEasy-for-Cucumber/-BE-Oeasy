@@ -66,12 +66,19 @@ dependencies {
 	// Json Parse
 	implementation 'com.googlecode.json-simple:json-simple:1.1'
 
+	// OAuth2
+	implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
+
+	//javax
+	implementation 'javax.servlet:javax.servlet-api:4.0.1'
+
+
 }
 
 // YML 파일
 task copyYML(type: Copy) {
 	copy {
-		from './Sub_Module'
+		from './OEasy-SubModule'
 		include "*.yml"
 		into 'src/main/resources'
 	}

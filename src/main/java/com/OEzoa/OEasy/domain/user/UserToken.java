@@ -1,17 +1,21 @@
 package com.OEzoa.OEasy.domain.user;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.MapsId;
-import jakarta.persistence.OneToOne;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "user_token")
+@Getter
+@Builder(toBuilder = true)
+@NoArgsConstructor
+@AllArgsConstructor
 public class UserToken {
+
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long userPk;
 
     @OneToOne
@@ -24,10 +28,4 @@ public class UserToken {
 
     @Column(name = "refresh_tk")
     private String refreshToken;
-
-    @Column(name = "kakao_tk")
-    private String kakaoToken;
-
-
-    // Getters and setters
 }

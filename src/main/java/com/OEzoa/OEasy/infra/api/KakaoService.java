@@ -32,12 +32,11 @@ public class KakaoService {
         return KAKAO_AUTH_URI + "/oauth/authorize"
                 + "?client_id=" + KAKAO_CLIENT_ID
                 + "&redirect_uri=" + KAKAO_REDIRECT_URL
-                + "&response_type=code"
-                + "&scope=profile_nickname,account_email";  // 이메일과 닉네임 정보를 요청
+                + "&response_type=code";
     }
 
     public KakaoDTO getKakaoInfo(String code) throws Exception {
-        if (code == null) throw new Exception("Failed get authorization code");
+        if (code == null) throw new Exception("인가 코드가 존재하지 않습니다.");
 
         String accessToken = "";
 
@@ -66,9 +65,8 @@ public class KakaoService {
             JSONObject jsonObj = (JSONObject) jsonParser.parse(response.getBody());
 
             accessToken = (String) jsonObj.get("access_token");
-
         } catch (Exception e) {
-            throw new Exception("API call failed: " + e.getMessage(), e);
+            throw new Exception("액세스토큰 발급에 실패했습니다.");
         }
 
         return getUserInfoWithToken(accessToken);
@@ -90,21 +88,12 @@ public class KakaoService {
 
         JSONParser jsonParser = new JSONParser();
         JSONObject jsonObj = (JSONObject) jsonParser.parse(response.getBody());
-
         JSONObject account = (JSONObject) jsonObj.get("kakao_account");
-        String email = "정보 없음";
-        String nickname = "정보 없음";
-
-        if (account != null) {
-            email = account.get("email") != null ? String.valueOf(account.get("email")) : "정보 없음";
-
-            JSONObject profile = (JSONObject) account.get("profile");
-            if (profile != null) {
-                nickname = profile.get("nickname") != null ? String.valueOf(profile.get("nickname")) : "정보 없음";
-            }
-        }
+        JSONObject profile = (JSONObject) account.get("profile");
 
         long id = (long) jsonObj.get("id");
+        String email = String.valueOf(account.get("email"));
+        String nickname = String.valueOf(profile.get("nickname"));
 
         return KakaoDTO.builder()
                 .id(id)

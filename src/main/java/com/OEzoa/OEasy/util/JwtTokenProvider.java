@@ -2,33 +2,43 @@ package com.OEzoa.OEasy.util;
 
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.security.Keys;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import javax.crypto.SecretKey;
 import java.util.Date;
 
 @Component
 public class JwtTokenProvider {
 
-    private final SecretKey SECRET_KEY = Keys.secretKeyFor(SignatureAlgorithm.HS512);
-    private final long EXPIRATION_TIME = 1000 * 60 * 60 * 24; // 24 hours
+    @Value("${jwt.secret-key}")
+    private String SECRET_KEY;
 
-    public String generateToken(Long userPk) {
+    private final long TOKEN_VALIDITY = 1000L * 60 * 60;  // 1시간 유효
+    private final long REFRESH_TOKEN_VALIDITY = 1000L * 60 * 60 * 24 * 7;  // 7일 유효
+
+    // JWT 토큰 생성 메서드
+    public String generateToken(Long userId) {
+        Date now = new Date();
+        Date validity = new Date(now.getTime() + TOKEN_VALIDITY);
+
         return Jwts.builder()
-                .setSubject(String.valueOf(userPk))
-                .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
-                .signWith(SECRET_KEY)
+                .setSubject(String.valueOf(userId))
+                .setIssuedAt(now)
+                .setExpiration(validity)
+                .signWith(SignatureAlgorithm.HS256, SECRET_KEY)
                 .compact();
     }
 
-    public Claims getClaimsFromToken(String token) {
-        return Jwts.parser()
-                .setSigningKey(SECRET_KEY)
-                .build()
-                .parseClaimsJws(token)
-                .getBody();
+    // JWT Refresh 토큰 생성 메서드
+    public String generateRefreshToken(Long userId) {
+        Date now = new Date();
+        Date validity = new Date(now.getTime() + REFRESH_TOKEN_VALIDITY);
+
+        return Jwts.builder()
+                .setSubject(String.valueOf(userId))
+                .setIssuedAt(now)
+                .setExpiration(validity)
+                .signWith(SignatureAlgorithm.HS256, SECRET_KEY)
+                .compact();
     }
 }

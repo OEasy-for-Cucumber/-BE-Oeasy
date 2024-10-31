@@ -38,11 +38,11 @@ public class User {
     @Column(name = "email", nullable = false)
     private String email;
 
-    @Column(name = "pw", nullable = false)
+    @Column(name = "pw")
     private String pw;
 
     @Column(name = "nick_name", length = 16)
-    private String nickName;
+    private String nickname;
 
     @Column(name = "user_image")
     private String userImage;
