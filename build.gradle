@@ -59,12 +59,22 @@ dependencies {
 
 	//Swagger
 	implementation group: 'org.springdoc', name: 'springdoc-openapi-starter-webmvc-ui', version: '2.6.0'
+
+	// Tymeleaf
+	implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
+
+	// Json Parse
+	implementation 'com.googlecode.json-simple:json-simple:1.1'
+
+	// OAuth2
+	implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
+
 }
 
 // YML 파일
 task copyYML(type: Copy) {
 	copy {
-		from './Sub_Module'
+		from './OEasy-Submodule'
 		include "*.yml"
 		into 'src/main/resources'
 	}
