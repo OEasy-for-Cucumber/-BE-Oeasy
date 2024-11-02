@@ -4,6 +4,7 @@ import com.OEzoa.OEasy.domain.index.Weather;
 import com.OEzoa.OEasy.domain.index.WeatherImg;
 import com.OEzoa.OEasy.domain.index.WeatherImgRepository;
 import com.OEzoa.OEasy.domain.index.WeatherRepository;
+import com.OEzoa.OEasy.util.timeTrace.TimeTrace;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +17,7 @@ import java.net.URL;
 import java.time.LocalDateTime;
 
 @Service
+@TimeTrace
 public class WeatherScheduler {
 
     @Autowired
@@ -23,8 +25,8 @@ public class WeatherScheduler {
     @Autowired
     private WeatherImgRepository weatherImgRepository;
 
-    @Scheduled(cron = "0 30 * * * *") // 매 시간의 30분 마다 작업 초/분/시/일/월/요일(0 to 7)
-//    @Scheduled(fixedRate = 100000)
+    @Scheduled(cron = "00 30 * * * *") // 매 시간의 30분 마다 작업 초/분/시/일/월/요일(0 to 7)
+    //@Scheduled(fixedRate = 100000)
     public void fetchWeatherData() throws IOException {
         // 현재 시간을 기준으로 baseDate와 baseTime 설정
         LocalDateTime now = LocalDateTime.now();
@@ -33,9 +35,10 @@ public class WeatherScheduler {
                 + "&pageNo=1"
                 + "&numOfRows=100"
                 + "&dataType=JSON"
-                + "&base_date=" + now.getYear() + now.getMonthValue() + now.getDayOfMonth()
+                + "&base_date=" + now.getYear() + String.format("%02d",now.getMonthValue()) + String.format("%02d",now.getDayOfMonth())
                 + "&base_time=" + String.format("%02d",now.getHour()) + 30
                 + "&nx=59&ny=125");
+        System.out.println(url.toString());
         // URL 객체를 통해 HTTP 연결을 설정하고 HttpURLConnection 객체로 캐스팅
         HttpURLConnection con = (HttpURLConnection) url.openConnection();
 
