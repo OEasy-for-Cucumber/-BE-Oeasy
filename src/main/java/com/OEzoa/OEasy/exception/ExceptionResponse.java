@@ -16,7 +16,7 @@ public class ExceptionResponse {
     private LocalDateTime timestamp;
 
     public static ResponseEntity<ExceptionResponse> toResponse(GlobalExceptionCode code) {
-        log.info("예외 발생! httpStatus : {} | message : {} | descrition : {}", code.getHttpStatus(), code.getMessage(), code.getDescription());
+        log.info("예외 발생! httpStatus : {} | message : {} | description : {}", code.getHttpStatus(), code.getMessage(), code.getDescription());
         return ResponseEntity.status(code.getHttpStatus())
                 .body(ExceptionResponse.builder()
                         .message(code.getMessage())
