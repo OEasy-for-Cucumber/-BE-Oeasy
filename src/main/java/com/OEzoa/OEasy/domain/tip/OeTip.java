@@ -1,28 +1,32 @@
 package com.OEzoa.OEasy.domain.tip;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
-import lombok.Getter;
-import lombok.Setter;
+import com.OEzoa.OEasy.application.tip.OeTipDTO;
+import com.OEzoa.OEasy.application.tip.OeTipTitleDTO;
+import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.persistence.*;
+import lombok.*;
+
+import java.util.List;
 
 @Getter
-@Setter
+@Builder(toBuilder = true)
 @Entity
+@NoArgsConstructor
+@AllArgsConstructor
 @Table(name = "oe_tip", schema = "oeasy")
 public class OeTip {
     @Id
-    @Column(name = "TIP_PK", nullable = false)
+    @Column(name = "oe_tip_pk", nullable = false)
     private Long id;
 
-    @Column(name = "CONTENT", nullable = false, length = 50)
+    @Column(name = "content", nullable = false, length = 255)
     private String content;
 
-    @Column(name = "WRITER", nullable = false, length = 20)
-    private String writer;
-
-    @Column(name = "TIP_YEAR", nullable = false)
-    private Integer tipYear;
+    public static OeTipDTO of(OeTip oeTip, List<OeTipTitleDTO> oeTipTitleDTOList){
+        return OeTipDTO.builder()
+                .content(oeTip.getContent())
+                .oeTipTitleDTOList(oeTipTitleDTOList)
+        .build();
+    }
 
 }
