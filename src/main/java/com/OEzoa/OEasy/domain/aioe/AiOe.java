@@ -17,8 +17,8 @@ public class AiOe {
     @Column(name = "chatbot_pk", nullable = false)
     private Long id;
 
-    @Column(name = "user_pk", nullable = false)
-    private String userPk;
+    @Column(name = "member_pk", nullable = false)
+    private String memberPk;
 
     @Column(name = "text")
     private String text;
