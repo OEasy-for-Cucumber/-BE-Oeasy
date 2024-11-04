@@ -2,6 +2,9 @@ package com.OEzoa.OEasy.api.index;
 
 import com.OEzoa.OEasy.application.index.IndexService;
 import com.OEzoa.OEasy.application.index.OEIndexDTO;
+import com.OEzoa.OEasy.exception.GlobalException;
+import com.OEzoa.OEasy.exception.GlobalExceptionCode;
+import com.OEzoa.OEasy.util.timeTrace.TimeTrace;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -29,5 +32,6 @@ public class IndexController {
     public ResponseEntity<OEIndexDTO> getOEIndex() {
         return ResponseEntity.ok(indexService.getOEIndex());
     }
+
 
 }
