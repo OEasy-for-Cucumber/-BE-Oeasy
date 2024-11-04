@@ -69,12 +69,16 @@ dependencies {
 	// OAuth2
 	implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
 
+	//javax
+	implementation 'javax.servlet:javax.servlet-api:4.0.1'
+
+
 }
 
 // YML 파일
 task copyYML(type: Copy) {
 	copy {
-		from './OEasy-Submodule'
+		from './OEasy-SubModule'
 		include "*.yml"
 		into 'src/main/resources'
 	}

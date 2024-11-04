@@ -1,6 +1,6 @@
 package com.OEzoa.OEasy.domain.voting;
 
-import com.OEzoa.OEasy.domain.user.User;
+import com.OEzoa.OEasy.domain.member.Member;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -23,6 +23,6 @@ public class OeVoting {
     private Boolean voting;
 
     @ManyToOne
-    @JoinColumn(name = "user_pk", nullable = false)
-    private User user;
+    @JoinColumn(name = "member_pk", nullable = false)
+    private Member member;
 }
