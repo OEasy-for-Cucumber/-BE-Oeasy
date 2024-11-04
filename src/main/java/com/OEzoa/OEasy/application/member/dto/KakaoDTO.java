@@ -1,4 +1,4 @@
-package com.OEzoa.OEasy.application.user.dto;
+package com.OEzoa.OEasy.application.member.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;

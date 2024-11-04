@@ -1,7 +1,7 @@
 package com.OEzoa.OEasy.api.user.login;
 
-import com.OEzoa.OEasy.application.user.UserService;
-import com.OEzoa.OEasy.application.user.dto.UserLoginResponseDTO;
+import com.OEzoa.OEasy.application.member.MemberService;
+import com.OEzoa.OEasy.application.member.dto.MemberLoginResponseDTO;
 import com.OEzoa.OEasy.infra.api.KakaoService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("kakao")
 public class KakaoController {
 
-    private final UserService userService;
+    private final MemberService userService;
     private final KakaoService kakaoService;
 
     @GetMapping("/callback")
@@ -33,9 +33,9 @@ public class KakaoController {
             }
     )
 
-    public ResponseEntity<UserLoginResponseDTO> kakaoCallback(@RequestParam("code") String code, HttpSession session) {
+    public ResponseEntity<MemberLoginResponseDTO> kakaoCallback(@RequestParam("code") String code, HttpSession session) {
         try {
-            UserLoginResponseDTO responseDTO = userService.loginWithKakao(code, session);
+            MemberLoginResponseDTO responseDTO = userService.loginWithKakao(code, session);
             return ResponseEntity.ok(responseDTO); // 로그인 성공 시 JWT 토큰 반환
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(null);

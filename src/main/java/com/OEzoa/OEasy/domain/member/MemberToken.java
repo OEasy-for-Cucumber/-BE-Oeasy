@@ -1,4 +1,4 @@
-package com.OEzoa.OEasy.domain.user;
+package com.OEzoa.OEasy.domain.member;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -7,21 +7,21 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "user_token")
+@Table(name = "member_token")
 @Getter
 @Builder(toBuilder = true)
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserToken {
+public class MemberToken {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long userPk;
+    private Long memberPk;
 
     @OneToOne
     @MapsId
-    @JoinColumn(name = "user_pk")
-    private User user;
+    @JoinColumn(name = "member_pk")
+    private Member member;
 
     @Column(name = "access_tk")
     private String accessToken;

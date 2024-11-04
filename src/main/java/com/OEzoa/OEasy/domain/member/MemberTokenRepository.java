@@ -1,10 +1,10 @@
-package com.OEzoa.OEasy.domain.user;
+package com.OEzoa.OEasy.domain.member;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface UserTokenRepository extends JpaRepository<UserToken, Long> {
+public interface MemberTokenRepository extends JpaRepository<MemberToken, Long> {
 
 }
 

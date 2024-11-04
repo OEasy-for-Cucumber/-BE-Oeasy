@@ -1,4 +1,4 @@
-package com.OEzoa.OEasy.domain.user;
+package com.OEzoa.OEasy.domain.member;
 
 import com.OEzoa.OEasy.domain.chatting.OeChatting;
 import com.OEzoa.OEasy.domain.community.OeBoard;
@@ -22,15 +22,15 @@ import lombok.NoArgsConstructor;
 @Getter
 @Entity
 @Builder(toBuilder = true)
-@Table(name = "user", schema = "oeasy")
+@Table(name = "member", schema = "oeasy")
 @NoArgsConstructor
 @AllArgsConstructor
-public class User {
+public class Member {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "user_pk", nullable = false)
-    private Long userPk;
+    @Column(name = "member_pk", nullable = false)
+    private Long memberPk;
 
     @Column(name = "kakao_id", unique = true)
     private Long kakaoId;
@@ -44,21 +44,21 @@ public class User {
     @Column(name = "nick_name", length = 16)
     private String nickname;
 
-    @Column(name = "user_image")
-    private String userImage;
+    @Column(name = "member_image")
+    private String memberImage;
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
     private List<OeBoard> oeBoard;
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
     private List<OeBoardComment> oeBoardComments;
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
     private List<OeBoardLike> oeBoardLikes;
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
     private List<OeVoting> oeVoting;
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
     private List<OeChatting> oeChatting;
 }

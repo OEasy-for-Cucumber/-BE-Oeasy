@@ -2,7 +2,7 @@ package com.OEzoa.OEasy.infra.api;
 
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
-import com.OEzoa.OEasy.application.user.dto.KakaoDTO;
+import com.OEzoa.OEasy.application.member.dto.KakaoDTO;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
