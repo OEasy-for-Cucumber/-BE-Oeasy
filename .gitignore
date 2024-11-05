@@ -176,7 +176,7 @@ fabric.properties
 # SonarQube Plugin
 # https://plugins.jetbrains.com/plugin/7238-sonarqube-community-plugin
 .idea/**/sonarIssues.xml
-
+.idea/**
 # Markdown Navigator plugin
 # https://plugins.jetbrains.com/plugin/7896-markdown-navigator-enhanced
 .idea/**/markdown-navigator.xml
@@ -291,4 +291,13 @@ gradle-app.setting
 # Java heap dump
 *.hprof
 
+# application.yml 파일 무시
+src/main/resources/application.yml
+
+# 서브모듈 폴더 무시
+OEasy-Submodule
+
+# modules 폴더 하위 모든 파일 무시
+/.idea/modules/
+node_module/
 # End of https://www.toptal.com/developers/gitignore/api/eclipse,windows,git,java,maven,intellij,gradle
