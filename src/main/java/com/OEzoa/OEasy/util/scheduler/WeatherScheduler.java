@@ -7,7 +7,9 @@ import com.OEzoa.OEasy.domain.index.WeatherRepository;
 import com.OEzoa.OEasy.util.timeTrace.TimeTrace;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
@@ -18,12 +20,14 @@ import java.time.LocalDateTime;
 
 @Service
 @TimeTrace
+@RequiredArgsConstructor
 public class WeatherScheduler {
 
-    @Autowired
-    private WeatherRepository weatherRepository;
-    @Autowired
-    private WeatherImgRepository weatherImgRepository;
+    private final WeatherRepository weatherRepository;
+    private final WeatherImgRepository weatherImgRepository;
+
+    @Value("${weather.api.key}")
+    private String weatherKey;
 
     @Scheduled(cron = "00 30 * * * *") // 매 시간의 30분 마다 작업 초/분/시/일/월/요일(0 to 7)
     //@Scheduled(fixedRate = 100000)
@@ -31,7 +35,7 @@ public class WeatherScheduler {
         // 현재 시간을 기준으로 baseDate와 baseTime 설정
         LocalDateTime now = LocalDateTime.now();
         URL url = new URL("https://apis.data.go.kr/1360000/VilageFcstInfoService_2.0/getUltraSrtNcst"
-                + "?serviceKey=QhhPZjW98BBHDmzZBQQilJa0z5bJiECMwZD7Q8A5KwvZtnBCJj39Jr05DeK3AWIsLZToDLIjdFsa3V4LiId%2B5g%3D%3D"
+                + "?serviceKey=" + weatherKey
                 + "&pageNo=1"
                 + "&numOfRows=100"
                 + "&dataType=JSON"
