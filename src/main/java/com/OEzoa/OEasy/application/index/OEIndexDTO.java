@@ -7,6 +7,8 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
+
 @Getter
 @Builder
 @NoArgsConstructor
@@ -23,4 +25,7 @@ public class OEIndexDTO {
 
     @Schema(description = "온도", example = "24.1")
     private double temperature;
+
+    @Schema(description = "측정 시간")
+    private LocalDateTime dateTime;
 }
