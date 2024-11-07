@@ -1,3 +1,3 @@
 [submodule "OEasy-SubModule"]
-	path = OEasy-SubModule
-	url = git@github.com:OEasy-for-Cucumber/-BE-SubModule.git
+    path = OEasy-SubModule
+    url = git@github.com:OEasy-for-Cucumber/-BE-SubModule.git
