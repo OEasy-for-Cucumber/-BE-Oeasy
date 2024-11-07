@@ -1,5 +1,6 @@
 package com.OEzoa.OEasy.domain.recipe;
 
+import com.OEzoa.OEasy.application.recipe.DTO.GetRecipeManualDTO;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -25,5 +26,12 @@ public class OeRecipeManual {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "recipe_pk")
     private OeRecipe recipe;
+
+    public static GetRecipeManualDTO of(OeRecipeManual manual) {
+        return GetRecipeManualDTO.builder()
+                .content(manual.getContent())
+                .order(manual.getOrder())
+                .build();
+    }
 
 }
