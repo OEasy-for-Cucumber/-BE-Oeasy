@@ -18,5 +18,6 @@ public class GetRecipeDTO {
     private String ingredients;
     private String tip;
     private String title;
+    @Builder.Default
     private List<GetRecipeManualDTO> manualList = new ArrayList<>();
 }
