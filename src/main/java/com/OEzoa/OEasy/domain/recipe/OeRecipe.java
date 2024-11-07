@@ -1,5 +1,7 @@
 package com.OEzoa.OEasy.domain.recipe;
 
+import com.OEzoa.OEasy.application.recipe.DTO.GetRecipeDTO;
+import com.OEzoa.OEasy.application.recipe.DTO.GetRecipeManualDTO;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -32,4 +34,15 @@ public class OeRecipe {
 
     @OneToMany(mappedBy = "recipe", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<OeRecipeManual> recipeManuals;
+
+    public static GetRecipeDTO of(OeRecipe recipe, List<GetRecipeManualDTO> list) {
+        return GetRecipeDTO.builder()
+                .title(recipe.title)
+                .ingredients(recipe.ingredients)
+                .tip(recipe.tip)
+                .manualList(list)
+                .recipeImg(recipe.img)
+                .build();
+    }
+
 }

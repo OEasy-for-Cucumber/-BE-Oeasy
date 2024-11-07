@@ -11,4 +11,6 @@ import java.util.List;
 public interface OeRecipeRepository extends JpaRepository<OeRecipe, Long> {
     @Query(value = "SELECT recipe_img FROM oe_recipe ORDER BY RAND() limit :limit", nativeQuery = true)
     List<String> getRandomImg(@Param("limit") int limit);
+
+    long count();
 }
