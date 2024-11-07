@@ -1,13 +1,14 @@
 package com.OEzoa.OEasy.domain.recipe;
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import java.util.List;
 
 @Getter
-@Setter
+@Builder(toBuilder = true)
+@AllArgsConstructor
+@NoArgsConstructor
 @Entity
 @Table(name = "oe_recipe", schema = "oeasy")
 public class OeRecipe {
@@ -17,12 +18,18 @@ public class OeRecipe {
     @Column(name = "recipe_pk", nullable = false)
     private Long recipePk;
 
-    @Column(name = "content", nullable = false, length = 1000)
-    private String content;
+    @Column(name = "ingredients", nullable = false, length = 1000)
+    private String ingredients;
 
-    @Column(name = "recipe_timestamp", nullable = false)
-    private String recipeTimestamp;
+    @Column(name = "title", nullable = false, length = 100)
+    private String title;
 
-    @OneToMany(mappedBy = "recipe", cascade = CascadeType.ALL)
-    private List<OeRecipeImg> recipeImages;
+    @Column(name = "recipe_tip", nullable = false, length = 255)
+    private String tip;
+
+    @Column(name = "recipe_img", nullable = false, length = 255)
+    private String img;
+
+    @OneToMany(mappedBy = "recipe", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<OeRecipeManual> recipeManuals;
 }
