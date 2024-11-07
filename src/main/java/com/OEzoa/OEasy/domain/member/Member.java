@@ -38,8 +38,11 @@ public class Member {
     @Column(name = "email", nullable = false)
     private String email;
 
-    @Column(name = "pw")
+    @Column(name = "pw", nullable = false)
     private String pw;
+
+    @Column(name = "salt", nullable = false)
+    private String salt;
 
     @Column(name = "nick_name", length = 16)
     private String nickname;
@@ -61,4 +64,9 @@ public class Member {
 
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
     private List<OeChatting> oeChatting;
+
+    public Long getMemberId() {
+        return memberPk;
+    }
+
 }
