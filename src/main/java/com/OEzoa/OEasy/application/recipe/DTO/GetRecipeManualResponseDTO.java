@@ -5,7 +5,7 @@ import lombok.Getter;
 
 @Builder(toBuilder = true)
 @Getter
-public class GetRecipeManualDTO {
+public class GetRecipeManualResponseDTO {
     private String content;
     private int order;
 }

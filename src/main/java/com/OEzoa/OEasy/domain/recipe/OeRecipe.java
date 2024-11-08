@@ -1,10 +1,13 @@
 package com.OEzoa.OEasy.domain.recipe;
 
-import com.OEzoa.OEasy.application.recipe.DTO.GetRecipeDTO;
-import com.OEzoa.OEasy.application.recipe.DTO.GetRecipeManualDTO;
+import com.OEzoa.OEasy.application.recipe.DTO.GetRecipeResponseDTO;
+import com.OEzoa.OEasy.application.recipe.DTO.GetRecipeManualResponseDTO;
+import com.OEzoa.OEasy.application.recipe.DTO.GetRecipeResponseBoardAll;
+import com.OEzoa.OEasy.application.recipe.DTO.GetRecipeResponseBoard;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Getter
@@ -35,8 +38,8 @@ public class OeRecipe {
     @OneToMany(mappedBy = "recipe", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<OeRecipeManual> recipeManuals;
 
-    public static GetRecipeDTO of(OeRecipe recipe, List<GetRecipeManualDTO> list) {
-        return GetRecipeDTO.builder()
+    public static GetRecipeResponseDTO of(OeRecipe recipe, List<GetRecipeManualResponseDTO> list) {
+        return GetRecipeResponseDTO.builder()
                 .title(recipe.title)
                 .ingredients(recipe.ingredients)
                 .tip(recipe.tip)
@@ -44,5 +47,22 @@ public class OeRecipe {
                 .recipeImg(recipe.img)
                 .build();
     }
+
+    public static GetRecipeResponseBoardAll of(List<OeRecipe> Oelist) {
+        List<GetRecipeResponseBoard> list = new ArrayList<>();
+
+        for (OeRecipe recipe : Oelist) {
+            list.add(GetRecipeResponseBoard.builder()
+                            .id(recipe.recipePk)
+                            .imgUrl(recipe.img)
+                            .title(recipe.title)
+                    .build());
+        }
+        return GetRecipeResponseBoardAll.builder()
+                .refId(list.get(list.size()-1).getId())
+                .list(list)
+                .build();
+    }
+
 
 }
