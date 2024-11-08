@@ -24,7 +24,7 @@ jobs:
             ./gradlew build -x test
             cd build/libs/
             sudo kill -9 $(sudo lsof -t -i :8080)
-            nohup java -jar -Dspring.profiles-active=dev OEasy-0.0.1-SNAPSHOT.jar &
+            nohup java -jar -Dspring.profiles.active=dev OEasy-0.0.1-SNAPSHOT.jar &
             
             
           
