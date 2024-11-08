@@ -55,13 +55,11 @@ jobs:
           mkdir -p ~/.ssh
           ssh-keyscan -H $EC2_HOST >> ~/.ssh/known_hosts
           
-          # 기존 애플리케이션 종료 (디버깅 모드 활성화)
-          ssh -i private_key.pem -v $EC2_USER@$EC2_HOST "pkill -f 'java -jar' || true"
+          # 기존 애플리케이션 종료 
+          ssh -i private_key.pem -o StrictHostKeyChecking=no $EC2_USER@$EC2_HOST "pkill -f 'java -jar' || true"
 
-          # 새로운 파일 전송 (디버깅 모드 활성화)
-          scp -i private_key.pem -v -C $ARTIFACT $EC2_USER@$EC2_HOST:/home/$EC2_USER/
+          # 새로운 파일 전송
+          scp -i private_key.pem -o StrictHostKeyChecking=no -C $ARTIFACT $EC2_USER@$EC2_HOST:/home/$EC2_USER/
 
-          # 애플리케이션을 백그라운드에서 실행 (디버깅 모드 활성화)
-          ssh -i private_key.pem -v $EC2_USER@$EC2_HOST << EOF
-            nohup java -jar /home/$EC2_USER/$(basename $ARTIFACT) > /dev/null 2>&1 &
-          EOF
+          # 애플리케이션을 백그라운드에서 실행
+          ssh -i private_key.pem -o StrictHostKeyChecking=no $EC2_USER@$EC2_HOST "nohup java -jar /home/$EC2_USER/$(basename $ARTIFACT) > /dev/null 2>&1 &"
