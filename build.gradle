@@ -77,9 +77,7 @@ dependencies {
 
 
 }
- jar {
-   enabled = false
-}
+
 
 // YML 파일
 task copyYML(type: Copy) {
