@@ -54,7 +54,8 @@ jobs:
           echo "$PRIVATE_KEY" > private_key.pem
           chmod 600 private_key.pem
           
-          # 기존 .ssh 디렉토리에 known_hosts에 EC2 호스트 추가
+          # .ssh 디렉토리 생성 및 known_hosts에 EC2 호스트 추가
+          mkdir -p ~/.ssh
           ssh-keyscan -H $EC2_HOST >> ~/.ssh/known_hosts
           
           # SSH를 통해 EC2 서버에 파일을 복사하고 애플리케이션을 실행
