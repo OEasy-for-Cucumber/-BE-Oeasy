@@ -1,0 +1,30 @@
+name: CI/CD
+
+on: # 아래 job을 실행시킬 상황
+  push:
+    branches: [ main ]
+
+jobs:
+  deploy:
+    name: deploy
+    runs-on: ubuntu-latest # 실행될 인스턴스 OS와 버전
+
+    steps:
+      - name: 서버로 SSH 배포
+        uses: appleboy/ssh-action@v0.1.6
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ubuntu
+          key: ${{ secrets.EC2_PRIVATE_KEY }}
+          port: 22
+          script: |
+            cd ~/.ssh/-BE-Oeasy/
+            git pull
+            git submodule update --remote
+            ./gradlew build -x test
+            cd build/libs/
+            sudo kill -9 $(sudo lsof -t -i :8080)
+            nohup java -jar -Dspring.profiles-active=dev OEasy-0.0.1-SNAPSHOT.jar &
+            
+            
+          
