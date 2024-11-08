@@ -46,7 +46,7 @@ jobs:
           # EC2 서버로 SSH 연결하기 위해서 private key를 저장하고, SSH-agent를 사용하여 인증
           echo "$PRIVATE_KEY" > private_key.pem
           chmod 600 private_key.pem
-
+          ssh-keyscan -H $EC2_HOST >> ~/.ssh/known_hosts
           # SSH를 통해 EC2 서버에 파일을 복사하고 애플리케이션을 실행
           scp -i private_key.pem ./build/libs/${{env.artifact}} $EC2_USER@$EC2_HOST:/home/$EC2_USER/ # EC2 서버로 파일 복사
           
