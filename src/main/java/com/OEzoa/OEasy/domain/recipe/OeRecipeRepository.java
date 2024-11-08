@@ -13,4 +13,12 @@ public interface OeRecipeRepository extends JpaRepository<OeRecipe, Long> {
     List<String> getRandomImg(@Param("limit") int limit);
 
     long count();
+
+    Integer deleteByImgLike(String img);
+
+    @Query(value = "SELECT * " +
+            "FROM oe_recipe " +
+            "WHERE recipe_pk < :pk " +
+            "order by recipe_pk DESC limit :limit", nativeQuery = true)
+    List<OeRecipe> findByRecipePkLessThanOrderByDescTopN(@Param("pk") long pk, @Param("limit") int limit);
 }
