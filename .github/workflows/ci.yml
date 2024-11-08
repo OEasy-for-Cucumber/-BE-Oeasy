@@ -10,14 +10,14 @@ jobs:
     runs-on: ubuntu-latest # 실행될 인스턴스 OS와 버전
 
     steps:
-      - name: excuting remote ssh commands
-        uses: appleboy/ssh-action@v0.1.6 # ssh 접속하는 오픈소스
+      - name: 서버로 SSH 배포
+        uses: appleboy/ssh-action@v0.1.6
         with:
-          host: ${{ secrets.EC2_HOST }} # 인스턴스 IP
-          username: ubuntu # 우분투 아이디
-          key: ${{ secrets.EC2_PRIVATE_KEY }} # ec2 instance pem key
-          port: 8080 # 접속포트
-          script: | # 실행할 스크립트
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SERVER_SSH_KEY }}
+          port: 22
+          script: |
             cd ~/.ssh/-BE-Oeasy/
             git pull
             git submodule update --remote
