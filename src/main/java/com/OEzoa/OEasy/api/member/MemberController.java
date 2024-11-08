@@ -1,13 +1,27 @@
 package com.OEzoa.OEasy.api.member;
 
 import com.OEzoa.OEasy.application.member.MemberService;
+import com.OEzoa.OEasy.application.member.dto.MemberDTO;
 import com.OEzoa.OEasy.application.member.dto.MemberSignUpDTO;
+import com.OEzoa.OEasy.application.member.mapper.MemberMapper;
+import com.OEzoa.OEasy.domain.member.Member;
+import com.OEzoa.OEasy.domain.member.MemberRepository;
+import com.OEzoa.OEasy.util.JwtTokenProvider;
+import com.OEzoa.OEasy.util.s3Bucket.FileUploader;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.CookieValue;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
@@ -16,6 +30,11 @@ import org.springframework.web.bind.annotation.*;
 public class MemberController {
 
     private final MemberService memberService;
+    private final MemberRepository memberRepository;
+    private final FileUploader fileUploader;
+
+    @Autowired
+    private JwtTokenProvider jwtTokenProvider;
 
     // 일반 회원가입
     @PostMapping("/signup")
@@ -49,9 +68,13 @@ public class MemberController {
                     @ApiResponse(responseCode = "401", description = "조회 실패: 인증되지 않은 사용자.")
             }
     )
-    public ResponseEntity<?> getProfile() {
-        // 회원 정보 조회 로직 추가해야해이예에~
-        return ResponseEntity.ok("회원 정보 조회 성공");
+    public ResponseEntity<?> getProfile(@CookieValue(name = "accessToken", required = false) String accessToken) {
+        try {
+            MemberDTO memberDTO = validateMemberAccessToken(accessToken);
+            return ResponseEntity.ok(memberDTO);
+        } catch (Exception e) {
+            return ResponseEntity.status(401).body(e.getMessage());
+        }
     }
 
     // 닉네임 변경
@@ -64,12 +87,18 @@ public class MemberController {
                     @ApiResponse(responseCode = "400", description = "닉네임 변경 실패.")
             }
     )
-    public ResponseEntity<?> updateNickname(@RequestParam String newNickname) {
-        // 닉네임 변경 로직 추가 필요
-        return ResponseEntity.ok("닉네임 변경 성공");
+    public ResponseEntity<?> updateNickname(@RequestParam String newNickname, @CookieValue(name = "accessToken", required = false) String accessToken) {
+        try {
+            Member member = validateMemberAccessTokenAndReturnMember(accessToken);
+            member = member.toBuilder().nickname(newNickname).build();
+            memberRepository.save(member);
+            return ResponseEntity.ok("닉네임 변경 성공");
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("닉네임 변경 실패: " + e.getMessage());
+        }
     }
 
-    // 프로필 사진 선택
+    // 프로필 사진 선택 (S3 버킷에 저장)
     @PatchMapping("/profile-picture")
     @Operation(
             summary = "프로필 사진 선택",
@@ -79,8 +108,39 @@ public class MemberController {
                     @ApiResponse(responseCode = "400", description = "프로필 사진 변경 실패.")
             }
     )
-    public ResponseEntity<?> updateProfilePicture(@RequestParam String newProfilePictureUrl) {
-        // 프로필 사진 변경 로직 추가 필요함함함
-        return ResponseEntity.ok("프로필 사진 변경 성공");
+    public ResponseEntity<?> updateProfilePicture(@RequestParam String imageName, @RequestParam String imageUri, @CookieValue(name = "accessToken", required = false) String accessToken) {
+        try {
+            Member member = validateMemberAccessTokenAndReturnMember(accessToken);
+            // S3 버킷에 이미지 업로드
+            String s3ImageUrl = fileUploader.uploadImage(imageName, imageUri);
+            member = member.toBuilder().memberImage(s3ImageUrl).build();
+            memberRepository.save(member);
+            return ResponseEntity.ok("프로필 사진 변경 성공");
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("프로필 사진 변경 실패: " + e.getMessage());
+        }
+    }
+
+    // 액세스 토큰 검증 및 사용자 정보 조회 메서드
+    private MemberDTO validateMemberAccessToken(String accessToken) throws Exception {
+        if (accessToken == null) {
+            throw new Exception("인증되지 않은 사용자입니다.");
+        }
+
+        // JWT 토큰에서 사용자 ID 추출
+        Long memberId = jwtTokenProvider.getMemberIdFromToken(accessToken);
+        Member member = memberRepository.findById(memberId).orElseThrow(() -> new Exception("회원 정보를 찾을 수 없습니다."));
+        return MemberMapper.toDto(member);
+    }
+
+    // 액세스 토큰 검증 및 Member 객체 조회 메서드
+    private Member validateMemberAccessTokenAndReturnMember(String accessToken) throws Exception {
+        if (accessToken == null) {
+            throw new Exception("인증되지 않은 사용자입니다.");
+        }
+
+        // JWT 토큰에서 사용자 ID 추출
+        Long memberId = jwtTokenProvider.getMemberIdFromToken(accessToken);
+        return memberRepository.findById(memberId).orElseThrow(() -> new Exception("회원 정보를 찾을 수 없습니다."));
     }
 }
