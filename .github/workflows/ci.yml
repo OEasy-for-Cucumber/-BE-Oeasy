@@ -1,0 +1,30 @@
+name: CI/CD
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  deploy:
+    name: deploy
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 서버로 SSH 배포
+        uses: appleboy/ssh-action@v0.1.6
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ubuntu
+          key: ${{ secrets.EC2_PRIVATE_KEY }}
+          port: 22
+          script: |
+            cd ~/.ssh/-BE-Oeasy/
+            git pull
+            git submodule update --remote
+            ./gradlew build -x test
+            cd build/libs/
+            pid=$(sudo lsof -t -i :8080)
+            if [ -n "$pid" ]; then
+              sudo kill -9 $pid
+            fi
+            nohup java -jar -Dspring.profiles.active=dev OEasy-0.0.1-SNAPSHOT.jar > /dev/null 2>&1 &

@@ -9,7 +9,7 @@ import java.util.List;
 
 @Builder
 @Getter
-public class GetRecipeDTO {
+public class GetRecipeResponseDTO {
     private String recipeImg;
     @Schema(description = "재료들 입니다.", example = "●오이무침 :\n" +
             "오이 70g(1/3개), 다진 땅콩 10g(1큰술)\n" +
@@ -19,5 +19,5 @@ public class GetRecipeDTO {
     private String tip;
     private String title;
     @Builder.Default
-    private List<GetRecipeManualDTO> manualList = new ArrayList<>();
+    private List<GetRecipeManualResponseDTO> manualList = new ArrayList<>();
 }

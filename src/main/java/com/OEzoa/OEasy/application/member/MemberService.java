@@ -1,17 +1,21 @@
 package com.OEzoa.OEasy.application.member;
 
-import com.OEzoa.OEasy.application.member.dto.KakaoDTO;
+import com.OEzoa.OEasy.application.member.dto.MemberDTO;
+import com.OEzoa.OEasy.application.member.dto.MemberLoginDTO;
 import com.OEzoa.OEasy.application.member.dto.MemberLoginResponseDTO;
+import com.OEzoa.OEasy.application.member.dto.MemberSignUpDTO;
+import com.OEzoa.OEasy.application.member.mapper.MemberMapper;
 import com.OEzoa.OEasy.domain.member.Member;
 import com.OEzoa.OEasy.domain.member.MemberRepository;
 import com.OEzoa.OEasy.domain.member.MemberToken;
 import com.OEzoa.OEasy.domain.member.MemberTokenRepository;
-import com.OEzoa.OEasy.infra.api.KakaoService;
 import com.OEzoa.OEasy.util.JwtTokenProvider;
+import com.OEzoa.OEasy.util.PasswordUtil;
 import jakarta.servlet.http.HttpSession;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
 
 @Slf4j
 @Service
@@ -19,75 +23,90 @@ public class MemberService {
 
     @Autowired
     private MemberRepository memberRepository;
-
     @Autowired
     private MemberTokenRepository memberTokenRepository;
 
     @Autowired
     private JwtTokenProvider jwtTokenProvider;
 
-    @Autowired
-    private KakaoService kakaoService;
+    // 일반 회원 가입
+    public void registerMember(MemberSignUpDTO memberSignUpDTO) throws Exception {
+        if (memberRepository.findByEmail(memberSignUpDTO.getEmail()).isPresent()) {
+            throw new Exception("이미 존재하는 이메일입니다.");
+        }
+        if (memberSignUpDTO.getPassword() == null || memberSignUpDTO.getPassword().isEmpty()) {
+            throw new Exception("비밀번호는 필수 입력 항목입니다.");
+        }
+        // 비밀번호 해싱
+        String salt = PasswordUtil.generateSalt();
+        String hashedPassword = PasswordUtil.hashPassword(memberSignUpDTO.getPassword(), salt);
 
-    public MemberLoginResponseDTO loginWithKakao(String code, HttpSession session)
-            throws Exception {
-        // 카카오 API를 사용하여 사용자 정보 가져오기
-        KakaoDTO kakaoInfo = kakaoService.getKakaoInfo(code);
-        log.info("카카오 사용자 정보 수신: " + kakaoInfo);
+        Member member = Member.builder()
+                .email(memberSignUpDTO.getEmail())
+                .pw(hashedPassword)
+                .salt(salt)
+                .nickname(memberSignUpDTO.getNickname())
+                .build();
+        memberRepository.save(member);
+        log.info("신규 회원 저장 완료: " + member);
+    }
 
-        // 사용자 조회 또는 신규 사용자 등록
-        Member member = memberRepository.findByKakaoId(kakaoInfo.getId());
-        if (member == null) {
-            log.info("사용자가 없으므로 신규 등록 진행");
-            try {
-                // 신규 사용자 등록
-                member = Member.builder()
-                        .kakaoId(kakaoInfo.getId())
-//                        .membePk(membe.getMemberPk()) // membePk는 @MapsID 로 이미 명시되어 있어서 오류가 발생했었다.
-                        .email(kakaoInfo.getEmail())
-                        .nickname(kakaoInfo.getNickname())
-                        .build();
-                member = memberRepository.save(member);
-                log.info("신규 사용자 저장 완료: " + member);
-            } catch (Exception e) {
-                log.error("사용자 저장 중 오류 발생", e);
-                throw e;
-            }
-        } else {
-            log.info("기존 사용자 발견: " + member);
+    public MemberDTO registerMember(MemberDTO memberDTO, String rawPassword) {
+        String salt = PasswordUtil.generateSalt();
+        String hashedPassword = PasswordUtil.hashPassword(rawPassword, salt);
+
+        Member member = MemberMapper.toEntity(memberDTO).toBuilder()
+                .pw(hashedPassword)
+                .salt(salt)
+                .build();
+
+        // Member 엔티티를 저장
+        Member savedMember = memberRepository.save(member);
+        return MemberMapper.toDto(savedMember);
+    }
+
+    // 일반 로그인 처리 (JWT 발급)
+    public MemberLoginResponseDTO login(MemberLoginDTO memberLoginDTO, HttpSession session) throws Exception {
+        Member member = memberRepository.findByEmail(memberLoginDTO.getEmail())
+                .orElseThrow(() -> new Exception("해당 이메일의 회원이 존재하지 않습니다."));
+
+        String hashedInputPassword = PasswordUtil.hashPassword(memberLoginDTO.getPassword(), member.getSalt());
+
+        if (!member.getPw().equals(hashedInputPassword)) {
+            throw new Exception("비밀번호가 일치하지 않습니다.");
         }
 
-        // JWT 토큰 발급
         String jwtAccessToken = jwtTokenProvider.generateToken(member.getMemberPk());
         String jwtRefreshToken = jwtTokenProvider.generateRefreshToken(member.getMemberPk());
-        log.info("생성된 Access Token: " + jwtAccessToken);
-        log.info("생성된 Refresh Token: " + jwtRefreshToken);
+        session.setAttribute("accessToken", jwtAccessToken);
+        log.info("로그인 성공. 생성된 JWT 토큰: " + jwtAccessToken);
 
-        // MemberToken 저장
-        MemberToken MemberToken = memberTokenRepository.findById(member.getMemberPk()).orElse(null);
-        if (MemberToken == null) {
+        // MemberToken 저장 & 업데이트
+        MemberToken memberToken = memberTokenRepository.findById(member.getMemberPk()).orElse(null);
+        if (memberToken == null) {
             // 신규 MemberToken 생성
-            MemberToken = MemberToken.builder()
+            memberToken = MemberToken.builder()
                     .member(member)
                     .accessToken(jwtAccessToken)
                     .refreshToken(jwtRefreshToken)
                     .build();
-            log.info("신규 MemberToken 생성: " + MemberToken);
+            log.info("신규 MemberToken 생성: " + memberToken);
         } else {
             // 기존 MemberToken 업데이트
-            MemberToken = MemberToken.toBuilder()
+            memberToken = memberToken.toBuilder()
                     .accessToken(jwtAccessToken)
                     .refreshToken(jwtRefreshToken)
                     .build();
-            log.info("기존 MemberToken 업데이트: " + MemberToken);
+            log.info("기존 MemberToken 업데이트: " + memberToken);
         }
+        memberToken = memberTokenRepository.save(memberToken);
+        log.info("MemberToken 저장 완료: " + memberToken);
 
-        MemberToken = memberTokenRepository.save(MemberToken);
-        log.info("MemberToken 저장 완료: " + MemberToken);
-
-        session.setAttribute("membeId", member.getMemberPk());
-        session.setAttribute("accessToken", jwtAccessToken);
-
-        return new MemberLoginResponseDTO(jwtAccessToken, member.getEmail(), member.getNickname());
+        // AccessToken 반환
+        return MemberLoginResponseDTO.builder()
+                .accessToken(jwtAccessToken)
+                .email(member.getEmail())
+                .nickname(member.getNickname())
+                .build();
     }
 }
