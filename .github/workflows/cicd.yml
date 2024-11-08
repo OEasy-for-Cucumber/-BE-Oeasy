@@ -43,25 +43,25 @@ jobs:
         run: echo "artifact=$(ls ./build/libs/*.jar)" >> $GITHUB_ENV  # 특정 .jar 파일 경로 저장
 
       # SSH로 EC2에 배포
-   - name: Deploy to EC2
-     env:
-       PRIVATE_KEY: ${{ secrets.EC2_PRIVATE_KEY }}
-       EC2_USER: ubuntu
-       EC2_HOST: ${{ secrets.EC2_HOST }}
-       ARTIFACT: ${{ env.artifact }}
-     run: |
-       echo "$PRIVATE_KEY" > private_key.pem
-       chmod 600 private_key.pem
-       mkdir -p ~/.ssh
-       ssh-keyscan -H $EC2_HOST >> ~/.ssh/known_hosts
-       
-       # 기존 애플리케이션 종료 
-       ssh -i private_key.pem $EC2_USER@$EC2_HOST "pkill -f 'java -jar' || true"
+      - name: Deploy to EC2
+        env:
+          PRIVATE_KEY: ${{ secrets.EC2_PRIVATE_KEY }}
+          EC2_USER: ubuntu
+          EC2_HOST: ${{ secrets.EC2_HOST }}
+          ARTIFACT: ${{ env.artifact }}
+        run: |
+          echo "$PRIVATE_KEY" > private_key.pem
+          chmod 600 private_key.pem
+          mkdir -p ~/.ssh
+          ssh-keyscan -H $EC2_HOST >> ~/.ssh/known_hosts
+          
+          # 기존 애플리케이션 종료 
+          ssh -i private_key.pem $EC2_USER@$EC2_HOST "pkill -f 'java -jar' || true"
 
-       # 새로운 파일 전송
-       scp -i private_key.pem -C $ARTIFACT $EC2_USER@$EC2_HOST:/home/$EC2_USER/
+          # 새로운 파일 전송
+          scp -i private_key.pem -C $ARTIFACT $EC2_USER@$EC2_HOST:/home/$EC2_USER/
 
-       # 애플리케이션을 백그라운드에서 실행
-       ssh -i private_key.pem $EC2_USER@$EC2_HOST << EOF
-         nohup java -jar /home/$EC2_USER/$(basename $ARTIFACT) > /dev/null 2>&1 &
-       EOF
+          # 애플리케이션을 백그라운드에서 실행
+          ssh -i private_key.pem $EC2_USER@$EC2_HOST << EOF
+            nohup java -jar /home/$EC2_USER/$(basename $ARTIFACT) > /dev/null 2>&1 &
+          EOF
