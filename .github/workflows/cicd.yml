@@ -21,7 +21,11 @@ jobs:
       # Gradle 빌드 (dev 프로파일 활성화)
       - name: Build with Gradle (dev profile)
         run: ./gradlew clean build -x test -Dspring.profiles.active=dev
-
+      # 빌드 로그 출력 (디버깅용)
+      - name: Check build output
+        run: |
+          echo "Listing build/libs directory"
+          ls -al ./build/libs  # 빌드 후 생성된 파일을 출력
       #2 현재시간가져오기
       - name: Get current time
         uses: josStorer/get-current-time@v2.0.2
