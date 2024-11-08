@@ -43,24 +43,25 @@ jobs:
         run: echo "artifact=$(ls ./build/libs/*.jar)" >> $GITHUB_ENV  # 특정 .jar 파일 경로 저장
 
       # SSH로 EC2에 배포
-      - name: Deploy to EC2
-        env:
-          PRIVATE_KEY: ${{ secrets.EC2_PRIVATE_KEY }}  # GitHub Secrets에 저장된 EC2 private key
-          EC2_USER: ubuntu  # EC2에서 사용하는 사용자 (예: ec2-user, ubuntu 등)
-          EC2_HOST: ${{ secrets.EC2_HOST }}  # EC2 호스트 주소 (예: EC2 public IP)
-          ARTIFACT: ${{ env.artifact }}  # 빌드된 artifact 경로
-        run: |
-          # EC2 서버로 SSH 연결하기 위해서 private key를 저장하고, SSH-agent를 사용하여 인증
-          echo "$PRIVATE_KEY" > private_key.pem
-          chmod 600 private_key.pem
-          
-          # .ssh 디렉토리 생성 및 known_hosts에 EC2 호스트 추가
-          mkdir -p ~/.ssh
-          ssh-keyscan -H $EC2_HOST >> ~/.ssh/known_hosts
-          
-          # SSH를 통해 EC2 서버에 파일을 복사하고 애플리케이션을 실행
-          scp -i private_key.pem $ARTIFACT $EC2_USER@$EC2_HOST:/home/$EC2_USER/ # EC2 서버로 파일 복사
-          
-          ssh -i private_key.pem $EC2_USER@$EC2_HOST << EOF
-            nohup java -jar /home/$EC2_USER/$(basename $ARTIFACT) > /dev/null 2>&1 &
-          EOF
+   - name: Deploy to EC2
+     env:
+       PRIVATE_KEY: ${{ secrets.EC2_PRIVATE_KEY }}
+       EC2_USER: ubuntu
+       EC2_HOST: ${{ secrets.EC2_HOST }}
+       ARTIFACT: ${{ env.artifact }}
+     run: |
+       echo "$PRIVATE_KEY" > private_key.pem
+       chmod 600 private_key.pem
+       mkdir -p ~/.ssh
+       ssh-keyscan -H $EC2_HOST >> ~/.ssh/known_hosts
+       
+       # 기존 애플리케이션 종료 
+       ssh -i private_key.pem $EC2_USER@$EC2_HOST "pkill -f 'java -jar' || true"
+
+       # 새로운 파일 전송
+       scp -i private_key.pem -C $ARTIFACT $EC2_USER@$EC2_HOST:/home/$EC2_USER/
+
+       # 애플리케이션을 백그라운드에서 실행
+       ssh -i private_key.pem $EC2_USER@$EC2_HOST << EOF
+         nohup java -jar /home/$EC2_USER/$(basename $ARTIFACT) > /dev/null 2>&1 &
+       EOF
