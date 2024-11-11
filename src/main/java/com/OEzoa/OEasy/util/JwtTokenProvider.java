@@ -1,8 +1,10 @@
 package com.OEzoa.OEasy.util;
 
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -46,11 +48,24 @@ public class JwtTokenProvider {
     // 토큰을 검증하고, 페이로드에서 sub 필드값을 추출 -> Long으로 변경-> 사용자 ID!! 더 공부하자
     public Long getMemberIdFromToken(String token) {
         Claims claims = Jwts.parserBuilder()
-                .setSigningKey(SECRET_KEY) // 검증하기 위해 시크릿 키 설정
+                .setSigningKey(SECRET_KEY.getBytes(StandardCharsets.UTF_8)) // 검증하기 위해 시크릿 키 설정
                 .build() // 호출로 파서 생성
                 .parseClaimsJws(token) // 토큰 파싱 후 클레임데이터 추출 ( 페이로드 )
                 .getBody(); // 페이로드 반환
 
         return Long.parseLong(claims.getSubject()); // sub 필드의 값 추출
+    }
+
+    // 토큰 만료시간 메서드
+    public boolean isTokenExpired(String token) {
+        try {
+            Claims claims = Jwts.parser()
+                    .setSigningKey(SECRET_KEY)
+                    .parseClaimsJws(token)
+                    .getBody();
+            return claims.getExpiration().before(new Date());
+        } catch (ExpiredJwtException e) {
+            return true;
+        }
     }
 }
