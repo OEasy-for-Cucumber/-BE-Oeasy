@@ -65,8 +65,4 @@ public class Member {
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
     private List<OeChatting> oeChatting;
 
-    public Long getMemberId() {
-        return memberPk;
-    }
-
 }

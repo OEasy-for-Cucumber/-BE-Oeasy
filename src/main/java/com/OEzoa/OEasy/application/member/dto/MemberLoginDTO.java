@@ -14,5 +14,5 @@ public class MemberLoginDTO {
     @Schema(description = "회원 이메일", example = "example@domain.com")
     private String email;
     @Schema(description = "회원 비밀번호", example = "password1234")
-    private String password;
+    private String pw;
 }

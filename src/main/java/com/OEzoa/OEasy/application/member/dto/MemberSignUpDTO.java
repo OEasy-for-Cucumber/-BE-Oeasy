@@ -17,7 +17,7 @@ public class MemberSignUpDTO {
     private String email;
     @Schema(description = "회원 비밀번호", example = "password1234")
     @NotEmpty(message = "비밀번호는 필수 항목입니다.")
-    private String password;
+    private String pw;
     @Schema(description = "회원 닉네임", example = "Hyunbin Kim")
     @NotEmpty(message = "닉네임은 필수 항목입니다.")
     private String nickname;

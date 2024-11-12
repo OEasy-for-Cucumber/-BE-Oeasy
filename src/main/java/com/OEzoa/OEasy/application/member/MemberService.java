@@ -34,12 +34,12 @@ public class MemberService {
         if (memberRepository.findByEmail(memberSignUpDTO.getEmail()).isPresent()) {
             throw new Exception("이미 존재하는 이메일입니다.");
         }
-        if (memberSignUpDTO.getPassword() == null || memberSignUpDTO.getPassword().isEmpty()) {
+        if (memberSignUpDTO.getPw() == null || memberSignUpDTO.getPw().isEmpty()) {
             throw new Exception("비밀번호는 필수 입력 항목입니다.");
         }
         // 비밀번호 해싱
         String salt = PasswordUtil.generateSalt();
-        String hashedPassword = PasswordUtil.hashPassword(memberSignUpDTO.getPassword(), salt);
+        String hashedPassword = PasswordUtil.hashPassword(memberSignUpDTO.getPw(), salt);
 
         Member member = Member.builder()
                 .email(memberSignUpDTO.getEmail())
@@ -70,7 +70,7 @@ public class MemberService {
         Member member = memberRepository.findByEmail(memberLoginDTO.getEmail())
                 .orElseThrow(() -> new Exception("해당 이메일의 회원이 존재하지 않습니다."));
 
-        String hashedInputPassword = PasswordUtil.hashPassword(memberLoginDTO.getPassword(), member.getSalt());
+        String hashedInputPassword = PasswordUtil.hashPassword(memberLoginDTO.getPw(), member.getSalt());
 
         if (!member.getPw().equals(hashedInputPassword)) {
             throw new Exception("비밀번호가 일치하지 않습니다.");

@@ -6,6 +6,6 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface MemberTokenRepository extends JpaRepository<MemberToken, Long> {
-    Optional<MemberToken> findByMemberId(Long memberId);
+    Optional<MemberToken> findByMemberPk(Long memberId);
 }
 
