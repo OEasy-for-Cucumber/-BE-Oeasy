@@ -34,12 +34,12 @@ public class MemberService {
         if (memberRepository.findByEmail(memberSignUpDTO.getEmail()).isPresent()) {
             throw new Exception("이미 존재하는 이메일입니다.");
         }
-        if (memberSignUpDTO.getPassword() == null || memberSignUpDTO.getPassword().isEmpty()) {
+        if (memberSignUpDTO.getPw() == null || memberSignUpDTO.getPw().isEmpty()) {
             throw new Exception("비밀번호는 필수 입력 항목입니다.");
         }
         // 비밀번호 해싱
         String salt = PasswordUtil.generateSalt();
-        String hashedPassword = PasswordUtil.hashPassword(memberSignUpDTO.getPassword(), salt);
+        String hashedPassword = PasswordUtil.hashPassword(memberSignUpDTO.getPw(), salt);
 
         Member member = Member.builder()
                 .email(memberSignUpDTO.getEmail())
@@ -79,7 +79,9 @@ public class MemberService {
         String jwtAccessToken = jwtTokenProvider.generateToken(member.getMemberPk());
         String jwtRefreshToken = jwtTokenProvider.generateRefreshToken(member.getMemberPk());
         session.setAttribute("accessToken", jwtAccessToken);
-        log.info("로그인 성공. 생성된 JWT 토큰: " + jwtAccessToken);
+        session.setAttribute("refreshToken", jwtRefreshToken);
+        log.info("로그인 성공. 생성된 액세스 토큰: " + jwtAccessToken);
+        log.info("로그인 성공. 생성된 리프레시 토큰: " + jwtRefreshToken);
 
         // MemberToken 저장 & 업데이트
         MemberToken memberToken = memberTokenRepository.findById(member.getMemberPk()).orElse(null);
@@ -102,9 +104,10 @@ public class MemberService {
         memberToken = memberTokenRepository.save(memberToken);
         log.info("MemberToken 저장 완료: " + memberToken);
 
-        // AccessToken 반환
+        // AccessToken, RefreshToken 반환
         return MemberLoginResponseDTO.builder()
                 .accessToken(jwtAccessToken)
+                .refreshToken(jwtRefreshToken)
                 .email(member.getEmail())
                 .nickname(member.getNickname())
                 .build();

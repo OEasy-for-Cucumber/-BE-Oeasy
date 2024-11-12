@@ -2,8 +2,7 @@ package com.OEzoa.OEasy.application.recipe;
 
 import com.OEzoa.OEasy.application.recipe.DTO.GetRecipeResponseDTO;
 import com.OEzoa.OEasy.application.recipe.DTO.GetRecipeManualResponseDTO;
-import com.OEzoa.OEasy.application.recipe.DTO.GetRecipeBoardRequest;
-import com.OEzoa.OEasy.application.recipe.DTO.GetRecipeResponseBoardAll;
+import com.OEzoa.OEasy.application.recipe.DTO.GetRecipeResponseBoardAllDTD;
 import com.OEzoa.OEasy.domain.recipe.OeRecipe;
 import com.OEzoa.OEasy.domain.recipe.OeRecipeManual;
 import com.OEzoa.OEasy.domain.recipe.OeRecipeRepository;
@@ -11,6 +10,7 @@ import com.OEzoa.OEasy.exception.GlobalException;
 import com.OEzoa.OEasy.exception.GlobalExceptionCode;
 import com.OEzoa.OEasy.util.timeTrace.TimeTrace;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -42,11 +42,15 @@ public class RecipeService {
     }
 
     @Transactional(readOnly = true)
-    public GetRecipeResponseBoardAll getRecipeBoard(long refId, int view){
-        List<OeRecipe> recipe = oeRecipeRepository.findByRecipePkLessThanOrderByDescTopN(refId, view);
+    public GetRecipeResponseBoardAllDTD getRecipeBoard(int page, int view){
+        List<OeRecipe> recipe = oeRecipeRepository.findAllByOrderByRecipePkDesc(PageRequest.of(page-1, view));
         if(recipe.isEmpty())
-            return new GetRecipeResponseBoardAll();
-        return OeRecipe.of(recipe);
+            return new GetRecipeResponseBoardAllDTD();
+        int cnt = (int)oeRecipeRepository.count();
+        int total = cnt/10;
+        total += cnt%10 == 0 ? 0 : 1;
+
+        return OeRecipe.of(recipe, page, total, view);
     }
 
 }
