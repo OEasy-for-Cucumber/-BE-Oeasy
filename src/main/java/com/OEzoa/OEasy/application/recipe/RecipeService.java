@@ -1,7 +1,9 @@
 package com.OEzoa.OEasy.application.recipe;
 
-import com.OEzoa.OEasy.application.recipe.DTO.GetRecipeDTO;
-import com.OEzoa.OEasy.application.recipe.DTO.GetRecipeManualDTO;
+import com.OEzoa.OEasy.application.recipe.DTO.GetRecipeResponseDTO;
+import com.OEzoa.OEasy.application.recipe.DTO.GetRecipeManualResponseDTO;
+import com.OEzoa.OEasy.application.recipe.DTO.GetRecipeBoardRequest;
+import com.OEzoa.OEasy.application.recipe.DTO.GetRecipeResponseBoardAll;
 import com.OEzoa.OEasy.domain.recipe.OeRecipe;
 import com.OEzoa.OEasy.domain.recipe.OeRecipeManual;
 import com.OEzoa.OEasy.domain.recipe.OeRecipeRepository;
@@ -29,14 +31,22 @@ public class RecipeService {
     }
 
     @Transactional(readOnly = true)
-    public GetRecipeDTO getRecipe(long id){
+    public GetRecipeResponseDTO getRecipe(long id){
         OeRecipe recipe = oeRecipeRepository.findById(id).orElseThrow(() -> new GlobalException(GlobalExceptionCode.RECIPE_ID_NOT_FOUND));
-        List<GetRecipeManualDTO> list = new ArrayList<>();
+        List<GetRecipeManualResponseDTO> list = new ArrayList<>();
         for(OeRecipeManual manual: recipe.getRecipeManuals()){
             list.add(OeRecipeManual.of(manual));
         }
 
         return OeRecipe.of(recipe, list);
+    }
+
+    @Transactional(readOnly = true)
+    public GetRecipeResponseBoardAll getRecipeBoard(long refId, int view){
+        List<OeRecipe> recipe = oeRecipeRepository.findByRecipePkLessThanOrderByDescTopN(refId, view);
+        if(recipe.isEmpty())
+            return new GetRecipeResponseBoardAll();
+        return OeRecipe.of(recipe);
     }
 
 }

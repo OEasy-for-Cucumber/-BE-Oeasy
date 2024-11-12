@@ -1,10 +1,12 @@
 package com.OEzoa.OEasy.api.recipe;
 
 
-import com.OEzoa.OEasy.application.recipe.DTO.GetRecipeDTO;
+import com.OEzoa.OEasy.application.recipe.DTO.GetRecipeBoardRequest;
+import com.OEzoa.OEasy.application.recipe.DTO.GetRecipeResponseDTO;
+import com.OEzoa.OEasy.application.recipe.DTO.GetRecipeResponseBoardAll;
 import com.OEzoa.OEasy.application.recipe.RecipeService;
-import com.OEzoa.OEasy.application.recipe.RecipeUploadService;
 import com.OEzoa.OEasy.application.recipe.RecipeValidator;
+import com.OEzoa.OEasy.domain.recipe.OeRecipeRepository;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -22,6 +24,8 @@ public class RecipeController {
     private final RecipeService recipeService;
     private final RecipeValidator recipeValidator;
 
+    private final OeRecipeRepository oeRecipeRepository;
+
     @GetMapping("/{limit}")
     @Operation(summary = "랜덤 이미지 불러오기", description = "limit에 해당하는 만큼 랜덤으로 불러옵니다.")
     public ResponseEntity<List<String>> getRandomImg(@PathVariable int limit) {
@@ -30,12 +34,33 @@ public class RecipeController {
 
     @GetMapping()
     @Operation(summary = "레시피 가져오기", description = "id에 해당하는 데이터를 불러옵니다.")
-    public ResponseEntity<GetRecipeDTO> getRecipe(@RequestParam long id) {
+    public ResponseEntity<GetRecipeResponseDTO> getRecipe(@RequestParam long id) {
         recipeValidator.isValidValue(id);
 
         return ResponseEntity.ok(recipeService.getRecipe(id));
     }
 
+    @GetMapping("board")
+    @Operation(summary = "레시피 보드 가져오기",
+            description = "refId 보다 작은 값 들을 조회하여 view 만큼 가져오고 더 이상 가져올 값이 없다면 list는 null을 반환합니다")
+    public ResponseEntity<GetRecipeResponseBoardAll> getRecipeBoard(
+            @RequestParam("refId") long refId,
+            @RequestParam("view") int view) {
+
+        return  ResponseEntity.ok(recipeService.getRecipeBoard(refId, view));
+    }
+
+//    @GetMapping("del")
+//    @Transactional
+//    public void asd(String str){
+//        System.out.println("str = " + str);
+//        StringTokenizer st = new StringTokenizer(str, ",");
+//        while(st.hasMoreTokens()){
+//            String s = st.nextToken().strip();
+//            System.out.println("s = " + s);
+//            System.out.println(oeRecipeRepository.deleteByImgLike("%"+s+"%"));
+//        }
+//    }
 
 
 //    @GetMapping("upload")
