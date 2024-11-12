@@ -1,6 +1,7 @@
 package com.OEzoa.OEasy.domain.recipe;
 
 import io.lettuce.core.dynamic.annotation.Param;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -21,4 +22,6 @@ public interface OeRecipeRepository extends JpaRepository<OeRecipe, Long> {
             "WHERE recipe_pk < :pk " +
             "order by recipe_pk DESC limit :limit", nativeQuery = true)
     List<OeRecipe> findByRecipePkLessThanOrderByDescTopN(@Param("pk") long pk, @Param("limit") int limit);
+
+    List<OeRecipe> findAllByOrderByRecipePkDesc(Pageable pageable);
 }

@@ -21,4 +21,11 @@ public class RecipeValidator {
 
     }
 
+    public void isValidValue(int page,int view){
+        if(page <= 0 || view <= 0){
+            throw new GlobalException(GlobalExceptionCode.RECIPE_OUT_OF_VALID_RANGE);
+        }
+
+    }
+
 }
