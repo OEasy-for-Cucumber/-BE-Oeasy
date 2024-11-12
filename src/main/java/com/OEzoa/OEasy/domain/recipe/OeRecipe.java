@@ -2,8 +2,8 @@ package com.OEzoa.OEasy.domain.recipe;
 
 import com.OEzoa.OEasy.application.recipe.DTO.GetRecipeResponseDTO;
 import com.OEzoa.OEasy.application.recipe.DTO.GetRecipeManualResponseDTO;
-import com.OEzoa.OEasy.application.recipe.DTO.GetRecipeResponseBoardAll;
-import com.OEzoa.OEasy.application.recipe.DTO.GetRecipeResponseBoard;
+import com.OEzoa.OEasy.application.recipe.DTO.GetRecipeResponseBoardAllDTD;
+import com.OEzoa.OEasy.application.recipe.DTO.GetRecipeResponseBoardDTO;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -48,18 +48,21 @@ public class OeRecipe {
                 .build();
     }
 
-    public static GetRecipeResponseBoardAll of(List<OeRecipe> Oelist) {
-        List<GetRecipeResponseBoard> list = new ArrayList<>();
+    public static GetRecipeResponseBoardAllDTD of(List<OeRecipe> Oelist, int nowPage, int totalPage, int view) {
+        List<GetRecipeResponseBoardDTO> list = new ArrayList<>();
 
         for (OeRecipe recipe : Oelist) {
-            list.add(GetRecipeResponseBoard.builder()
+            list.add(GetRecipeResponseBoardDTO.builder()
                             .id(recipe.recipePk)
                             .imgUrl(recipe.img)
                             .title(recipe.title)
                     .build());
         }
-        return GetRecipeResponseBoardAll.builder()
-                .refId(list.get(list.size()-1).getId())
+        return GetRecipeResponseBoardAllDTD.builder()
+                .hasNextPage(nowPage<totalPage)
+                .lastPage(totalPage)
+                .view(view)
+                .nowPage(nowPage)
                 .list(list)
                 .build();
     }
