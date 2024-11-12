@@ -42,12 +42,11 @@ public class CorsConfig {
                 "http://localhost:3000/",
                 "https://oeasy.world/"
         ));
-        config.setAllowedMethods(Collections.singletonList("*"));
+        config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS")); // 허용할 HTTP 메서드 지정
         config.setAllowCredentials(true);
-        config.setAllowedHeaders(Collections.singletonList("*"));
-        config.setMaxAge(3600L);
+        config.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type")); // 허용할 헤더를 명시적으로 지정
         config.setExposedHeaders(Arrays.asList("Authorization", "X-Refresh-Token"));
-
+    
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", config);
         return source;
