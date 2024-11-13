@@ -59,7 +59,8 @@ public class KakaoMemberService {
                 .accessToken(jwtAccessToken)
                 .refreshToken(jwtRefreshToken)
                 .email(member.getEmail())
-                .nickname(member.getNickname())
+                .nickname(kakaoInfo.getNickname())
+                .pw("") // 비밀번호 필드에 빈 문자열 기본값 설정
                 .build();
     }
 }
