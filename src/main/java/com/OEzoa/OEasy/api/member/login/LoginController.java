@@ -62,8 +62,18 @@ public class LoginController {
     public ResponseEntity<MemberLoginResponseDTO> kakaoCallback(@RequestParam("code") String code, HttpSession session) {
         try {
             MemberLoginResponseDTO responseDTO = kakaoMemberService.loginWithKakao(code, session);
-            return ResponseEntity.ok(responseDTO); // 로그인 성공 시 JWT 토큰 반환
+
+            // 반환되는 정보 확인 로그 추가
+            log.info("카카오 로그인 응답: accessToken={}, email={}, nickname={}, refreshToken={}",
+                    responseDTO.getAccessToken(),
+                    responseDTO.getRefreshToken(),
+                    responseDTO.getEmail(),
+                    responseDTO.getNickname());
+
+            // 프론트로 응답
+            return ResponseEntity.ok(responseDTO);
         } catch (Exception e) {
+            log.error("카카오 로그인 중 오류 발생:", e);
             return ResponseEntity.badRequest().body(null); // 오류 발생 시 ResponseEntity를 반환
         }
     }
