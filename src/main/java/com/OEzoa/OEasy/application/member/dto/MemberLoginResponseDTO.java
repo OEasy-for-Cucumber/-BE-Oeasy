@@ -17,4 +17,5 @@ public class MemberLoginResponseDTO {
     private String email;
     @Schema(description = "회원 닉네임", example = "Hyunbin Kim")
     private String nickname;
+    private String pw;
 }
