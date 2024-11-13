@@ -70,7 +70,7 @@ public class MemberService {
         Member member = memberRepository.findByEmail(memberLoginDTO.getEmail())
                 .orElseThrow(() -> new Exception("해당 이메일의 회원이 존재하지 않습니다."));
 
-        String hashedInputPassword = PasswordUtil.hashPassword(memberLoginDTO.getPassword(), member.getSalt());
+        String hashedInputPassword = PasswordUtil.hashPassword(memberLoginDTO.getPw(), member.getSalt());
 
         if (!member.getPw().equals(hashedInputPassword)) {
             throw new Exception("비밀번호가 일치하지 않습니다.");

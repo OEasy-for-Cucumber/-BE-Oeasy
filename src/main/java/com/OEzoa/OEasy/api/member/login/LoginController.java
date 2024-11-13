@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @Slf4j
@@ -48,7 +49,7 @@ public class LoginController {
         }
     }
 
-    // 카카오 로그인 콜백 - POST 요청으로 인가 코드 전달받기
+    /// 카카오 로그인 콜백 - POST 요청으로 인가 코드 전달받기 (쿼리 파라미터 사용)
     @PostMapping("/kakao/callback")
     @Operation(
             summary = "카카오 API 로그인",
@@ -58,7 +59,7 @@ public class LoginController {
                     @ApiResponse(responseCode = "400", description = "알 수 없는 오류 발생.")
             }
     )
-    public ResponseEntity<MemberLoginResponseDTO> kakaoCallback(@RequestBody String code, HttpSession session) {
+    public ResponseEntity<MemberLoginResponseDTO> kakaoCallback(@RequestParam("code") String code, HttpSession session) {
         try {
             MemberLoginResponseDTO responseDTO = kakaoMemberService.loginWithKakao(code, session);
             return ResponseEntity.ok(responseDTO); // 로그인 성공 시 JWT 토큰 반환
