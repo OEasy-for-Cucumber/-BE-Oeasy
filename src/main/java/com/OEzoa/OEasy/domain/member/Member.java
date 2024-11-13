@@ -42,7 +42,7 @@ public class Member {
     @Column(name = "pw") // 소셜 로그인 이슈
     private String pw;
 
-    @Column(name = "salt", nullable = false)
+    @Column(name = "salt" )// 소셜 로그인 이슈
     private String salt;
 
     @Column(name = "nick_name", length = 16)
