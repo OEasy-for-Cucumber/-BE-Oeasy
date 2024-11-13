@@ -1,7 +1,6 @@
 package com.OEzoa.OEasy.infra.configuration;
 
 import java.util.Arrays;
-import java.util.Collections;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -14,14 +13,17 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.web.filter.CorsFilter;
+
 @EnableWebSecurity
 @RequiredArgsConstructor
 @Configuration
 public class CorsConfig {
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.csrf(AbstractHttpConfigurer::disable);
-        http.cors(cors -> cors.configurationSource(corsConfiguration()));
+        http.cors(cors -> cors.configurationSource(corsConfigurationSource())); // CorsConfigurationSource로 변경
         http.httpBasic(HttpBasicConfigurer::disable);
         http.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
         http.formLogin(AbstractHttpConfigurer::disable);
@@ -34,18 +36,18 @@ public class CorsConfig {
     }
 
     @Bean
-    public CorsConfigurationSource corsConfiguration() {
+    public CorsFilter corsFilter() {  // **새로 추가된 CorsFilter Bean**
+        return new CorsFilter(corsConfigurationSource());
+    }
+
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {  // 메소드명 변경
         CorsConfiguration config = getCorsConfiguration();
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", config);
 
-        // /login/kakao/callback 전용 CORS 설정
-        CorsConfiguration kakaoCallbackConfig = getCorsConfiguration();  // 기본 설정 복사
-        kakaoCallbackConfig.setAllowedOrigins(Collections.singletonList("http://localhost:3000"));
-        kakaoCallbackConfig.setAllowedMethods(Arrays.asList("GET", "POST", "OPTIONS")); // 프리플라이트 요청 허용
-        source.registerCorsConfiguration("/login/kakao/callback", kakaoCallbackConfig);
-
+        // **특정 경로를 위한 추가 CORS 설정이 필요하지 않다면 기본 설정만 사용**
         return source;
     }
 
