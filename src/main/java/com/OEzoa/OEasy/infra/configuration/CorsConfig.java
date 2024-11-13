@@ -41,8 +41,9 @@ public class CorsConfig {
         source.registerCorsConfiguration("/**", config);
 
         // /login/kakao/callback 전용 CORS 설정
-        CorsConfiguration kakaoCallbackConfig = getCorsConfiguration();
+        CorsConfiguration kakaoCallbackConfig = getCorsConfiguration();  // 기본 설정 복사
         kakaoCallbackConfig.setAllowedOrigins(Collections.singletonList("http://localhost:3000"));
+        kakaoCallbackConfig.setAllowedMethods(Arrays.asList("GET", "POST", "OPTIONS")); // 프리플라이트 요청 허용
         source.registerCorsConfiguration("/login/kakao/callback", kakaoCallbackConfig);
 
         return source;
@@ -56,7 +57,7 @@ public class CorsConfig {
         ));
         config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS")); // 허용할 HTTP 메서드 지정
         config.setAllowCredentials(true);
-        config.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type")); // 허용할 헤더를 명시적으로 지정
+        config.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type"));
         config.setExposedHeaders(Arrays.asList("Authorization", "X-Refresh-Token"));
         return config;
     }
