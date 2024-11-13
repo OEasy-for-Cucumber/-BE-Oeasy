@@ -9,10 +9,13 @@ import com.OEzoa.OEasy.domain.member.Member;
 import com.OEzoa.OEasy.domain.member.MemberRepository;
 import com.OEzoa.OEasy.domain.member.MemberTokenRepository;
 import com.OEzoa.OEasy.util.s3Bucket.FileUploader;
+import io.jsonwebtoken.ExpiredJwtException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -23,6 +26,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+@Slf4j
 @RestController
 @RequiredArgsConstructor
 @Tag(name = "Member API", description = "회원 가입 및 회원 정보 관리를 제공합니다.")
@@ -67,13 +71,22 @@ public class MemberController {
                     @ApiResponse(responseCode = "401", description = "조회 실패: 인증되지 않은 사용자.")
             }
     )
-    public ResponseEntity<?> getProfile(@CookieValue(name = "accessToken", required = false) String accessToken) {
+    public ResponseEntity<?> getProfile(@CookieValue(name = "accessToken", required = true) String accessToken) {
+        log.info("전달 받은 액세스 토큰: {}", accessToken); // 요청 수신 로그
+
         try {
+            // 토큰 유효성 검증 및 사용자 정보 조회
             Member member = tokenValidator.validateAccessTokenAndReturnMember(accessToken);
             MemberDTO memberDTO = MemberMapper.toDto(member);
+
+            log.info("회원정보 조회 성공 email: {}", member.getEmail());
             return ResponseEntity.ok(memberDTO);
+        } catch (ExpiredJwtException e) {
+            // 토큰 만료 예외 처리: 401 응답과 함께 리프레시 토큰 요청 메시지 전달
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body("액세스 토큰이 만료되었습니다. 리프레시 토큰을 포함하여 다시 요청하세요.");
         } catch (Exception e) {
-            return ResponseEntity.status(401).body(e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("잘못된 요청입니다.");
         }
     }
 
@@ -122,5 +135,7 @@ public class MemberController {
             return ResponseEntity.badRequest().body("프로필 사진 변경 실패: " + e.getMessage());
         }
     }
+
+
 
 }
