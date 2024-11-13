@@ -1,18 +1,21 @@
 package com.OEzoa.OEasy.api.member;
 
 import com.OEzoa.OEasy.application.member.MemberService;
+import com.OEzoa.OEasy.application.member.TokenValidator;
 import com.OEzoa.OEasy.application.member.dto.MemberDTO;
 import com.OEzoa.OEasy.application.member.dto.MemberSignUpDTO;
 import com.OEzoa.OEasy.application.member.mapper.MemberMapper;
 import com.OEzoa.OEasy.domain.member.Member;
 import com.OEzoa.OEasy.domain.member.MemberRepository;
-import com.OEzoa.OEasy.util.JwtTokenProvider;
+import com.OEzoa.OEasy.domain.member.MemberTokenRepository;
 import com.OEzoa.OEasy.util.s3Bucket.FileUploader;
+import io.jsonwebtoken.ExpiredJwtException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -23,6 +26,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+@Slf4j
 @RestController
 @RequiredArgsConstructor
 @Tag(name = "Member API", description = "회원 가입 및 회원 정보 관리를 제공합니다.")
@@ -32,9 +36,8 @@ public class MemberController {
     private final MemberService memberService;
     private final MemberRepository memberRepository;
     private final FileUploader fileUploader;
-
-    @Autowired
-    private JwtTokenProvider jwtTokenProvider;
+    private final MemberTokenRepository memberTokenRepository;
+    private final TokenValidator tokenValidator;
 
     // 일반 회원가입
     @PostMapping("/signup")
@@ -68,12 +71,22 @@ public class MemberController {
                     @ApiResponse(responseCode = "401", description = "조회 실패: 인증되지 않은 사용자.")
             }
     )
-    public ResponseEntity<?> getProfile(@CookieValue(name = "accessToken", required = false) String accessToken) {
+    public ResponseEntity<?> getProfile(@CookieValue(name = "accessToken", required = true) String accessToken) {
+        log.info("전달 받은 액세스 토큰: {}", accessToken); // 요청 수신 로그
+
         try {
-            MemberDTO memberDTO = validateMemberAccessToken(accessToken);
+            // 토큰 유효성 검증 및 사용자 정보 조회
+            Member member = tokenValidator.validateAccessTokenAndReturnMember(accessToken);
+            MemberDTO memberDTO = MemberMapper.toDto(member);
+
+            log.info("회원정보 조회 성공 email: {}", member.getEmail());
             return ResponseEntity.ok(memberDTO);
+        } catch (ExpiredJwtException e) {
+            // 토큰 만료 예외 처리: 401 응답과 함께 리프레시 토큰 요청 메시지 전달
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body("액세스 토큰이 만료되었습니다. 리프레시 토큰을 포함하여 다시 요청하세요.");
         } catch (Exception e) {
-            return ResponseEntity.status(401).body(e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("잘못된 요청입니다.");
         }
     }
 
@@ -87,9 +100,10 @@ public class MemberController {
                     @ApiResponse(responseCode = "400", description = "닉네임 변경 실패.")
             }
     )
-    public ResponseEntity<?> updateNickname(@RequestParam String newNickname, @CookieValue(name = "accessToken", required = false) String accessToken) {
+    public ResponseEntity<?> updateNickname(@RequestParam String newNickname,
+                                            @CookieValue(name = "accessToken", required = false) String accessToken) {
         try {
-            Member member = validateMemberAccessTokenAndReturnMember(accessToken);
+            Member member = tokenValidator.validateAccessTokenAndReturnMember(accessToken);
             member = member.toBuilder().nickname(newNickname).build();
             memberRepository.save(member);
             return ResponseEntity.ok("닉네임 변경 성공");
@@ -108,9 +122,10 @@ public class MemberController {
                     @ApiResponse(responseCode = "400", description = "프로필 사진 변경 실패.")
             }
     )
-    public ResponseEntity<?> updateProfilePicture(@RequestParam String imageName, @RequestParam String imageUri, @CookieValue(name = "accessToken", required = false) String accessToken) {
+    public ResponseEntity<?> updateProfilePicture(@RequestParam String imageName, @RequestParam String imageUri,
+                                                  @CookieValue(name = "accessToken", required = false) String accessToken) {
         try {
-            Member member = validateMemberAccessTokenAndReturnMember(accessToken);
+            Member member = tokenValidator.validateAccessTokenAndReturnMember(accessToken);
             // S3 버킷에 이미지 업로드
             String s3ImageUrl = fileUploader.uploadImage(imageName, imageUri);
             member = member.toBuilder().memberImage(s3ImageUrl).build();
@@ -121,26 +136,6 @@ public class MemberController {
         }
     }
 
-    // 액세스 토큰 검증 및 사용자 정보 조회 메서드
-    private MemberDTO validateMemberAccessToken(String accessToken) throws Exception {
-        if (accessToken == null) {
-            throw new Exception("인증되지 않은 사용자입니다.");
-        }
 
-        // JWT 토큰에서 사용자 ID 추출
-        Long memberId = jwtTokenProvider.getMemberIdFromToken(accessToken);
-        Member member = memberRepository.findById(memberId).orElseThrow(() -> new Exception("회원 정보를 찾을 수 없습니다."));
-        return MemberMapper.toDto(member);
-    }
 
-    // 액세스 토큰 검증 및 Member 객체 조회 메서드
-    private Member validateMemberAccessTokenAndReturnMember(String accessToken) throws Exception {
-        if (accessToken == null) {
-            throw new Exception("인증되지 않은 사용자입니다.");
-        }
-
-        // JWT 토큰에서 사용자 ID 추출
-        Long memberId = jwtTokenProvider.getMemberIdFromToken(accessToken);
-        return memberRepository.findById(memberId).orElseThrow(() -> new Exception("회원 정보를 찾을 수 없습니다."));
-    }
 }
