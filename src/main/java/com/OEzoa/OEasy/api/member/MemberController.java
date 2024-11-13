@@ -17,15 +17,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CookieValue;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @Slf4j
 @RestController
@@ -39,6 +31,15 @@ public class MemberController {
     private final FileUploader fileUploader;
     private final MemberTokenRepository memberTokenRepository;
     private final TokenValidator tokenValidator;
+
+    // Bearer 토큰에서 실제 토큰을 추출하는 메서드
+    private String extractTokenFromHeader(String authorizationHeader) {
+        if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
+            return authorizationHeader.substring(7); // "Bearer " 이후의 토큰만 추출
+        } else {
+            throw new IllegalArgumentException("올바르지 않은 인증 헤더 형식입니다.");
+        }
+    }
 
     // 일반 회원가입
     @PostMapping("/signup")
@@ -73,17 +74,17 @@ public class MemberController {
             }
     )
     public ResponseEntity<?> getProfile(@RequestHeader(name = "Authorization", required = false) String authorizationHeader) {
-        log.info("전달 받은 액세스 토큰: {}", authorizationHeader); // 요청 수신 로그
+        log.info("전달 받은 액세스 토큰: {}", authorizationHeader);
 
         try {
-            // 토큰 유효성 검증 및 사용자 정보 조회
-            Member member = tokenValidator.validateAccessTokenAndReturnMember(authorizationHeader);
+            // Bearer 접두사 제거 후 토큰 유효성 검증 및 사용자 정보 조회
+            String accessToken = extractTokenFromHeader(authorizationHeader);
+            Member member = tokenValidator.validateAccessTokenAndReturnMember(accessToken);
             MemberDTO memberDTO = MemberMapper.toDto(member);
 
             log.info("회원정보 조회 성공 email: {}", member.getEmail());
             return ResponseEntity.ok(memberDTO);
         } catch (ExpiredJwtException e) {
-            // 토큰 만료 예외 처리: 401 응답과 함께 리프레시 토큰 요청 메시지 전달
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body("액세스 토큰이 만료되었습니다. 리프레시 토큰을 포함하여 다시 요청하세요.");
         } catch (Exception e) {
@@ -102,8 +103,9 @@ public class MemberController {
             }
     )
     public ResponseEntity<?> updateNickname(@RequestParam String newNickname,
-                                            @CookieValue(name = "accessToken", required = false) String accessToken) {
+                                            @RequestHeader(name = "Authorization", required = false) String authorizationHeader) {
         try {
+            String accessToken = extractTokenFromHeader(authorizationHeader);
             Member member = tokenValidator.validateAccessTokenAndReturnMember(accessToken);
             member = member.toBuilder().nickname(newNickname).build();
             memberRepository.save(member);
@@ -124,8 +126,9 @@ public class MemberController {
             }
     )
     public ResponseEntity<?> updateProfilePicture(@RequestParam String imageName, @RequestParam String imageUri,
-                                                  @CookieValue(name = "accessToken", required = false) String accessToken) {
+                                                  @RequestHeader(name = "Authorization", required = false) String authorizationHeader) {
         try {
+            String accessToken = extractTokenFromHeader(authorizationHeader);
             Member member = tokenValidator.validateAccessTokenAndReturnMember(accessToken);
             // S3 버킷에 이미지 업로드
             String s3ImageUrl = fileUploader.uploadImage(imageName, imageUri);
@@ -136,7 +139,4 @@ public class MemberController {
             return ResponseEntity.badRequest().body("프로필 사진 변경 실패: " + e.getMessage());
         }
     }
-
-
-
 }
