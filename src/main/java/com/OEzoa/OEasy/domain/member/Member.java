@@ -12,6 +12,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import java.util.List;
 import lombok.AllArgsConstructor;
@@ -49,6 +50,9 @@ public class Member {
 
     @Column(name = "member_image")
     private String memberImage;
+
+    @OneToOne(mappedBy = "member", cascade = CascadeType.ALL)
+    private MemberToken memberToken;
 
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
     private List<OeBoard> oeBoard;

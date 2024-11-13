@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -71,12 +72,12 @@ public class MemberController {
                     @ApiResponse(responseCode = "401", description = "조회 실패: 인증되지 않은 사용자.")
             }
     )
-    public ResponseEntity<?> getProfile(@CookieValue(name = "accessToken", required = true) String accessToken) {
-        log.info("전달 받은 액세스 토큰: {}", accessToken); // 요청 수신 로그
+    public ResponseEntity<?> getProfile(@RequestHeader(name = "Authorization", required = false) String authorizationHeader) {
+        log.info("전달 받은 액세스 토큰: {}", authorizationHeader); // 요청 수신 로그
 
         try {
             // 토큰 유효성 검증 및 사용자 정보 조회
-            Member member = tokenValidator.validateAccessTokenAndReturnMember(accessToken);
+            Member member = tokenValidator.validateAccessTokenAndReturnMember(authorizationHeader);
             MemberDTO memberDTO = MemberMapper.toDto(member);
 
             log.info("회원정보 조회 성공 email: {}", member.getEmail());
