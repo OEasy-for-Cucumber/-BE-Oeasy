@@ -16,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.StringTokenizer;
 
 @TimeTrace
 @Service
@@ -47,10 +48,13 @@ public class RecipeService {
         if(recipe.isEmpty())
             return new GetRecipeResponseBoardAllDTD();
         int cnt = (int)oeRecipeRepository.count();
-        int total = cnt/10;
-        total += cnt%10 == 0 ? 0 : 1;
+        int total = cnt/view;
+        total += cnt % view == 0 ? 0 : 1;
 
         return OeRecipe.of(recipe, page, total, view);
     }
+
+
+
 
 }
