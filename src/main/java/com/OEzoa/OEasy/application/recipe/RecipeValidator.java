@@ -22,7 +22,10 @@ public class RecipeValidator {
     }
 
     public void isValidValue(int page,int view){
-        if(page <= 0 || view <= 0){
+        long cnt = oeRecipeRepository.count();
+        int lastPage = (int)cnt/view;
+        lastPage += cnt % view == 0 ? 0 : 1;
+        if(page <= 0 || view <= 0 || lastPage < page){
             throw new GlobalException(GlobalExceptionCode.RECIPE_OUT_OF_VALID_RANGE);
         }
 
