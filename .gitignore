@@ -295,7 +295,7 @@ gradle-app.setting
 src/main/resources/application.yml
 
 # 서브모듈 폴더 무시
-OEasy-Submodule
+OEasy-SubModule
 
 # modules 폴더 하위 모든 파일 무시
 /.idea/modules/
