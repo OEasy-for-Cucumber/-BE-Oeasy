@@ -60,7 +60,6 @@ public class KakaoMemberService {
                 .refreshToken(jwtRefreshToken)
                 .email(member.getEmail())
                 .nickname(kakaoInfo.getNickname())
-                .pw("") // 비밀번호 필드에 빈 문자열 기본값 설정
                 .build();
     }
 }
