@@ -13,9 +13,9 @@ public class RecipeValidator {
     private final OeRecipeRepository oeRecipeRepository;
 
     public void isValidValue(long id){
-        long cnt = oeRecipeRepository.count();
+        long top = oeRecipeRepository.findTopId();
 
-        if(id < 0 || cnt < id){
+        if(id < 0 || top < id){
             throw new GlobalException(GlobalExceptionCode.RECIPE_OUT_OF_VALID_RANGE);
         }
 

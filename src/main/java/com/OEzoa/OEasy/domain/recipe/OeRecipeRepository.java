@@ -24,4 +24,8 @@ public interface OeRecipeRepository extends JpaRepository<OeRecipe, Long> {
     List<OeRecipe> findByRecipePkLessThanOrderByDescTopN(@Param("pk") long pk, @Param("limit") int limit);
 
     List<OeRecipe> findAllByOrderByRecipePkDesc(Pageable pageable);
+
+    @Query(value = "select recipe_pk from oe_recipe order by recipe_pk desc limit 1", nativeQuery = true)
+    long findTopId();
+
 }

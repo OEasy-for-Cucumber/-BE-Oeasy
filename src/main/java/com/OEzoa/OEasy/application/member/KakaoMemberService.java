@@ -45,15 +45,21 @@ public class KakaoMemberService {
             log.info("기존 사용자 발견: " + member);
         }
 
-        // JWT 토큰 발급
+        // JWT 액세스 토큰 및 리프레시 토큰 발급
         String jwtAccessToken = jwtTokenProvider.generateToken(member.getMemberPk());
+        String jwtRefreshToken = jwtTokenProvider.generateRefreshToken(member.getMemberPk());
+
+        // 세션에 액세스 및 리프레시 토큰 저장
         session.setAttribute("accessToken", jwtAccessToken);
-        log.info("카카오 로그인 성공. 생성된 JWT 토큰: " + jwtAccessToken);
+        session.setAttribute("refreshToken", jwtRefreshToken);
+
+        log.info("카카오 로그인 성공. 생성된 액세스 토큰: {}, 리프레시 토큰: {}", jwtAccessToken, jwtRefreshToken);
 
         return MemberLoginResponseDTO.builder()
                 .accessToken(jwtAccessToken)
+                .refreshToken(jwtRefreshToken)
                 .email(member.getEmail())
-                .nickname(member.getNickname())
+                .nickname(kakaoInfo.getNickname())
                 .build();
     }
 }
