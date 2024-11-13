@@ -1,9 +1,8 @@
 package com.OEzoa.OEasy.api.recipe;
 
 
-import com.OEzoa.OEasy.application.recipe.DTO.GetRecipeBoardRequest;
 import com.OEzoa.OEasy.application.recipe.DTO.GetRecipeResponseDTO;
-import com.OEzoa.OEasy.application.recipe.DTO.GetRecipeResponseBoardAll;
+import com.OEzoa.OEasy.application.recipe.DTO.GetRecipeResponseBoardAllDTD;
 import com.OEzoa.OEasy.application.recipe.RecipeService;
 import com.OEzoa.OEasy.application.recipe.RecipeValidator;
 import com.OEzoa.OEasy.domain.recipe.OeRecipeRepository;
@@ -43,11 +42,11 @@ public class RecipeController {
     @GetMapping("board")
     @Operation(summary = "레시피 보드 가져오기",
             description = "refId 보다 작은 값 들을 조회하여 view 만큼 가져오고 더 이상 가져올 값이 없다면 list는 null을 반환합니다")
-    public ResponseEntity<GetRecipeResponseBoardAll> getRecipeBoard(
-            @RequestParam("refId") long refId,
+    public ResponseEntity<GetRecipeResponseBoardAllDTD> getRecipeBoard(
+            @RequestParam("page") int page,
             @RequestParam("view") int view) {
-
-        return  ResponseEntity.ok(recipeService.getRecipeBoard(refId, view));
+        recipeValidator.isValidValue(page,view);
+        return  ResponseEntity.ok(recipeService.getRecipeBoard(page, view));
     }
 
 //    @GetMapping("del")
