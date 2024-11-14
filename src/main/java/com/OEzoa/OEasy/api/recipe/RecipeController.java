@@ -31,12 +31,19 @@ public class RecipeController {
         return ResponseEntity.ok(recipeService.getRandomImg(limit));
     }
 
-    @GetMapping()
+    @GetMapping
     @Operation(summary = "레시피 가져오기", description = "id에 해당하는 데이터를 불러옵니다.")
     public ResponseEntity<GetRecipeResponseDTO> getRecipe(@RequestParam long id) {
         recipeValidator.isValidValue(id);
 
         return ResponseEntity.ok(recipeService.getRecipe(id));
+    }
+
+    @GetMapping("/random")
+    @Operation(summary = "레시피를 랜덤으로 가져오기")
+    public ResponseEntity<GetRecipeResponseDTO> getRandomRecipe() {
+
+        return ResponseEntity.ok(recipeService.getRandomRecipe());
     }
 
     @GetMapping("board")

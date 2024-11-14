@@ -43,6 +43,17 @@ public class RecipeService {
     }
 
     @Transactional(readOnly = true)
+    public GetRecipeResponseDTO getRandomRecipe(){
+        OeRecipe recipe = oeRecipeRepository.findRandomRecipe();
+        List<GetRecipeManualResponseDTO> list = new ArrayList<>();
+        for(OeRecipeManual manual: recipe.getRecipeManuals()){
+            list.add(OeRecipeManual.of(manual));
+        }
+
+        return OeRecipe.of(recipe, list);
+    }
+
+    @Transactional(readOnly = true)
     public GetRecipeResponseBoardAllDTD getRecipeBoard(int page, int view){
         List<OeRecipe> recipe = oeRecipeRepository.findAllByOrderByRecipePkDesc(PageRequest.of(page-1, view));
         if(recipe.isEmpty())
