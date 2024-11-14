@@ -28,4 +28,6 @@ public interface OeRecipeRepository extends JpaRepository<OeRecipe, Long> {
     @Query(value = "select recipe_pk from oe_recipe order by recipe_pk desc limit 1", nativeQuery = true)
     long findTopId();
 
+    @Query(value = "SELECT * FROM oe_recipe order by RAND() limit 1", nativeQuery = true)
+    OeRecipe findRandomRecipe();
 }
