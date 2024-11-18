@@ -4,11 +4,15 @@ import com.OEzoa.OEasy.application.member.dto.MemberDTO;
 import com.OEzoa.OEasy.application.member.dto.MemberLoginDTO;
 import com.OEzoa.OEasy.application.member.dto.MemberLoginResponseDTO;
 import com.OEzoa.OEasy.application.member.dto.MemberSignUpDTO;
+import com.OEzoa.OEasy.application.member.dto.NicknameRequestDTO;
+import com.OEzoa.OEasy.application.member.dto.NicknameResponseDTO;
 import com.OEzoa.OEasy.application.member.mapper.MemberMapper;
 import com.OEzoa.OEasy.domain.member.Member;
 import com.OEzoa.OEasy.domain.member.MemberRepository;
 import com.OEzoa.OEasy.domain.member.MemberToken;
 import com.OEzoa.OEasy.domain.member.MemberTokenRepository;
+import com.OEzoa.OEasy.exception.GlobalException;
+import com.OEzoa.OEasy.exception.GlobalExceptionCode;
 import com.OEzoa.OEasy.util.JwtTokenProvider;
 import com.OEzoa.OEasy.util.PasswordUtil;
 import jakarta.servlet.http.HttpSession;
@@ -25,7 +29,8 @@ public class MemberService {
     private MemberRepository memberRepository;
     @Autowired
     private MemberTokenRepository memberTokenRepository;
-
+    @Autowired
+    private TokenValidator tokenValidator;
     @Autowired
     private JwtTokenProvider jwtTokenProvider;
 
@@ -112,4 +117,29 @@ public class MemberService {
                 .nickname(member.getNickname())
                 .build();
     }
+
+    // 닉네임 변경
+    public NicknameResponseDTO modifyNickname(NicknameRequestDTO nicknameRequest, String accessToken) {
+        String newNickname = nicknameRequest.getNewNickname();
+
+        validateNickname(newNickname);
+        Member member = tokenValidator.validateAccessTokenAndReturnMember(accessToken);
+        member = MemberMapper.updateNickname(member, newNickname);
+        memberRepository.save(member);
+
+        return new NicknameResponseDTO(newNickname, "닉네임 변경 성공");
+    }
+
+    private void validateNickname(String nickname) {
+        if (nickname == null || nickname.isBlank()) {
+            throw new GlobalException(GlobalExceptionCode.NICKNAME_EMPTY);
+        }
+
+        String trimmedNickname = nickname.trim();
+        if (trimmedNickname.length() > 8) {
+            throw new GlobalException(GlobalExceptionCode.NICKNAME_TOO_LONG);
+        }
+    }
+
+
 }
