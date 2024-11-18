@@ -24,7 +24,7 @@ public class TokenValidator {
         this.memberTokenRepository = memberTokenRepository;
     }
 
-    public Member validateAccessTokenAndReturnMember(String accessToken) throws Exception {
+    public Member validateAccessTokenAndReturnMember(String accessToken)   {
         log.info("Access token 유효성 검사 시작: {}", accessToken); // 토큰 유효성 검사 로그
 
         if (accessToken == null) {
