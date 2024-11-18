@@ -40,8 +40,8 @@ public class RecipeController {
     }
 
     @GetMapping("/random")
-    @Operation(summary = "레시피를 랜덤으로 가져오기")
-    public ResponseEntity<GetRecipeResponseDTO> getRandomRecipe() {
+    @Operation(summary = "유효한 레시피 pk를 랜덤으로 가져오기")
+    public ResponseEntity<Long> getRandomRecipe() {
 
         return ResponseEntity.ok(recipeService.getRandomRecipe());
     }

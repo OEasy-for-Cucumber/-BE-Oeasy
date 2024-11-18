@@ -43,14 +43,15 @@ public class RecipeService {
     }
 
     @Transactional(readOnly = true)
-    public GetRecipeResponseDTO getRandomRecipe(){
-        OeRecipe recipe = oeRecipeRepository.findRandomRecipe();
-        List<GetRecipeManualResponseDTO> list = new ArrayList<>();
-        for(OeRecipeManual manual: recipe.getRecipeManuals()){
-            list.add(OeRecipeManual.of(manual));
-        }
+    public Long getRandomRecipe(){
+//        OeRecipe recipe = oeRecipeRepository.findRandomRecipe();
+//        List<GetRecipeManualResponseDTO> list = new ArrayList<>();
+//        for(OeRecipeManual manual: recipe.getRecipeManuals()){
+//            list.add(OeRecipeManual.of(manual));
+//        }
 
-        return OeRecipe.of(recipe, list);
+//        return OeRecipe.of(recipe, list);
+        return oeRecipeRepository.findRandomPk();
     }
 
     @Transactional(readOnly = true)

@@ -22,4 +22,10 @@ public class MemberMapper {
                 .memberImage(memberDTO.getMemberImage())
                 .build();
     }
+
+    public static Member updateNickname(Member member, String newNickname) {
+        return member.toBuilder()
+                .nickname(newNickname.trim())
+                .build();
+    }
 }

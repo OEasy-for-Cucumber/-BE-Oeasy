@@ -4,13 +4,18 @@ import com.OEzoa.OEasy.application.member.dto.MemberDTO;
 import com.OEzoa.OEasy.application.member.dto.MemberLoginDTO;
 import com.OEzoa.OEasy.application.member.dto.MemberLoginResponseDTO;
 import com.OEzoa.OEasy.application.member.dto.MemberSignUpDTO;
+import com.OEzoa.OEasy.application.member.dto.NicknameRequestDTO;
+import com.OEzoa.OEasy.application.member.dto.NicknameResponseDTO;
 import com.OEzoa.OEasy.application.member.mapper.MemberMapper;
 import com.OEzoa.OEasy.domain.member.Member;
 import com.OEzoa.OEasy.domain.member.MemberRepository;
 import com.OEzoa.OEasy.domain.member.MemberToken;
 import com.OEzoa.OEasy.domain.member.MemberTokenRepository;
+import com.OEzoa.OEasy.exception.GlobalException;
+import com.OEzoa.OEasy.exception.GlobalExceptionCode;
 import com.OEzoa.OEasy.util.JwtTokenProvider;
 import com.OEzoa.OEasy.util.PasswordUtil;
+import com.OEzoa.OEasy.util.s3Bucket.FileUploader;
 import jakarta.servlet.http.HttpSession;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,9 +30,12 @@ public class MemberService {
     private MemberRepository memberRepository;
     @Autowired
     private MemberTokenRepository memberTokenRepository;
-
+    @Autowired
+    private TokenValidator tokenValidator;
     @Autowired
     private JwtTokenProvider jwtTokenProvider;
+    @Autowired
+    private FileUploader fileUploader;
 
     // 일반 회원 가입
     public void registerMember(MemberSignUpDTO memberSignUpDTO) throws Exception {
@@ -112,4 +120,46 @@ public class MemberService {
                 .nickname(member.getNickname())
                 .build();
     }
+
+    // 닉네임 변경
+    public NicknameResponseDTO modifyNickname(NicknameRequestDTO nicknameRequest, String accessToken) {
+        String newNickname = nicknameRequest.getNewNickname();
+
+        validateNickname(newNickname);
+        Member member = tokenValidator.validateAccessTokenAndReturnMember(accessToken);
+        member = MemberMapper.updateNickname(member, newNickname);
+        memberRepository.save(member);
+
+        return new NicknameResponseDTO(newNickname, "닉네임 변경 성공");
+    }
+
+    private void validateNickname(String nickname) {
+        if (nickname == null || nickname.isBlank()) {
+            throw new GlobalException(GlobalExceptionCode.NICKNAME_EMPTY);
+        }
+
+        String trimmedNickname = nickname.trim();
+        if (trimmedNickname.length() > 8) {
+            throw new GlobalException(GlobalExceptionCode.NICKNAME_TOO_LONG);
+        }
+    }
+
+    //이미지 변경 및 생성
+    public String updateProfileImage(String nickname, String imageUrl, String accessToken) {
+        Member member = tokenValidator.validateAccessTokenAndReturnMember(accessToken);
+
+        if (member.getMemberImage() != null) {
+            String existingKey = fileUploader.extractKeyFromUrl(member.getMemberImage());
+            fileUploader.deleteImage(existingKey);
+        }
+        // 닉네임을 활용하여 imageKey 생성
+        String imageKey = nickname + ".png";
+        String uploadedImageUrl = fileUploader.uploadImage(imageKey,imageUrl);
+        member = member.toBuilder().memberImage(uploadedImageUrl).build();
+        memberRepository.save(member);
+
+        return uploadedImageUrl;
+    }
+
+
 }

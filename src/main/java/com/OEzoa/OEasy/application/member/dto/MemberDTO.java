@@ -7,7 +7,7 @@ import lombok.Data;
 @Data
 @Builder
 public class MemberDTO {
-    @Schema(description = "회원 ID", example = "1")
+    @Schema(description = "회원 Pk", example = "1")
     private Long memberPk;
 
     @Schema(description = "이메일", example = "abc123@naver.com")

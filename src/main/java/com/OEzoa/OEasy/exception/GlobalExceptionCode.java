@@ -16,6 +16,9 @@ public enum GlobalExceptionCode {
 
     //---------------tip----------------------
 
+    //---------------nickname-------------------
+    NICKNAME_EMPTY(HttpStatus.BAD_REQUEST, "닉네임을 입력해주세요.", "닉네임이 null이거나 빈 문자열"),
+    NICKNAME_TOO_LONG(HttpStatus.BAD_REQUEST, "닉네임은 최대 8글자까지 가능합니다.", "닉네임의 길이가 허용된 범위를 초과"),
 
     //---------------recipe-------------------
     RECIPE_OUT_OF_VALID_RANGE(HttpStatus.BAD_REQUEST, "범위를 벗어났습니다", "범위를 벗어난 데이터를 요청"),
