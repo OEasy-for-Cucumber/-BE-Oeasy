@@ -8,7 +8,7 @@ import java.util.Optional;
 
 
 @Repository
-public interface OeTipRepository extends JpaRepository<OeTip, Long> {
-    @Query(value = "SELECT * FROM oe_tip ORDER BY RAND() LIMIT 1", nativeQuery = true)
-    Optional<OeTip> findRandomOeTip();
+public interface OeTipImgRepository extends JpaRepository<OeTipImg, Long> {
+    @Query(value = "SELECT * FROM oe_tip_img ORDER BY RAND() LIMIT 1", nativeQuery = true)
+    Optional<OeTipImg> findRandomOeTip();
 }

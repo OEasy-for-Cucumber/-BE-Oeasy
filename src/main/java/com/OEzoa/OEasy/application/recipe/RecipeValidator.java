@@ -13,16 +13,19 @@ public class RecipeValidator {
     private final OeRecipeRepository oeRecipeRepository;
 
     public void isValidValue(long id){
-        long cnt = oeRecipeRepository.count();
+        long top = oeRecipeRepository.findTopId();
 
-        if(id < 0 || cnt < id){
+        if(id < 0 || top < id){
             throw new GlobalException(GlobalExceptionCode.RECIPE_OUT_OF_VALID_RANGE);
         }
 
     }
 
     public void isValidValue(int page,int view){
-        if(page <= 0 || view <= 0){
+        long cnt = oeRecipeRepository.count();
+        int lastPage = (int)cnt/view;
+        lastPage += cnt % view == 0 ? 0 : 1;
+        if(page <= 0 || view <= 0 || lastPage < page){
             throw new GlobalException(GlobalExceptionCode.RECIPE_OUT_OF_VALID_RANGE);
         }
 

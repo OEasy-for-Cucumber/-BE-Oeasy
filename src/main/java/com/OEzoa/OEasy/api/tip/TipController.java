@@ -1,8 +1,7 @@
 package com.OEzoa.OEasy.api.tip;
 
-import com.OEzoa.OEasy.application.tip.OeTipDTO;
 import com.OEzoa.OEasy.application.tip.TipService;
-import com.OEzoa.OEasy.domain.tip.OeTip;
+import com.OEzoa.OEasy.domain.tip.OeTipImg;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -19,7 +18,7 @@ public class TipController {
     private final TipService tipService;
 
     @GetMapping
-    public ResponseEntity<OeTipDTO> getTip() {
+    public ResponseEntity<OeTipImg> getTip() {
         return ResponseEntity.ok(tipService.getTip());
     }
 
