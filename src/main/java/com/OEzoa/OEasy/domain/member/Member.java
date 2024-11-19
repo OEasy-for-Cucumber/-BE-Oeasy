@@ -1,10 +1,10 @@
 package com.OEzoa.OEasy.domain.member;
 
-import com.OEzoa.OEasy.domain.chatting.OeChatting;
 import com.OEzoa.OEasy.domain.community.OeBoard;
 import com.OEzoa.OEasy.domain.community.OeBoardComment;
 import com.OEzoa.OEasy.domain.community.OeBoardLike;
-import com.OEzoa.OEasy.domain.voting.OeVoting;
+import com.OEzoa.OEasy.domain.vote.OeChatting;
+import com.OEzoa.OEasy.domain.vote.OeVote;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -39,10 +39,10 @@ public class Member {
     @Column(name = "email", nullable = false)
     private String email;
 
-    @Column(name = "pw") // 소셜 로그인 이슈
+    @Column(name = "pw")
     private String pw;
 
-    @Column(name = "salt" )// 소셜 로그인 이슈
+    @Column(name = "salt")
     private String salt;
 
     @Column(name = "nick_name", length = 8)
@@ -51,22 +51,22 @@ public class Member {
     @Column(name = "member_image")
     private String memberImage;
 
-    @OneToOne(mappedBy = "member", cascade = CascadeType.ALL)
+    @OneToOne(mappedBy = "member", cascade = CascadeType.REMOVE, orphanRemoval = true) // 회원 삭제 시 MemberToken 삭제
     private MemberToken memberToken;
 
-    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "member", cascade = CascadeType.REMOVE, orphanRemoval = true) // 게시글 삭제
     private List<OeBoard> oeBoard;
 
-    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "member", cascade = CascadeType.REMOVE, orphanRemoval = true) // 댓글 삭제
     private List<OeBoardComment> oeBoardComments;
 
-    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "member", cascade = CascadeType.REMOVE, orphanRemoval = true) // 좋아요 삭제
     private List<OeBoardLike> oeBoardLikes;
 
-    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
-    private List<OeVoting> oeVoting;
+    @OneToMany(mappedBy = "member", cascade = CascadeType.REMOVE, orphanRemoval = true) // 투표 삭제
+    private List<OeVote> oeVoting;
 
-    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "member", cascade = CascadeType.REMOVE, orphanRemoval = true) // 채팅 삭제
     private List<OeChatting> oeChatting;
 
 }
