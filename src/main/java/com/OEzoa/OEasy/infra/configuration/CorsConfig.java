@@ -1,5 +1,10 @@
 package com.OEzoa.OEasy.infra.configuration;
 
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import java.util.Arrays;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -8,7 +13,6 @@ import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
-import org.springframework.security.config.annotation.web.configurers.HttpBasicConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.web.cors.CorsConfiguration;
@@ -21,30 +25,15 @@ import org.springframework.web.filter.CorsFilter;
 @Configuration
 public class CorsConfig {
 
-//    @Bean
-//    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-//        http.csrf(AbstractHttpConfigurer::disable);
-//        http.cors(cors -> cors.configurationSource(corsConfigurationSource())); // CorsConfigurationSource로 변경
-//        http.httpBasic(HttpBasicConfigurer::disable);
-//        http.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
-//        http.formLogin(AbstractHttpConfigurer::disable);
-//
-//        http.authorizeHttpRequests(request -> request
-//                .anyRequest().permitAll()
-//        );
-//
-//        return http.build();
-//    }
-    // 11월 18일 17:15 수정
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.csrf(AbstractHttpConfigurer::disable)
-                .cors(cors -> cors.configurationSource(corsConfigurationSource())) // Spring Security cors() 설정 사용
-                .httpBasic(HttpBasicConfigurer::disable)
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+                .httpBasic(AbstractHttpConfigurer::disable)
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .formLogin(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(request -> request
-                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll() // OPTIONS 메서드 허용
+                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll() // OPTIONS 요청 허용
+                        .requestMatchers(HttpMethod.PATCH, "/member/**").permitAll() // PATCH 요청 허용
                         .anyRequest().permitAll()
                 );
 
@@ -52,31 +41,31 @@ public class CorsConfig {
     }
 
     @Bean
-    public CorsFilter corsFilter() {  // **새로 추가된 CorsFilter Bean**
-        return new CorsFilter(corsConfigurationSource());
-    }
-
-    @Bean
-    public CorsConfigurationSource corsConfigurationSource() {  // 메소드명 변경
-        CorsConfiguration config = getCorsConfiguration();
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration config = new CorsConfiguration();
+        config.setAllowedOrigins(Arrays.asList("http://localhost:3000", "https://oeasy.world"));
+        config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH")); // PATCH 포함
+        config.setAllowCredentials(true);
+        config.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type", "X-Requested-With", "Accept", "Origin"));
+        config.setExposedHeaders(Arrays.asList("Authorization", "X-Refresh-Token"));
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", config);
-
-        // **특정 경로를 위한 추가 CORS 설정이 필요하지 않다면 기본 설정만 사용**
         return source;
     }
 
-    private static CorsConfiguration getCorsConfiguration() {
-        CorsConfiguration config = new CorsConfiguration();
-        config.setAllowedOrigins(Arrays.asList(
-                "http://localhost:3000",
-                "https://oeasy.world" // / 빼줌.
-        ));
-        config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS")); // 허용할 HTTP 메서드 지정
-        config.setAllowCredentials(true);
-        config.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type"));
-        config.setExposedHeaders(Arrays.asList("Authorization", "X-Refresh-Token"));
-        return config;
+    @Bean
+    public CorsFilter corsFilter() {
+        return new CorsFilter(corsConfigurationSource()) {
+            @Override
+            protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
+                    throws IOException, ServletException {
+                if ("OPTIONS".equalsIgnoreCase(request.getMethod())) {
+                    System.out.println("OPTIONS 요청 처리 중: " + request.getRequestURI());
+                }
+                super.doFilterInternal(request, response, filterChain);
+            }
+        };
     }
+
 }
