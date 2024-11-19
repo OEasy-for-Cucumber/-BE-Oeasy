@@ -3,9 +3,11 @@ package com.OEzoa.OEasy.api.member;
 import com.OEzoa.OEasy.application.member.MemberService;
 import com.OEzoa.OEasy.application.member.TokenValidator;
 import com.OEzoa.OEasy.application.member.dto.MemberDTO;
+import com.OEzoa.OEasy.application.member.dto.MemberDeleteRequestDTO;
 import com.OEzoa.OEasy.application.member.dto.MemberSignUpDTO;
 import com.OEzoa.OEasy.application.member.dto.NicknameRequestDTO;
 import com.OEzoa.OEasy.application.member.dto.NicknameResponseDTO;
+import com.OEzoa.OEasy.application.member.dto.PasswordChangeRequestDTO;
 import com.OEzoa.OEasy.application.member.dto.ProfilePictureRequestDTO;
 import com.OEzoa.OEasy.application.member.mapper.MemberMapper;
 import com.OEzoa.OEasy.domain.member.Member;
@@ -20,6 +22,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -130,6 +133,7 @@ public class MemberController {
                     @ApiResponse(responseCode = "401", description = "인증 실패. 유효하지 않은 액세스 토큰.")
             }
     )
+
     public ResponseEntity<String> updateProfilePicture(
             @RequestBody ProfilePictureRequestDTO profilePictureRequest,
             @RequestHeader(name = "Authorization") String authorizationHeader) {
@@ -142,5 +146,43 @@ public class MemberController {
         );
 
         return ResponseEntity.ok(newImageUrl);
+    }
+
+    // 비밀번호 변경
+    @PatchMapping("/password")
+    @Operation(
+            summary = "비밀번호 변경",
+            description = "기존 비밀번호를 확인한 후 새로운 비밀번호로 변경합니다.",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "비밀번호 변경 성공."),
+                    @ApiResponse(responseCode = "400", description = "비밀번호 변경 실패.")
+            }
+    )
+    public ResponseEntity<String> updatePassword(
+            @RequestBody PasswordChangeRequestDTO passwordChangeRequest,
+            @RequestHeader(name = "Authorization") String authorizationHeader
+    ) {
+        String accessToken = extractTokenFromHeader(authorizationHeader);
+        memberService.changePassword(passwordChangeRequest, accessToken);
+        return ResponseEntity.ok("비밀번호 변경 성공");
+    }
+
+    // 회원 탈퇴
+    @DeleteMapping("/delete")
+    @Operation(
+            summary = "회원 탈퇴",
+            description = "회원 탈퇴 요청을 처리합니다.",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "탈퇴 성공"),
+                    @ApiResponse(responseCode = "400", description = "탈퇴 실패: 확인 메시지 불일치")
+            }
+    )
+    public ResponseEntity<String> deleteMember(
+            @RequestHeader(name = "Authorization") String authorizationHeader,
+            @RequestBody MemberDeleteRequestDTO deleteRequest
+    ) {
+        String accessToken = extractTokenFromHeader(authorizationHeader);
+        memberService.deleteMember(deleteRequest, accessToken);
+        return ResponseEntity.ok("회원 탈퇴가 성공적으로 처리되었습니다.");
     }
 }

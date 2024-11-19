@@ -1,11 +1,12 @@
 package com.OEzoa.OEasy.application.member;
 
-import com.OEzoa.OEasy.application.member.dto.MemberDTO;
+import com.OEzoa.OEasy.application.member.dto.MemberDeleteRequestDTO;
 import com.OEzoa.OEasy.application.member.dto.MemberLoginDTO;
 import com.OEzoa.OEasy.application.member.dto.MemberLoginResponseDTO;
 import com.OEzoa.OEasy.application.member.dto.MemberSignUpDTO;
 import com.OEzoa.OEasy.application.member.dto.NicknameRequestDTO;
 import com.OEzoa.OEasy.application.member.dto.NicknameResponseDTO;
+import com.OEzoa.OEasy.application.member.dto.PasswordChangeRequestDTO;
 import com.OEzoa.OEasy.application.member.mapper.MemberMapper;
 import com.OEzoa.OEasy.domain.member.Member;
 import com.OEzoa.OEasy.domain.member.MemberRepository;
@@ -20,6 +21,7 @@ import jakarta.servlet.http.HttpSession;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 
 @Slf4j
@@ -40,10 +42,13 @@ public class MemberService {
     // 일반 회원 가입
     public void registerMember(MemberSignUpDTO memberSignUpDTO) throws Exception {
         if (memberRepository.findByEmail(memberSignUpDTO.getEmail()).isPresent()) {
-            throw new Exception("이미 존재하는 이메일입니다.");
+            throw new GlobalException(GlobalExceptionCode.EMAIL_DUPLICATION);
+        }
+        if (memberRepository.existsByNickname(memberSignUpDTO.getNickname())) {
+            throw new GlobalException(GlobalExceptionCode.NICKNAME_DUPLICATION);
         }
         if (memberSignUpDTO.getPw() == null || memberSignUpDTO.getPw().isEmpty()) {
-            throw new Exception("비밀번호는 필수 입력 항목입니다.");
+            throw new GlobalException(GlobalExceptionCode.INVALID_PASSWORD);
         }
         // 비밀번호 해싱
         String salt = PasswordUtil.generateSalt();
@@ -57,20 +62,6 @@ public class MemberService {
                 .build();
         memberRepository.save(member);
         log.info("신규 회원 저장 완료: " + member);
-    }
-
-    public MemberDTO registerMember(MemberDTO memberDTO, String rawPassword) {
-        String salt = PasswordUtil.generateSalt();
-        String hashedPassword = PasswordUtil.hashPassword(rawPassword, salt);
-
-        Member member = MemberMapper.toEntity(memberDTO).toBuilder()
-                .pw(hashedPassword)
-                .salt(salt)
-                .build();
-
-        // Member 엔티티를 저장
-        Member savedMember = memberRepository.save(member);
-        return MemberMapper.toDto(savedMember);
     }
 
     // 일반 로그인 처리 (JWT 발급)
@@ -126,6 +117,10 @@ public class MemberService {
         String newNickname = nicknameRequest.getNewNickname();
 
         validateNickname(newNickname);
+
+        if (memberRepository.existsByNickname(newNickname)) {
+            throw new GlobalException(GlobalExceptionCode.NICKNAME_DUPLICATION);
+        }
         Member member = tokenValidator.validateAccessTokenAndReturnMember(accessToken);
         member = MemberMapper.updateNickname(member, newNickname);
         memberRepository.save(member);
@@ -161,5 +156,32 @@ public class MemberService {
         return uploadedImageUrl;
     }
 
+    //비밀번호 변경
+    @Transactional
+    public void changePassword(PasswordChangeRequestDTO passwordChangeRequest, String accessToken) {
+        Member member = tokenValidator.validateAccessTokenAndReturnMember(accessToken);
+
+        // 기존 비밀번호 검증
+        String hashedOldPassword = PasswordUtil.hashPassword(passwordChangeRequest.getOldPw(), member.getSalt());
+        if (!member.getPw().equals(hashedOldPassword)) {
+            throw new GlobalException(GlobalExceptionCode.INVALID_OLD_PASSWORD); // 상태 코드와 메시지 처리
+        }
+
+        // 새 비밀번호 저장
+        String newSalt = PasswordUtil.generateSalt();
+        String hashedNewPassword = PasswordUtil.hashPassword(passwordChangeRequest.getNewPw(), newSalt);
+        member = member.toBuilder().pw(hashedNewPassword).salt(newSalt).build();
+        memberRepository.save(member);
+    }
+
+    @Transactional
+    public void deleteMember(MemberDeleteRequestDTO requestDTO, String accessToken) {
+        // 탈퇴 확인 메시지 검증 ㅋ ㅋㅎㅋㅎㅋ
+        if (!"오이,, 오이오이오이? 오이.. 오이 ㅠㅠ".equals(requestDTO.getConfirmationMessage())) {
+            throw new IllegalArgumentException("탈퇴 확인 메시지가 일치하지 않습니다.");
+        }
+        Member member = tokenValidator.validateAccessTokenAndReturnMember(accessToken);
+        memberRepository.delete(member);
+    }
 
 }
