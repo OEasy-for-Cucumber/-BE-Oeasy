@@ -7,6 +7,7 @@ import java.net.URL;
 import java.util.UUID;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.DeleteObjectRequest;
@@ -52,6 +53,48 @@ public class FileUploader {
         } catch (Exception e) {
             e.printStackTrace();
             throw new RuntimeException("파일 업로드에 실패했습니다.", e);
+        }
+    }
+
+    public String uploadFile(MultipartFile file, String imageKey) {
+        try {
+            // 파일 확장자 추출
+            String extension = getFileExtension(file);
+            String fullImageKey = imageKey + "." + extension; // 확장자 추가
+
+            // 파일 데이터를 바이트 배열로 변환
+            byte[] fileData = file.getBytes();
+
+            // S3 업로드 요청 생성
+            PutObjectRequest putObjectRequest = PutObjectRequest.builder()
+                    .bucket(bucketName)
+                    .key(fullImageKey)
+                    .build();
+
+            s3Client.putObject(putObjectRequest, RequestBody.fromBytes(fileData));
+
+            return "https://" + bucketName + ".s3." + region + ".amazonaws.com/" + fullImageKey;
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException("파일 업로드에 실패했습니다.", e);
+        }
+    }
+
+    private String getFileExtension(MultipartFile file) {
+        // Content-Type으로 확장자 추출
+        String contentType = file.getContentType();
+        if (contentType == null) {
+            return "jpg"; // 기본 확장자
+        }
+
+        switch (contentType) {
+            case "image/png":
+                return "png";
+            case "image/jpeg":
+            case "image/jpg":
+                return "jpg";
+            default:
+                return "jpg"; // 기본 확장자
         }
     }
 

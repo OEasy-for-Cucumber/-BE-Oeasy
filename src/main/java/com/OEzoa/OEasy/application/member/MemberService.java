@@ -18,10 +18,12 @@ import com.OEzoa.OEasy.util.JwtTokenProvider;
 import com.OEzoa.OEasy.util.PasswordUtil;
 import com.OEzoa.OEasy.util.s3Bucket.FileUploader;
 import jakarta.servlet.http.HttpSession;
+import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 
 @Slf4j
@@ -40,6 +42,7 @@ public class MemberService {
     private FileUploader fileUploader;
 
     // 일반 회원 가입
+    @Transactional
     public void registerMember(MemberSignUpDTO memberSignUpDTO) throws Exception {
         if (memberRepository.findByEmail(memberSignUpDTO.getEmail()).isPresent()) {
             throw new GlobalException(GlobalExceptionCode.EMAIL_DUPLICATION);
@@ -65,6 +68,7 @@ public class MemberService {
     }
 
     // 일반 로그인 처리 (JWT 발급)
+    @Transactional
     public MemberLoginResponseDTO login(MemberLoginDTO memberLoginDTO, HttpSession session) throws Exception {
         Member member = memberRepository.findByEmail(memberLoginDTO.getEmail())
                 .orElseThrow(() -> new Exception("해당 이메일의 회원이 존재하지 않습니다."));
@@ -113,6 +117,7 @@ public class MemberService {
     }
 
     // 닉네임 변경
+    @Transactional
     public NicknameResponseDTO modifyNickname(NicknameRequestDTO nicknameRequest, String accessToken) {
         String newNickname = nicknameRequest.getNewNickname();
 
@@ -139,21 +144,22 @@ public class MemberService {
         }
     }
 
-    //이미지 변경 및 생성
-    public String updateProfileImage(String nickname, String imageUrl, String accessToken) {
+    @Transactional
+    public String updateProfilePicture(MultipartFile file, String accessToken) {
+
         Member member = tokenValidator.validateAccessTokenAndReturnMember(accessToken);
+        String uniqueImageKey = member.getNickname() + "_" + UUID.randomUUID();
+        String uploadedUrl = fileUploader.uploadFile(file, uniqueImageKey);
 
         if (member.getMemberImage() != null) {
             String existingKey = fileUploader.extractKeyFromUrl(member.getMemberImage());
             fileUploader.deleteImage(existingKey);
         }
-        // 닉네임을 활용하여 imageKey 생성
-        String imageKey = nickname + ".png";
-        String uploadedImageUrl = fileUploader.uploadImage(imageKey,imageUrl);
-        member = member.toBuilder().memberImage(uploadedImageUrl).build();
+
+        member = member.toBuilder().memberImage(uploadedUrl).build();
         memberRepository.save(member);
 
-        return uploadedImageUrl;
+        return uploadedUrl;
     }
 
     //비밀번호 변경
