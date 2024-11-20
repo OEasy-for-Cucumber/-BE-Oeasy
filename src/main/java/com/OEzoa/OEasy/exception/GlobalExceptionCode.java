@@ -16,6 +16,9 @@ public enum GlobalExceptionCode {
 
     //---------------tip----------------------
 
+    //---------------member---------------------
+    NOT_FIND_MEMBER(HttpStatus.NOT_FOUND, "회원을 찾을 수 없습니다", "잘못 들어온 pk"),
+
     //---------------sign up-------------------
     EMAIL_DUPLICATION(HttpStatus.CONFLICT, "이미 사용 중인 이메일입니다.", "중복된 이메일 요청"),
     INVALID_PASSWORD(HttpStatus.BAD_REQUEST, "비밀번호는 필수 항목입니다.", "비밀번호 입력 누락"),
