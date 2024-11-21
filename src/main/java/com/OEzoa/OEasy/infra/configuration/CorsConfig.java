@@ -34,6 +34,7 @@ public class CorsConfig {
                 .authorizeHttpRequests(request -> request
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll() // OPTIONS 요청 허용
                         .requestMatchers(HttpMethod.PATCH, "/member/**").permitAll() // PATCH 요청 허용
+                        .requestMatchers("/ws/**").permitAll() // WebSocket 엔드포인트 허용
                         .anyRequest().permitAll()
                 );
 
