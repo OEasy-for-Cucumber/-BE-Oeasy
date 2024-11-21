@@ -1,16 +1,19 @@
 package com.OEzoa.OEasy.domain.community;
 
+import com.OEzoa.OEasy.application.community.CmnCreateRequestDTO;
 import com.OEzoa.OEasy.domain.member.Member;
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Getter
-@Setter
+@Builder(toBuilder = true)
 @Entity
 @Table(name = "oe_board", schema = "oeasy")
+@AllArgsConstructor
+@NoArgsConstructor
 public class OeBoard {
 
     @Id
@@ -24,6 +27,9 @@ public class OeBoard {
     @Column(name = "content", length = 5000)
     private String content;
 
+    @Column(name = "board_timestamp")
+    private LocalDateTime boardTimestamp;
+
     @ManyToOne
     @JoinColumn(name = "member_pk", nullable = false)
     private Member member;
@@ -36,4 +42,14 @@ public class OeBoard {
 
     @OneToMany(mappedBy = "board", cascade = CascadeType.ALL)
     private List<OeBoardImg> images;
+
+
+    public static OeBoard of(CmnCreateRequestDTO cmn, Member member){
+        return OeBoard.builder()
+                .member(member)
+                .title(cmn.getTitle())
+                .boardTimestamp(LocalDateTime.now())
+                .content(cmn.getContent())
+                .build();
+    }
 }
