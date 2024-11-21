@@ -1,4 +1,4 @@
-package com.OEzoa.OEasy.application.vote;
+package com.OEzoa.OEasy.application.vote.DTO;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;

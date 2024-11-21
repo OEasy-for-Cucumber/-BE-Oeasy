@@ -1,7 +1,7 @@
 package com.OEzoa.OEasy.application.vote;
 
+import com.OEzoa.OEasy.application.vote.DTO.ChattingResponseDTO;
 import com.OEzoa.OEasy.domain.member.Member;
-import com.OEzoa.OEasy.domain.member.MemberRepository;
 import com.OEzoa.OEasy.domain.vote.OeChatting;
 import com.OEzoa.OEasy.domain.vote.OeChattingRepository;
 import com.OEzoa.OEasy.domain.vote.OeVote;
