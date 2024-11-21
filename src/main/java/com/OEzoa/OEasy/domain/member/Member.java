@@ -1,10 +1,11 @@
 package com.OEzoa.OEasy.domain.member;
 
+import com.OEzoa.OEasy.domain.aioe.AiOe;
+import com.OEzoa.OEasy.domain.chatting.OeChatting;
 import com.OEzoa.OEasy.domain.community.OeBoard;
 import com.OEzoa.OEasy.domain.community.OeBoardComment;
 import com.OEzoa.OEasy.domain.community.OeBoardLike;
-import com.OEzoa.OEasy.domain.vote.OeChatting;
-import com.OEzoa.OEasy.domain.vote.OeVote;
+import com.OEzoa.OEasy.domain.voting.OeVoting;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -54,6 +55,9 @@ public class Member {
     @OneToOne(mappedBy = "member", cascade = CascadeType.REMOVE, orphanRemoval = true) // 회원 삭제 시 MemberToken 삭제
     private MemberToken memberToken;
 
+    @OneToOne(mappedBy = "member", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private AiOe aiOe;
+
     @OneToMany(mappedBy = "member", cascade = CascadeType.REMOVE, orphanRemoval = true) // 게시글 삭제
     private List<OeBoard> oeBoard;
 
@@ -64,7 +68,7 @@ public class Member {
     private List<OeBoardLike> oeBoardLikes;
 
     @OneToMany(mappedBy = "member", cascade = CascadeType.REMOVE, orphanRemoval = true) // 투표 삭제
-    private List<OeVote> oeVoting;
+    private List<OeVoting> oeVoting;
 
     @OneToMany(mappedBy = "member", cascade = CascadeType.REMOVE, orphanRemoval = true) // 채팅 삭제
     private List<OeChatting> oeChatting;
