@@ -1,11 +1,11 @@
 package com.OEzoa.OEasy.domain.member;
 
 import com.OEzoa.OEasy.domain.aioe.AiOe;
-import com.OEzoa.OEasy.domain.chatting.OeChatting;
 import com.OEzoa.OEasy.domain.community.OeBoard;
 import com.OEzoa.OEasy.domain.community.OeBoardComment;
 import com.OEzoa.OEasy.domain.community.OeBoardLike;
-import com.OEzoa.OEasy.domain.voting.OeVoting;
+import com.OEzoa.OEasy.domain.vote.OeChatting;
+import com.OEzoa.OEasy.domain.vote.OeVote;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -68,9 +68,8 @@ public class Member {
     private List<OeBoardLike> oeBoardLikes;
 
     @OneToMany(mappedBy = "member", cascade = CascadeType.REMOVE, orphanRemoval = true) // 투표 삭제
-    private List<OeVoting> oeVoting;
+    private List<OeVote> oeVoting;
 
     @OneToMany(mappedBy = "member", cascade = CascadeType.REMOVE, orphanRemoval = true) // 채팅 삭제
     private List<OeChatting> oeChatting;
-
 }
