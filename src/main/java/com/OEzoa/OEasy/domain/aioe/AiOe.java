@@ -1,29 +1,33 @@
 package com.OEzoa.OEasy.domain.aioe;
 
+import com.OEzoa.OEasy.domain.member.Member;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
-import java.time.LocalDate;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
-import lombok.Setter;
+import lombok.NoArgsConstructor;
 
 @Getter
-@Setter
 @Entity
-@Table(name = "`ai oe`", schema = "oeasy")
+@Builder(toBuilder = true)
+@NoArgsConstructor
+@AllArgsConstructor
+@Table(name = "aioe", schema = "oeasy")
 public class AiOe {
     @Id
-    @Column(name = "chatbot_pk", nullable = false)
-    private Long id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY) // 자동 증가
+    @Column(name = "aioe_pk", nullable = false)
+    private Long aioePk;
 
-    @Column(name = "member_pk", nullable = false)
-    private String memberPk;
-
-    @Column(name = "text")
-    private String text;
-
-    @Column(name = "date", nullable = false)
-    private LocalDate date;
-
+    @OneToOne (fetch = FetchType.LAZY)
+    @JoinColumn(name = "member_pk", nullable = false)
+    private Member member;
 }

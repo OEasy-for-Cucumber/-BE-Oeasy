@@ -10,9 +10,7 @@ import com.OEzoa.OEasy.application.member.dto.NicknameResponseDTO;
 import com.OEzoa.OEasy.application.member.dto.PasswordChangeRequestDTO;
 import com.OEzoa.OEasy.application.member.mapper.MemberMapper;
 import com.OEzoa.OEasy.domain.member.Member;
-import com.OEzoa.OEasy.domain.member.MemberRepository;
-import com.OEzoa.OEasy.domain.member.MemberTokenRepository;
-import com.OEzoa.OEasy.util.s3Bucket.FileUploader;
+import com.OEzoa.OEasy.util.HeaderUtils;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -41,19 +39,7 @@ import org.springframework.web.multipart.MultipartFile;
 public class MemberController {
 
     private final MemberService memberService;
-    private final MemberRepository memberRepository;
-    private final FileUploader fileUploader;
-    private final MemberTokenRepository memberTokenRepository;
     private final TokenValidator tokenValidator;
-
-    // Bearer 토큰에서 실제 토큰을 추출하는 메서드
-    private String extractTokenFromHeader(String authorizationHeader) {
-        if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
-            return authorizationHeader.substring(7); // "Bearer " 이후의 토큰만 추출
-        } else {
-            throw new IllegalArgumentException("올바르지 않은 인증 헤더 형식입니다.");
-        }
-    }
 
     // 일반 회원가입
     @PostMapping("/signup")
@@ -92,7 +78,7 @@ public class MemberController {
 
         try {
             // Bearer 접두사 제거 후 토큰 유효성 검증 및 사용자 정보 조회
-            String accessToken = extractTokenFromHeader(authorizationHeader);
+            String accessToken = HeaderUtils.extractTokenFromHeader(authorizationHeader);
             Member member = tokenValidator.validateAccessTokenAndReturnMember(accessToken);
             MemberDTO memberDTO = MemberMapper.toDto(member);
 
@@ -118,7 +104,7 @@ public class MemberController {
     public ResponseEntity<NicknameResponseDTO> modifyNickname(
             @RequestBody NicknameRequestDTO nicknameRequest,
             @RequestHeader(name = "Authorization", required = false) String authorizationHeader) {
-        String accessToken = extractTokenFromHeader(authorizationHeader);
+        String accessToken = HeaderUtils.extractTokenFromHeader(authorizationHeader);
         NicknameResponseDTO response = memberService.modifyNickname(nicknameRequest, accessToken);
         return ResponseEntity.ok(response);
     }
@@ -138,7 +124,7 @@ public class MemberController {
             @RequestHeader(name = "Authorization", required = false) String authorizationHeader,
             @RequestParam("file") MultipartFile file) {
         try {
-            String accessToken = extractTokenFromHeader(authorizationHeader);
+            String accessToken = HeaderUtils.extractTokenFromHeader(authorizationHeader);
             String newImageUrl = memberService.updateProfilePicture(file, accessToken);
             return ResponseEntity.ok(Map.of("message", "프로필 사진 변경 성공", "imageUrl", newImageUrl));
         } catch (Exception e) {
@@ -158,9 +144,8 @@ public class MemberController {
     )
     public ResponseEntity<String> updatePassword(
             @RequestBody PasswordChangeRequestDTO passwordChangeRequest,
-            @RequestHeader(name = "Authorization") String authorizationHeader
-    ) {
-        String accessToken = extractTokenFromHeader(authorizationHeader);
+            @RequestHeader(name = "Authorization") String authorizationHeader) {
+        String accessToken = HeaderUtils.extractTokenFromHeader(authorizationHeader);
         memberService.changePassword(passwordChangeRequest, accessToken);
         return ResponseEntity.ok("비밀번호 변경 성공");
     }
@@ -179,7 +164,7 @@ public class MemberController {
             @RequestHeader(name = "Authorization") String authorizationHeader,
             @RequestBody MemberDeleteRequestDTO deleteRequest
     ) {
-        String accessToken = extractTokenFromHeader(authorizationHeader);
+        String accessToken = HeaderUtils.extractTokenFromHeader(authorizationHeader);
         memberService.deleteMember(deleteRequest, accessToken);
         return ResponseEntity.ok("회원 탈퇴가 성공적으로 처리되었습니다.");
     }

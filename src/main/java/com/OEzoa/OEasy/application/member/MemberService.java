@@ -69,14 +69,14 @@ public class MemberService {
 
     // 일반 로그인 처리 (JWT 발급)
     @Transactional
-    public MemberLoginResponseDTO login(MemberLoginDTO memberLoginDTO, HttpSession session) throws Exception {
+    public MemberLoginResponseDTO login(MemberLoginDTO memberLoginDTO, HttpSession session) {
+
         Member member = memberRepository.findByEmail(memberLoginDTO.getEmail())
-                .orElseThrow(() -> new Exception("해당 이메일의 회원이 존재하지 않습니다."));
+                .orElseThrow(() -> new GlobalException(GlobalExceptionCode.NOT_FIND_MEMBER));
 
         String hashedInputPassword = PasswordUtil.hashPassword(memberLoginDTO.getPw(), member.getSalt());
-
         if (!member.getPw().equals(hashedInputPassword)) {
-            throw new Exception("비밀번호가 일치하지 않습니다.");
+            throw new GlobalException(GlobalExceptionCode.INVALID_OLD_PASSWORD);
         }
 
         String jwtAccessToken = jwtTokenProvider.generateToken(member.getMemberPk());
@@ -166,14 +166,6 @@ public class MemberService {
     @Transactional
     public void changePassword(PasswordChangeRequestDTO passwordChangeRequest, String accessToken) {
         Member member = tokenValidator.validateAccessTokenAndReturnMember(accessToken);
-
-        // 기존 비밀번호 검증
-        String hashedOldPassword = PasswordUtil.hashPassword(passwordChangeRequest.getOldPw(), member.getSalt());
-        if (!member.getPw().equals(hashedOldPassword)) {
-            throw new GlobalException(GlobalExceptionCode.INVALID_OLD_PASSWORD); // 상태 코드와 메시지 처리
-        }
-
-        // 새 비밀번호 저장
         String newSalt = PasswordUtil.generateSalt();
         String hashedNewPassword = PasswordUtil.hashPassword(passwordChangeRequest.getNewPw(), newSalt);
         member = member.toBuilder().pw(hashedNewPassword).salt(newSalt).build();
