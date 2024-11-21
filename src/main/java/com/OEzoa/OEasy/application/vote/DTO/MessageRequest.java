@@ -1,4 +1,4 @@
-package com.OEzoa.OEasy.api.vote;
+package com.OEzoa.OEasy.application.vote.DTO;
 
 import lombok.Builder;
 import lombok.Getter;

@@ -1,11 +1,12 @@
 package com.OEzoa.OEasy.domain.community;
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 @Getter
-@Setter
+@Builder(toBuilder = true)
+@NoArgsConstructor
+@AllArgsConstructor
 @Entity
 @Table(name = "oe_board_img", schema = "oeasy")
 public class OeBoardImg {
@@ -21,4 +22,11 @@ public class OeBoardImg {
     @ManyToOne
     @JoinColumn(name = "board_pk", nullable = false)
     private OeBoard board;
+
+    public static OeBoardImg of(OeBoard board, String url){
+        return OeBoardImg.builder()
+                    .s3ImgAddress(url)
+                    .board(board)
+                    .build();
+    }
 }

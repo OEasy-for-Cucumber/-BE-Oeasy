@@ -1,6 +1,6 @@
 package com.OEzoa.OEasy.domain.vote;
 
-import com.OEzoa.OEasy.application.vote.ChattingResponseDTO;
+import com.OEzoa.OEasy.application.vote.DTO.ChattingResponseDTO;
 import com.OEzoa.OEasy.domain.member.Member;
 import jakarta.persistence.*;
 import lombok.*;
