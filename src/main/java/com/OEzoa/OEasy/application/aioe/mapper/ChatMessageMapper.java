@@ -1,5 +1,6 @@
 package com.OEzoa.OEasy.application.aioe.mapper;
 
+import com.OEzoa.OEasy.application.aioe.dto.AioeIntroMessageDTO;
 import com.OEzoa.OEasy.application.aioe.dto.AioeResponseDTO;
 import com.OEzoa.OEasy.application.aioe.dto.ChatHistoryDTO;
 import com.OEzoa.OEasy.application.aioe.dto.ChatMessageDTO;
@@ -14,6 +15,13 @@ import java.util.stream.Collectors;
 public class ChatMessageMapper {
 
     private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+
+    public static AioeIntroMessageDTO toStartResponseDto(ChatMessage initialMessage) {
+        return AioeIntroMessageDTO.builder()
+                .initialMessage(initialMessage.getMessage())
+                .startTime(initialMessage.getDateTime().format(FORMATTER))
+                .build();
+    }
 
     public static ChatMessage toEntity(String message, String type, AiOe aiOe) {
         return ChatMessage.builder()
