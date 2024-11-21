@@ -144,8 +144,7 @@ public class MemberController {
     )
     public ResponseEntity<String> updatePassword(
             @RequestBody PasswordChangeRequestDTO passwordChangeRequest,
-            @RequestHeader(name = "Authorization") String authorizationHeader
-    ) {
+            @RequestHeader(name = "Authorization") String authorizationHeader) {
         String accessToken = HeaderUtils.extractTokenFromHeader(authorizationHeader);
         memberService.changePassword(passwordChangeRequest, accessToken);
         return ResponseEntity.ok("비밀번호 변경 성공");

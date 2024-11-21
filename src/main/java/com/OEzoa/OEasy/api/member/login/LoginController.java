@@ -41,12 +41,8 @@ public class LoginController {
             }
     )
     public ResponseEntity<MemberLoginResponseDTO> login(@RequestBody MemberLoginDTO memberLoginDTO, HttpSession session) {
-        try {
-            MemberLoginResponseDTO responseDTO = memberService.login(memberLoginDTO, session);
-            return ResponseEntity.ok(responseDTO);
-        } catch (Exception e) {
-            return ResponseEntity.status(401).body(null);
-        }
+        MemberLoginResponseDTO responseDTO = memberService.login(memberLoginDTO, session);
+        return ResponseEntity.ok(responseDTO);
     }
 
     /// 카카오 로그인 콜백 - POST 요청으로 인가 코드 전달받기 (쿼리 파라미터 사용)
