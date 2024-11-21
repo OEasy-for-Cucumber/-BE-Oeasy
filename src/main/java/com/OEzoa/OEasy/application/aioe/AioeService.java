@@ -1,5 +1,6 @@
 package com.OEzoa.OEasy.application.aioe;
 
+import com.OEzoa.OEasy.application.aioe.dto.AioeIntroMessageDTO;
 import com.OEzoa.OEasy.application.aioe.dto.AioeResponseDTO;
 import com.OEzoa.OEasy.application.aioe.dto.ChatHistoryDTO;
 import com.OEzoa.OEasy.application.aioe.mapper.ChatMessageMapper;
@@ -32,7 +33,7 @@ public class AioeService {
 
     // 챗봇 시작 로직
     @Transactional
-    public void startChatbot(String accessToken) {
+    public AioeIntroMessageDTO startChatbot(String accessToken) {
         Member member = tokenValidator.validateAccessTokenAndReturnMember(accessToken);
 
         if (aioeRepository.findByMember(member).isPresent()) {
@@ -45,6 +46,8 @@ public class AioeService {
                 "안녕하세오이? 저는 AI 오이입니다오이! 오이에 관련된 질문을 해주세오이! 🥒", "aioe", aiOe
         );
         chatMessageRepository.save(initialMessage);
+
+        return ChatMessageMapper.toStartResponseDto(initialMessage);
     }
 
     // 응답이랑 시간 생성~
@@ -81,10 +84,10 @@ public class AioeService {
 
     // 대화 내용 삭제
     @Transactional
-    public void deleteChatHistory(String accessToken) {
+    public void deleteChatbotConnection(String accessToken) {
         Member member = tokenValidator.validateAccessTokenAndReturnMember(accessToken);
         AiOe aiOe = aioeValidator.validateChatbotConnection(member);
-
-        chatMessageRepository.deleteByAiOe(aiOe);
+        chatMessageRepository.deleteByAiOe(aiOe); // 챗봇 대화 메시지 삭제
+        aioeRepository.delete(aiOe);             // 챗봇 연결 삭제
     }
 }
