@@ -13,14 +13,14 @@ public class GlobalExceptionHandler {
         return ExceptionResponse.toResponse(e.getGlobalExceptionCode());
     }
 
-    @ExceptionHandler(IllegalArgumentException.class)
-    public ResponseEntity<?> handleIllegalArgumentException(IllegalArgumentException ex) {
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
-    }
-
-    @ExceptionHandler(Exception.class)
-    public ResponseEntity<?> handleGenericException(Exception ex) {
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("알 수 없는 오류가 발생했습니다.");
-    }
+//    @ExceptionHandler(IllegalArgumentException.class)
+//    public ResponseEntity<?> handleIllegalArgumentException(IllegalArgumentException ex) {
+//        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+//    }
+//
+//    @ExceptionHandler(Exception.class)
+//    public ResponseEntity<?> handleGenericException(Exception ex) {
+//        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("알 수 없는 오류가 발생했습니다.");
+//    }
 
 }
