@@ -5,4 +5,5 @@ import lombok.Getter;
 @Getter
 public class VoteUserDTO {
     private long id;
+    private boolean vote;
 }

@@ -13,6 +13,7 @@ public class VoteInitResponseDTO {
 
     private Long like;
     private Long hate;
+    private String isVoting;
 
 
 }
