@@ -4,6 +4,7 @@ import com.OEzoa.OEasy.application.member.dto.MemberDeleteRequestDTO;
 import com.OEzoa.OEasy.application.member.dto.MemberLoginDTO;
 import com.OEzoa.OEasy.application.member.dto.MemberLoginResponseDTO;
 import com.OEzoa.OEasy.application.member.dto.MemberSignUpDTO;
+import com.OEzoa.OEasy.application.member.dto.MemberSignUpResponseDTO;
 import com.OEzoa.OEasy.application.member.dto.NicknameRequestDTO;
 import com.OEzoa.OEasy.application.member.dto.NicknameResponseDTO;
 import com.OEzoa.OEasy.application.member.dto.PasswordChangeRequestDTO;
@@ -43,7 +44,7 @@ public class MemberService {
 
     // 일반 회원 가입
     @Transactional
-    public void registerMember(MemberSignUpDTO memberSignUpDTO) throws Exception {
+    public MemberSignUpResponseDTO registerMember(MemberSignUpDTO memberSignUpDTO)  {
         if (memberRepository.findByEmail(memberSignUpDTO.getEmail()).isPresent()) {
             throw new GlobalException(GlobalExceptionCode.EMAIL_DUPLICATION);
         }
@@ -65,6 +66,7 @@ public class MemberService {
                 .build();
         memberRepository.save(member);
         log.info("신규 회원 저장 완료: " + member);
+        return new MemberSignUpResponseDTO(member.getNickname());
     }
 
     // 일반 로그인 처리 (JWT 발급)

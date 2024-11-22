@@ -5,6 +5,7 @@ import com.OEzoa.OEasy.application.member.TokenValidator;
 import com.OEzoa.OEasy.application.member.dto.MemberDTO;
 import com.OEzoa.OEasy.application.member.dto.MemberDeleteRequestDTO;
 import com.OEzoa.OEasy.application.member.dto.MemberSignUpDTO;
+import com.OEzoa.OEasy.application.member.dto.MemberSignUpResponseDTO;
 import com.OEzoa.OEasy.application.member.dto.NicknameRequestDTO;
 import com.OEzoa.OEasy.application.member.dto.NicknameResponseDTO;
 import com.OEzoa.OEasy.application.member.dto.PasswordChangeRequestDTO;
@@ -51,16 +52,9 @@ public class MemberController {
                     @ApiResponse(responseCode = "409", description = "중복된 이메일로 인한 회원가입 실패.")
             }
     )
-    public ResponseEntity<String> register(@RequestBody MemberSignUpDTO memberSignUpDTO) {
-        try {
-            memberService.registerMember(memberSignUpDTO);
-            return ResponseEntity.status(201).body("회원가입 성공");
-        } catch (Exception e) {
-            if (e.getMessage().equals("이미 존재하는 이메일입니다.")) {
-                return ResponseEntity.status(409).body("중복된 이메일입니다.");
-            }
-            return ResponseEntity.status(400).body("회원가입 실패");
-        }
+    public ResponseEntity<MemberSignUpResponseDTO> register(@RequestBody MemberSignUpDTO memberSignUpDTO) {
+        MemberSignUpResponseDTO responseDTO = memberService.registerMember(memberSignUpDTO);
+        return ResponseEntity.ok(responseDTO);
     }
 
     // 회원 정보 조회
@@ -73,23 +67,18 @@ public class MemberController {
                     @ApiResponse(responseCode = "401", description = "조회 실패: 인증되지 않은 사용자.")
             }
     )
-    public ResponseEntity<?> getProfile(@RequestHeader(name = "Authorization", required = false) String authorizationHeader) {
+    public ResponseEntity<MemberDTO> getProfile(
+            @RequestHeader(name = "Authorization", required = false) String authorizationHeader) {
         log.info("전달 받은 액세스 토큰: {}", authorizationHeader);
 
-        try {
-            // Bearer 접두사 제거 후 토큰 유효성 검증 및 사용자 정보 조회
-            String accessToken = HeaderUtils.extractTokenFromHeader(authorizationHeader);
-            Member member = tokenValidator.validateAccessTokenAndReturnMember(accessToken);
-            MemberDTO memberDTO = MemberMapper.toDto(member);
+//        try {
+        // Bearer 접두사 제거 후 토큰 유효성 검증 및 사용자 정보 조회
+        String accessToken = HeaderUtils.extractTokenFromHeader(authorizationHeader);
+        Member member = tokenValidator.validateAccessTokenAndReturnMember(accessToken);
+        MemberDTO memberDTO = MemberMapper.toDto(member);
 
-            log.info("회원정보 조회 성공 email: {}", member.getEmail());
-            return ResponseEntity.ok(memberDTO);
-        } catch (ExpiredJwtException e) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body("액세스 토큰이 만료되었습니다. 리프레시 토큰을 포함하여 다시 요청하세요.");
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("잘못된 요청입니다.");
-        }
+        log.info("회원정보 조회 성공 email: {}", member.getEmail());
+        return ResponseEntity.ok(memberDTO);
     }
 
     @PatchMapping("/nickname")
@@ -123,13 +112,10 @@ public class MemberController {
     public ResponseEntity<?> updateProfilePicture(
             @RequestHeader(name = "Authorization", required = false) String authorizationHeader,
             @RequestParam("file") MultipartFile file) {
-        try {
-            String accessToken = HeaderUtils.extractTokenFromHeader(authorizationHeader);
-            String newImageUrl = memberService.updateProfilePicture(file, accessToken);
-            return ResponseEntity.ok(Map.of("message", "프로필 사진 변경 성공", "imageUrl", newImageUrl));
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("프로필 사진 변경 실패: " + e.getMessage());
-        }
+        String accessToken = HeaderUtils.extractTokenFromHeader(authorizationHeader);
+        String newImageUrl = memberService.updateProfilePicture(file, accessToken);
+        return ResponseEntity.ok(Map.of("message", "프로필 사진 변경 성공", "imageUrl", newImageUrl));
+
     }
 
     // 비밀번호 변경
@@ -162,8 +148,7 @@ public class MemberController {
     )
     public ResponseEntity<String> deleteMember(
             @RequestHeader(name = "Authorization") String authorizationHeader,
-            @RequestBody MemberDeleteRequestDTO deleteRequest
-    ) {
+            @RequestBody MemberDeleteRequestDTO deleteRequest) {
         String accessToken = HeaderUtils.extractTokenFromHeader(authorizationHeader);
         memberService.deleteMember(deleteRequest, accessToken);
         return ResponseEntity.ok("회원 탈퇴가 성공적으로 처리되었습니다.");
