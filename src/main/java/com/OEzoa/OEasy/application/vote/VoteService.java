@@ -1,6 +1,7 @@
 package com.OEzoa.OEasy.application.vote;
 
 import com.OEzoa.OEasy.application.vote.DTO.ChattingResponseDTO;
+import com.OEzoa.OEasy.application.vote.DTO.VoteInitResponseDTO;
 import com.OEzoa.OEasy.domain.member.Member;
 import com.OEzoa.OEasy.domain.vote.OeChatting;
 import com.OEzoa.OEasy.domain.vote.OeChattingRepository;
@@ -20,6 +21,9 @@ import java.util.Optional;
 public class VoteService {
     private final OeChattingRepository oeChattingRepository;
     private final OeVoteRepository oeVoteRepository;
+
+
+    //----------------------------Stomp Start---------------------------------------
     /*
      input 메시지, 유저pk, 시간
 
@@ -56,6 +60,11 @@ public class VoteService {
         return oeVoteRepository.countByVote(hateAndLike);
     }
 
-
-
+    //----------------------------Stomp end---------------------------------------
+    public VoteInitResponseDTO init(){
+        return VoteInitResponseDTO.builder()
+                .hate(oeVoteRepository.countByVote(false))
+                .like(oeVoteRepository.countByVote(true))
+                .build();
+    }
 }
