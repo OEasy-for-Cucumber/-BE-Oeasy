@@ -41,34 +41,50 @@ public class VoteService {
         return OeChatting.of(member, oeChatting.getContent());
     }
 
-    public long voting(Member member, boolean hateAndLike){
+    public VoteInitResponseDTO voting(Member member, boolean hateAndLike){
         //hateAndLike true : 좋아요, false : 싫어요
         Optional<OeVote> oVote = oeVoteRepository.findByMemberAndDate(member, LocalDate.now());
-        log.info("java time is {}", LocalDateTime.now());
+        String isVoting;
+        log.info("java time is {}", LocalDate.now());
         OeVote vote;
         if(oVote.isPresent()){
             vote= oVote.get();
             if(vote.getVote() == hateAndLike){//같은 날 같은 곳에 투표했을 떄
                 oeVoteRepository.delete(vote);
+                isVoting = "not voting";
             }else{ // 바꾼 결과로 수정
                 oeVoteRepository.save(vote.toBuilder().vote(hateAndLike).build());
+                isVoting = hateAndLike ? "like" : "hate";
             }
         }else{
             vote = OeVote.builder().member(member)
                     .vote(hateAndLike)
                     .date(LocalDate.now()).build();
             vote = oeVoteRepository.save(vote);
+
             log.info("mySql time is {}", vote.getDate());
+            isVoting = hateAndLike ? "like" : "hate";
         }
 
-        return oeVoteRepository.countByVote(hateAndLike);
-    }
-
-    //----------------------------Stomp end---------------------------------------
-    public VoteInitResponseDTO init(){
         return VoteInitResponseDTO.builder()
                 .hate(oeVoteRepository.countByVote(false))
                 .like(oeVoteRepository.countByVote(true))
+                .isVoting(isVoting)
+                .build();
+    }
+
+    //----------------------------Stomp end---------------------------------------
+    public VoteInitResponseDTO init(Member member){
+        String isVoting;
+        Optional<OeVote> oVote = oeVoteRepository.findByMemberAndDate(member, LocalDate.now());
+        if(oVote.isPresent()){
+            isVoting = oVote.get().getVote() ? "like" : "hate";
+        }else isVoting = "not voting";
+
+        return VoteInitResponseDTO.builder()
+                .hate(oeVoteRepository.countByVote(false))
+                .like(oeVoteRepository.countByVote(true))
+                .isVoting(isVoting)
                 .build();
     }
 }

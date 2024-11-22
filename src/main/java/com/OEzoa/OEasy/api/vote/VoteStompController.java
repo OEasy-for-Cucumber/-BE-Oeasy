@@ -3,11 +3,13 @@ package com.OEzoa.OEasy.api.vote;
 import com.OEzoa.OEasy.application.vote.*;
 import com.OEzoa.OEasy.application.vote.DTO.ChattingResponseDTO;
 import com.OEzoa.OEasy.application.vote.DTO.MessageRequest;
+import com.OEzoa.OEasy.application.vote.DTO.VoteInitResponseDTO;
 import com.OEzoa.OEasy.application.vote.VoteService;
 import com.OEzoa.OEasy.application.vote.DTO.VoteUserDTO;
 import com.OEzoa.OEasy.domain.member.Member;
 import com.OEzoa.OEasy.util.timeTrace.TimeTrace;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.web.bind.annotation.RestController;
@@ -29,18 +31,13 @@ public class VoteStompController {
         return voteService.sendMessage(member, message.getContent());
     }
 
-    @MessageMapping("/like-votes")
-    @SendTo("/topic/like-votes")
-    public long likeVotes(VoteUserDTO voteUserDTO) {
+    @MessageMapping("/votes")
+    @SendTo("/topic/votes")
+    public VoteInitResponseDTO likeVotes(VoteUserDTO voteUserDTO) {
         Member member = voteValidator.getMember(voteUserDTO.getId());
-        return voteService.voting(member,true);
+        return voteService.voting(member,voteUserDTO.isVote());
     }
 
-    @MessageMapping("/hate-votes")
-    @SendTo("/topic/hate-votes")
-    public long hateVotes(VoteUserDTO voteUserDTO) {
-        Member member = voteValidator.getMember(voteUserDTO.getId());
-        return voteService.voting(member,false);
-    }
+
 
 }
