@@ -9,6 +9,7 @@ import com.OEzoa.OEasy.domain.vote.OeVote;
 import com.OEzoa.OEasy.domain.vote.OeVoteRepository;
 import com.OEzoa.OEasy.util.timeTrace.TimeTrace;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -18,6 +19,7 @@ import java.util.Optional;
 @Service
 @RequiredArgsConstructor
 @TimeTrace
+@Slf4j
 public class VoteService {
     private final OeChattingRepository oeChattingRepository;
     private final OeVoteRepository oeVoteRepository;
@@ -42,6 +44,7 @@ public class VoteService {
     public long voting(Member member, boolean hateAndLike){
         //hateAndLike true : 좋아요, false : 싫어요
         Optional<OeVote> oVote = oeVoteRepository.findByMemberAndDate(member, LocalDate.now());
+        log.info("java time is {}", LocalDateTime.now());
         OeVote vote;
         if(oVote.isPresent()){
             vote= oVote.get();
@@ -54,7 +57,8 @@ public class VoteService {
             vote = OeVote.builder().member(member)
                     .vote(hateAndLike)
                     .date(LocalDate.now()).build();
-            oeVoteRepository.save(vote);
+            vote = oeVoteRepository.save(vote);
+            log.info("mySql time is {}", vote.getDate());
         }
 
         return oeVoteRepository.countByVote(hateAndLike);
