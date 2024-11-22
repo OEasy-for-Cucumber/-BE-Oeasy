@@ -22,6 +22,11 @@ public enum GlobalExceptionCode {
 
     //---------------member---------------------
     NOT_FIND_MEMBER(HttpStatus.NOT_FOUND, "회원을 찾을 수 없습니다", "잘못 들어온 pk"),
+    //---------------token validation-------------------
+    INVALID_ACCESS_TOKEN(HttpStatus.UNAUTHORIZED, "유효하지 않은 액세스 토큰입니다.", "액세스 토큰이 잘못되었거나 만료됨"),
+    EXPIRED_ACCESS_TOKEN(HttpStatus.UNAUTHORIZED, "액세스 토큰이 만료되었습니다.", "JWT 액세스 토큰 만료"),
+    UNSUPPORTED_TOKEN(HttpStatus.BAD_REQUEST, "지원하지 않는 토큰입니다.", "지원하지 않는 JWT 토큰 형식"),
+    MALFORMED_TOKEN(HttpStatus.BAD_REQUEST, "잘못된 토큰 형식입니다.", "JWT 토큰 형식 오류"),
 
     //---------------sign up-------------------
     EMAIL_DUPLICATION(HttpStatus.CONFLICT, "이미 사용 중인 이메일입니다.", "중복된 이메일 요청"),
@@ -39,6 +44,9 @@ public enum GlobalExceptionCode {
     QUESTION_TOO_LONG(HttpStatus.BAD_REQUEST,"질문이 너무 길어오이ㅠ 조금 더 간단히 해주세오이!🥒", "100자 이내로 질문해주세요"),
     INVALID_INPUT(HttpStatus.BAD_REQUEST,"죄송하지만 오이와 관련된 질문만 답변할 수 있어오이!🥒","오이를 포함해 질문해 주세요"),
     DB_SAVE_FAILURE(HttpStatus.INTERNAL_SERVER_ERROR, "데이터 저장 중 오류가 발생했습니다.", "Hibernate insert 쿼리가 실패했습니다."),
+    //---------------auth service-------------------
+    INVALID_REFRESH_TOKEN(HttpStatus.UNAUTHORIZED, "유효하지 않은 리프레시 토큰입니다.", "리프레시 토큰이 만료되었거나 잘못된 형식입니다."),
+    TOKEN_MEMBER_NOT_FOUND(HttpStatus.NOT_FOUND, "회원 정보를 찾을 수 없습니다.", "리프레시 토큰에서 추출한 사용자 ID가 존재하지 않음"),
     //---------------recipe-------------------
     RECIPE_OUT_OF_VALID_RANGE(HttpStatus.BAD_REQUEST, "범위를 벗어났습니다", "범위를 벗어난 데이터를 요청"),
     RECIPE_ID_NOT_FOUND(HttpStatus.NOT_FOUND, "id를 확인해 주세요", "요청한 id에 해당하는 값이 없습니다.")

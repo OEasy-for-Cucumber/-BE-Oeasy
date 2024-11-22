@@ -11,6 +11,7 @@ public class MemberMapper {
                 .email(member.getEmail())
                 .nickname(member.getNickname())
                 .memberImage(member.getMemberImage())
+                .kakaoId(member.getKakaoId())
                 .build();
     }
 

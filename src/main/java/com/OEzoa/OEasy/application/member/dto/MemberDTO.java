@@ -18,4 +18,7 @@ public class MemberDTO {
 
     @Schema(description = "프로필 이미지 URL", example = "https://example.com/profile.png")
     private String memberImage;
+
+    @Schema(description = "카카오 ID", example = "12312321321321")
+    private Long kakaoId;
 }
