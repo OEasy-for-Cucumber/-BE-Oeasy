@@ -24,12 +24,15 @@ public class CmnValidator {
         return boardRepository.findById(id).orElseThrow(()->new GlobalException(GlobalExceptionCode.COMMUNITY_NOT_FIND));
     }
 
-    public void myBoardCheck(Member member, OeBoard board){
-        if(board.getMember().equals(member)){
-            return;
-        }else{
-            throw new GlobalException(GlobalExceptionCode.COMMUNITY_NOT_SAME);
-        }
+    /**
+     *
+     * @param memberPk
+     * @param boardPk
+     * @return
+     */
+    public OeBoard myBoardCheck(long memberPk, long boardPk){
+        Member member = getMember(memberPk);
+        return boardRepository.findByMember(member).orElseThrow(()-> new GlobalException(GlobalExceptionCode.COMMUNITY_NOT_FOUND_BOARD));
     }
 
 

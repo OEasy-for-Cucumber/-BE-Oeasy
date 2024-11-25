@@ -20,6 +20,8 @@ public enum GlobalExceptionCode {
     //---------------community----------------
     COMMUNITY_NOT_FIND(HttpStatus.NOT_FOUND, "게시글을 찾을 수 없습니다", "잘못 들어온 pk"),
     COMMUNITY_NOT_SAME(HttpStatus.BAD_REQUEST, "본인 게시글만 수정, 삭제가 가능합니다.", "게시글의 요청자와 소유자가 다름"),
+    COMMUNITY_NOT_FOUND_BOARD(HttpStatus.NOT_FOUND, "권한이 없거나 게시글을 찾을 수 없습니다.", "본인 게시물이 아니거라 board 조회를 실패"),
+
 
     //---------------member---------------------
     NOT_FIND_MEMBER(HttpStatus.NOT_FOUND, "회원을 찾을 수 없습니다", "잘못 들어온 pk"),

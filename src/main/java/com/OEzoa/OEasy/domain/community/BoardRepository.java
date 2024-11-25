@@ -1,6 +1,7 @@
 package com.OEzoa.OEasy.domain.community;
 
 import com.OEzoa.OEasy.application.community.DTO.CmnBoardListResponseDTO;
+import com.OEzoa.OEasy.domain.member.Member;
 import io.lettuce.core.dynamic.annotation.Param;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -9,6 +10,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface BoardRepository extends JpaRepository<OeBoard, Long> {
@@ -36,7 +38,7 @@ public interface BoardRepository extends JpaRepository<OeBoard, Long> {
 //                    "WHERE b.title LIKE CONCAT('%', :title, '%')",
 //            nativeQuery = true)
 //    Page<CmnBoardListResponseDTO> findByTitle(@Param("title") String title, Pageable pageable);
-
+    //제목 검색
     @Query("SELECT new com.OEzoa.OEasy.application.community.DTO.CmnBoardListResponseDTO(" +
             "b.boardPk, " +
             "b.title, " +
@@ -53,7 +55,7 @@ public interface BoardRepository extends JpaRepository<OeBoard, Long> {
             "JOIN b.member m " +
             "WHERE b.title LIKE CONCAT('%', :title, '%')")
     Page<CmnBoardListResponseDTO> findByTitle(@Param("title") String title, Pageable pageable);
-
+    //제목 & 내용 검색
     @Query("SELECT new com.OEzoa.OEasy.application.community.DTO.CmnBoardListResponseDTO(" +
             "b.boardPk, " +
             "b.title, " +
@@ -71,6 +73,7 @@ public interface BoardRepository extends JpaRepository<OeBoard, Long> {
             "WHERE (b.title LIKE CONCAT('%', :keyword, '%') OR b.content LIKE CONCAT('%', :keyword, '%'))")
     Page<CmnBoardListResponseDTO> findByTitleOrContent(@Param("keyword") String keyword, Pageable pageable);
 
+    //닉네임 검색
     @Query("SELECT new com.OEzoa.OEasy.application.community.DTO.CmnBoardListResponseDTO(" +
             "b.boardPk, " +
             "b.title, " +
@@ -87,4 +90,7 @@ public interface BoardRepository extends JpaRepository<OeBoard, Long> {
             "JOIN b.member m " +
             "WHERE (m.nickname LIKE CONCAT('%', :keyword, '%') )")
     Page<CmnBoardListResponseDTO> findByNickname(@Param("keyword") String keyword, Pageable pageable);
+
+    Optional<OeBoard> findByMember(Member member);
+
 }

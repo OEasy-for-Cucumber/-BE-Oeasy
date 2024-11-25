@@ -7,6 +7,7 @@ import com.OEzoa.OEasy.domain.member.Member;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.hibernate.annotations.Fetch;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -32,7 +33,19 @@ public class CommunityController {
         return ResponseEntity.ok("성공!");
     }
 
-    @Operation(summary = "커뮤니티 게시판 불러오기", description = "게시글들을 페이징 하여 불러옵니다.")
+
+    @Operation(summary = "게시물 수정하기",
+            description = "게시물을 수정")
+    @PatchMapping(consumes = "multipart/from-data")
+    public ResponseEntity<String> updateCmn(@ModelAttribute CmnUpdateRequestDTO cmn) {
+        OeBoard board = validator.myBoardCheck(cmn.getUserId(), cmn.getCommunityId());
+        cmnService.updateCmn(board, cmn);
+        return ResponseEntity.ok("성공!");
+    }
+
+
+    @Operation(summary = "커뮤니티 게시판 불러오기",
+            description = "게시글들을 페이징 하여 불러옵니다.")
     @GetMapping
     public Page<CmnBoardListResponseDTO> getAllCmn(
             @RequestParam int page,
@@ -53,7 +66,8 @@ public class CommunityController {
         return ResponseEntity.ok(cmnService.getCmn(board));
     }
 
-    @Operation(summary = "게시글 삭제", description = "본인의 게시글인 것을 확인 후 삭제합니다.")
+    @Operation(summary = "게시글 삭제",
+            description = "본인의 게시글인 것을 확인 후 삭제합니다.")
     @DeleteMapping
     public ResponseEntity<String> deleteCmn(@RequestBody CmnDeleteRequestDTO cmn) {
         validator.getMember(cmn.getUserId());
