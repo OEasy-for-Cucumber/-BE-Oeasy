@@ -37,8 +37,8 @@ public class AioeController {
             summary = "챗봇 시작",
             description = "챗봇과 연결되며 기본 메세지를 출력합니다.")
     @ApiResponse(responseCode = "200", description = "챗봇이 성공적으로 시작되었습니다.")
-    @ApiResponse(responseCode = "400", description = "잘못된 요청")
-    public ResponseEntity<?> startChatbot(@RequestHeader("Authorization") String authorizationHeader) {
+    @ApiResponse(responseCode = "400", description = "잘못된 토큰 또는, 이미 연결")
+    public ResponseEntity<AioeIntroMessageDTO> startChatbot(@RequestHeader("Authorization") String authorizationHeader) {
         String accessToken = extractTokenFromHeader(authorizationHeader);
         AioeIntroMessageDTO response = aioeService.startChatbot(accessToken);
 

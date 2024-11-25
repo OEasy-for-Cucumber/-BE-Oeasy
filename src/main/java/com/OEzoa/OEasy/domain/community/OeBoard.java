@@ -1,9 +1,10 @@
 package com.OEzoa.OEasy.domain.community;
 
-import com.OEzoa.OEasy.application.community.CmnCreateRequestDTO;
+import com.OEzoa.OEasy.application.community.DTO.CmnCreateRequestDTO;
 import com.OEzoa.OEasy.domain.member.Member;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.ColumnDefault;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -29,6 +30,15 @@ public class OeBoard {
 
     @Column(name = "board_timestamp")
     private LocalDateTime boardTimestamp;
+
+    @Column(name="view_cnt")
+    @ColumnDefault("0")
+    private int viewCnt;
+
+    @Column(name="like_cnt")
+    @ColumnDefault("0")
+    private int likeCnt;
+
 
     @ManyToOne
     @JoinColumn(name = "member_pk", nullable = false)

@@ -14,6 +14,8 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -38,7 +40,7 @@ public class VoteService {
                 .build();
         oeChatting = oeChattingRepository.save(oeChatting);
 
-        return OeChatting.of(member, oeChatting.getContent());
+        return ChattingResponseDTO.of(oeChatting);
     }
 
     public VoteInitResponseDTO voting(Member member, boolean hateAndLike){
@@ -80,11 +82,18 @@ public class VoteService {
         if(oVote.isPresent()){
             isVoting = oVote.get().getVote() ? "like" : "hate";
         }else isVoting = "not voting";
+        List<OeChatting> OeChattingList= oeChattingRepository.findAllByOrderByIdDescLimit50();;
+        List<ChattingResponseDTO> dtoList = new ArrayList<>();
+
+        for (OeChatting oeChatting : OeChattingList) {
+            dtoList.add(ChattingResponseDTO.of(oeChatting));
+        }
 
         return VoteInitResponseDTO.builder()
                 .hate(oeVoteRepository.countByVote(false))
                 .like(oeVoteRepository.countByVote(true))
                 .isVoting(isVoting)
+                .chattingList(dtoList)
                 .build();
     }
 }

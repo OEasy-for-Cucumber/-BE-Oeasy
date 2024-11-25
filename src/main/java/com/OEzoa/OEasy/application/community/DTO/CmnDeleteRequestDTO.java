@@ -1,4 +1,4 @@
-package com.OEzoa.OEasy.application.community;
+package com.OEzoa.OEasy.application.community.DTO;
 
 import lombok.Getter;
 
