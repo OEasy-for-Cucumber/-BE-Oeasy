@@ -1,17 +1,26 @@
 package com.OEzoa.OEasy.application.community;
 
-import com.OEzoa.OEasy.domain.community.BoardImgRepository;
-import com.OEzoa.OEasy.domain.community.BoardRepository;
-import com.OEzoa.OEasy.domain.community.OeBoard;
-import com.OEzoa.OEasy.domain.community.OeBoardImg;
+import com.OEzoa.OEasy.application.community.DTO.CmnBoardListRequestDTO;
+import com.OEzoa.OEasy.application.community.DTO.CmnBoardListResponseDTO;
+import com.OEzoa.OEasy.application.community.DTO.CmnCreateRequestDTO;
+import com.OEzoa.OEasy.application.community.DTO.CmnDTOResponse;
+import com.OEzoa.OEasy.domain.community.*;
 import com.OEzoa.OEasy.domain.member.Member;
+import com.OEzoa.OEasy.domain.member.MemberRepository;
+import com.OEzoa.OEasy.exception.GlobalException;
+import com.OEzoa.OEasy.exception.GlobalExceptionCode;
 import com.OEzoa.OEasy.util.s3Bucket.FileUploader;
 import com.OEzoa.OEasy.util.timeTrace.TimeTrace;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.swing.*;
+import java.awt.print.Pageable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -23,8 +32,10 @@ import java.util.UUID;
 public class CmnService {
     
     private final BoardRepository boardRepository;
-    private final BoardImgRepository boardImgRepository; 
+    private final BoardImgRepository boardImgRepository;
+    private final MemberRepository memberRepository;
     private final FileUploader fileUploader;
+    private final BoardLikeRepository boardLikeRepository;
 
     /**
      * 게시글 작성
@@ -51,6 +62,45 @@ public class CmnService {
 
     public void deleteCmn(OeBoard board){
         boardRepository.delete(board);
+    }
+
+    public void testInit(){
+        List<Member> memberList = memberRepository.findAll();
+        OeBoard board = boardRepository.findById(1L).get();
+        for(Member member : memberList){
+            boardLikeRepository.save(OeBoardLike.builder()
+                            .member(member)
+                            .board(board)
+                    .build());
+        }
+    }
+    public void testCnt(Long boardId){
+        System.out.println("boardId = " + boardId);
+        boardLikeRepository.countByBoard(boardRepository.findById(boardId).get());
+    }
+
+    public void notFoundTest(){
+        List<Member> memberList = memberRepository.findAll();
+        for(Member member : memberList){
+            System.out.println("member pk = "+member.getMemberPk()+"\ncnt = "+boardLikeRepository.countByMember(member));
+        }
+    }
+
+    public Page<CmnBoardListResponseDTO> searchBoard(CmnBoardListRequestDTO dto){
+
+        org.springframework.data.domain.Pageable pageable;
+        if(dto.isSortType()) {
+            pageable = PageRequest.of(dto.getPage(), dto.getSize(), Sort.by(Sort.Direction.ASC, dto.getSortKeyword()));
+        }else{
+            pageable = PageRequest.of(dto.getPage(), dto.getSize(), Sort.by(Sort.Direction.DESC, dto.getSortKeyword()));
+        }
+
+        return switch (dto.getSearchType()) {
+            case "titleAndContent" -> boardRepository.findByTitleOrContent(dto.getSearchKeyword(), pageable);
+            case "title" -> boardRepository.findByTitle(dto.getSearchKeyword(), pageable);
+            case "nickname" -> boardRepository.findByNickname(dto.getSearchKeyword(), pageable);
+            default -> throw new GlobalException(GlobalExceptionCode.BAD_REQUEST);
+        };
     }
 
 }

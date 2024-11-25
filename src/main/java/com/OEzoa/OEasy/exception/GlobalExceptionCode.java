@@ -10,6 +10,7 @@ public enum GlobalExceptionCode {
     //---------------global-------------------
     EXAMPLE_EXCEPTION(HttpStatus.BAD_REQUEST, "사용자에게 보여줄 메시지", "개발자가 볼 메시지"),
     DB_LOAD_FAILURE(HttpStatus.SERVICE_UNAVAILABLE, "[알 수 없는 오류] 잠시 후 다시 시도해 주세요.", "데이터 베이스에서 값을 가져오는 것을 실패"),
+    BAD_REQUEST(HttpStatus.BAD_REQUEST,"잘못된 요청입니다.", "개발자가 의도하지 않은 요청"),
 
     //---------------index--------------------
     INDEX_API_REQUEST_FAILURE(HttpStatus.SERVICE_UNAVAILABLE, "[일시적 오류] 잠시 후 다시 시도해 주세요.", "API 호출 실패"),

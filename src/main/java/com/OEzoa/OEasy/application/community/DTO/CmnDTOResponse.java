@@ -1,9 +1,8 @@
-package com.OEzoa.OEasy.application.community;
+package com.OEzoa.OEasy.application.community.DTO;
 
 import com.OEzoa.OEasy.domain.community.OeBoard;
 import lombok.Builder;
 import lombok.Getter;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;

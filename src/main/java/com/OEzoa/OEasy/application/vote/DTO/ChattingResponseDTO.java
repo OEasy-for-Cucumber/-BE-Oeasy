@@ -1,5 +1,7 @@
 package com.OEzoa.OEasy.application.vote.DTO;
 
+import com.OEzoa.OEasy.domain.member.Member;
+import com.OEzoa.OEasy.domain.vote.OeChatting;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 
@@ -18,6 +20,13 @@ public class ChattingResponseDTO {
     @Schema(description = "닉네임")
     private String nickname;
 
-
+    public static ChattingResponseDTO of(OeChatting oeChatting) {
+        return ChattingResponseDTO.builder()
+                .id(oeChatting.getMember().getMemberPk())
+                .content(oeChatting.getContent())
+                .nickname(oeChatting.getMember().getNickname())
+                .profileImg(oeChatting.getMember().getMemberImage())
+                .build();
+    }
 
 }
