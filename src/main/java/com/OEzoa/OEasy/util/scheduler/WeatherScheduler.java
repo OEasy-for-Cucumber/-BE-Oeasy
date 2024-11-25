@@ -42,7 +42,6 @@ public class WeatherScheduler {
                 + "&base_date=" + now.getYear() + String.format("%02d",now.getMonthValue()) + String.format("%02d",now.getDayOfMonth())
                 + "&base_time=" + String.format("%02d",now.getHour()) + 30
                 + "&nx=59&ny=125");
-        System.out.println(url.toString());
         // URL 객체를 통해 HTTP 연결을 설정하고 HttpURLConnection 객체로 캐스팅
         HttpURLConnection con = (HttpURLConnection) url.openConnection();
 
@@ -77,7 +76,7 @@ public class WeatherScheduler {
             }
         }
         int imgNum = 0;
-        if(imgNum !=0) {
+        if(weatherNum !=0) {
             switch (weatherNum) {
                 case 1:
                 case 2:
@@ -90,9 +89,9 @@ public class WeatherScheduler {
             }
         }else{
             if(temperature < 5) imgNum = 10; //추운 오이
-            else if(19 < temperature && temperature < 24) imgNum = 11; //기쁜오이
+            else if(20 <= temperature && temperature < 24) imgNum = 11; //기쁜오이
             else if(28 < temperature) imgNum = 12; //더운오이
-            else imgNum = 13;
+            else imgNum = 13;//보통오이
         }
 
         weather = Weather.builder()

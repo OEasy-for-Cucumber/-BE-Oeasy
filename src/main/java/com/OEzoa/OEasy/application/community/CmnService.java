@@ -1,9 +1,6 @@
 package com.OEzoa.OEasy.application.community;
 
-import com.OEzoa.OEasy.application.community.DTO.CmnBoardListRequestDTO;
-import com.OEzoa.OEasy.application.community.DTO.CmnBoardListResponseDTO;
-import com.OEzoa.OEasy.application.community.DTO.CmnCreateRequestDTO;
-import com.OEzoa.OEasy.application.community.DTO.CmnDTOResponse;
+import com.OEzoa.OEasy.application.community.DTO.*;
 import com.OEzoa.OEasy.domain.community.*;
 import com.OEzoa.OEasy.domain.member.Member;
 import com.OEzoa.OEasy.domain.member.MemberRepository;
@@ -58,6 +55,28 @@ public class CmnService {
 
     public CmnDTOResponse getCmn(OeBoard board){
         return CmnDTOResponse.of(board);
+    }
+
+    // s3버킷 리팩토링할 것
+    public void updateCmn(OeBoard board, CmnUpdateRequestDTO dto){
+        board.toBuilder().title(dto.getTitle())
+                .content(dto.getContent())
+                .build();
+        boardRepository.save(board);
+        //----이미지
+        for (OeBoardImg image : board.getImages()) {
+            fileUploader.deleteImage(image.getS3ImgAddress());
+        }
+        boardImgRepository.deleteByBoard(board);
+        for(MultipartFile multipartFile : dto.getImgList()){
+            OeBoardImg oeBoardImg = OeBoardImg.builder()
+                    .board(board)
+                    .s3ImgAddress(fileUploader.uploadFile(multipartFile, multipartFile.getName()))
+                    .build();
+            boardImgRepository.save(oeBoardImg);
+        }
+
+
     }
 
     public void deleteCmn(OeBoard board){
