@@ -30,12 +30,5 @@ public class OeChatting {
     @JoinColumn(name = "member_pk", nullable = false)
     private Member member;
 
-    public static ChattingResponseDTO of(Member member, String content) {
-        return ChattingResponseDTO.builder()
-                .id(member.getMemberPk())
-                .content(content)
-                .nickname(member.getNickname())
-                .profileImg(member.getMemberImage())
-                .build();
-    }
+
 }

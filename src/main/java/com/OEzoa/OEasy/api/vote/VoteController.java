@@ -20,7 +20,7 @@ public class VoteController {
     private final VoteService voteService;
     private final VoteValidator voteValidator;
 
-    @GetMapping("/init")
+    @GetMapping("/init/{id}")
     public ResponseEntity<VoteInitResponseDTO> init(@PathVariable long id) {
         return ResponseEntity.ok(voteService.init(voteValidator.getMember(id)));
     }

@@ -5,6 +5,8 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @Getter
 @Builder
 @AllArgsConstructor
@@ -14,6 +16,6 @@ public class VoteInitResponseDTO {
     private Long like;
     private Long hate;
     private String isVoting;
-
+    private List<ChattingResponseDTO> chattingList;
 
 }

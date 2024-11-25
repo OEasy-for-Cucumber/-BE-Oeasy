@@ -1,16 +1,21 @@
 package com.OEzoa.OEasy.api.community;
 
 import com.OEzoa.OEasy.application.community.*;
+import com.OEzoa.OEasy.application.community.DTO.*;
 import com.OEzoa.OEasy.domain.community.OeBoard;
 import com.OEzoa.OEasy.domain.member.Member;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @RestController
-@RequestMapping("/api/Community")
+@RequestMapping("/api/community")
 @Tag(name = "community API", description = "커뮤니티 게시판입니다.")
 @RequiredArgsConstructor
 public class CommunityController {
@@ -20,24 +25,31 @@ public class CommunityController {
 
     @Operation(summary = "게시물 작성하기",
             description = "게시물을 작성")
-    @PostMapping
-    public ResponseEntity<String> createCmn(@RequestBody CmnCreateRequestDTO cmn) {
+    @PostMapping(consumes = "multipart/form-data")
+    public ResponseEntity<String> createCmn(@ModelAttribute CmnCreateRequestDTO cmn) {
         Member member = validator.getMember(cmn.getUserId());
         cmnService.createCmn(cmn, member);
         return ResponseEntity.ok("성공!");
     }
 
-//    @Operation(summary = "커뮤니티 게시판 불러오기",
-//            description = "게시글들을 페이징 하여 불러옵니다.")
-//    @GetMapping
-//    public CmnDTOResponse getAllCmn(@PathVariable Long CmnId) {
-//        return null;
-//    }
+    @Operation(summary = "커뮤니티 게시판 불러오기", description = "게시글들을 페이징 하여 불러옵니다.")
+    @GetMapping
+    public Page<CmnBoardListResponseDTO> getAllCmn(
+            @RequestParam int page,
+            @RequestParam int size,
+            @RequestParam(required = false) String searchKeyword,
+            @RequestParam(required = false) String searchType,
+            @RequestParam(required = false) String sortKeyword,
+            @RequestParam(required = false) Boolean sortType
+    ) {
+        CmnBoardListRequestDTO dto = new CmnBoardListRequestDTO(page, size, searchKeyword, searchType, sortKeyword, sortType);
+        return cmnService.searchBoard(dto);
+    }
     @Operation(summary = "커뮤니티 게시글 불러오기",
             description = "게시글을 불러옵니다.")
-    @GetMapping("/{CmnId}")
-    public ResponseEntity<CmnDTOResponse> getCmn(@PathVariable Long CmnId) {
-        OeBoard board = validator.getBoard(CmnId);
+    @GetMapping("/{cmnId}")
+    public ResponseEntity<CmnDTOResponse> getCmn(@PathVariable Long cmnId) {
+        OeBoard board = validator.getBoard(cmnId);
         return ResponseEntity.ok(cmnService.getCmn(board));
     }
 
@@ -51,5 +63,21 @@ public class CommunityController {
         cmnService.deleteCmn(board);
         return ResponseEntity.ok("성공!");
     }
+
+//    @GetMapping("/test")
+//    public void test() {
+//        Member member = validator.getMember(38L);
+//
+//
+//        for(int i = 0; i< 10000; i++) {
+//            CmnCreateRequestDTO cmn = CmnCreateRequestDTO.builder()
+//                    .title("제목"+i)
+//                    .content("내용"+(10000-i))
+//                    .imgList(new ArrayList<>())
+//                    .build();
+//            cmnService.createCmn(cmn, member);
+//        }
+//    }
+
 
 }

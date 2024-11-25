@@ -2,11 +2,12 @@ package com.OEzoa.OEasy.domain.community;
 
 import com.OEzoa.OEasy.domain.member.Member;
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 @Getter
-@Setter
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 @Entity
 @Table(name = "oe_board_like", schema = "oeasy")
 public class OeBoardLike {
@@ -23,4 +24,8 @@ public class OeBoardLike {
     @ManyToOne
     @JoinColumn(name = "member_pk", nullable = false)
     private Member member;
+
+    @Version
+    private Integer version;
+
 }
