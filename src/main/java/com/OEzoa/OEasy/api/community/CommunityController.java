@@ -7,17 +7,14 @@ import com.OEzoa.OEasy.domain.member.Member;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
-import org.hibernate.annotations.Fetch;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.ArrayList;
-import java.util.List;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequestMapping("/api/community")
-@Tag(name = "community API", description = "커뮤니티 게시판입니다.")
+@Tag(name = "Community API", description = "커뮤니티 게시판입니다.")
 @RequiredArgsConstructor
 public class CommunityController {
 
@@ -26,10 +23,18 @@ public class CommunityController {
 
     @Operation(summary = "게시물 작성하기",
             description = "게시물을 작성")
-    @PostMapping(consumes = "multipart/form-data")
-    public ResponseEntity<String> createCmn(@ModelAttribute CmnCreateRequestDTO cmn) {
-        Member member = validator.getMember(cmn.getUserId());
-        cmnService.createCmn(cmn, member);
+    //@PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping
+    //public ResponseEntity<String> createCmn(@ModelAttribute CmnCreateRequestDTO cmn) {
+    public ResponseEntity<String> createCmn(@RequestParam("file") MultipartFile file) {
+
+            System.out.println("file = " + file.getName());
+
+
+//        System.out.println("cmn.getImgList().get(0).getName() = " + cmn.getImgList().size());
+//        System.out.println("cmn.getImgList().get(0).getName() = " + cmn.getImgList().get(0).getName());
+//        Member member = validator.getMember(cmn.getUserId());
+//        cmnService.createCmn(cmn, member);
         return ResponseEntity.ok("성공!");
     }
 
@@ -58,12 +63,16 @@ public class CommunityController {
         CmnBoardListRequestDTO dto = new CmnBoardListRequestDTO(page, size, searchKeyword, searchType, sortKeyword, sortType);
         return cmnService.searchBoard(dto);
     }
+
+
     @Operation(summary = "커뮤니티 게시글 불러오기",
             description = "게시글을 불러옵니다.")
-    @GetMapping("/{cmnId}")
-    public ResponseEntity<CmnDTOResponse> getCmn(@PathVariable Long cmnId) {
+    @GetMapping("{cmnId}/{memberId}")
+    public ResponseEntity<CmnDTOResponse> getCmn(@PathVariable Long cmnId,
+                                                 @PathVariable Long memberId) {
         OeBoard board = validator.getBoard(cmnId);
-        return ResponseEntity.ok(cmnService.getCmn(board));
+        Member member = validator.getMember(memberId);
+        return ResponseEntity.ok(cmnService.getCmn(board, member));
     }
 
     @Operation(summary = "게시글 삭제",
@@ -71,12 +80,22 @@ public class CommunityController {
     @DeleteMapping
     public ResponseEntity<String> deleteCmn(@RequestBody CmnDeleteRequestDTO cmn) {
         validator.getMember(cmn.getUserId());
-        System.out.println("cmn = " + cmn);
         OeBoard board = validator.getBoard(cmn.getCmnId());
 
         cmnService.deleteCmn(board);
         return ResponseEntity.ok("성공!");
     }
+
+    @Operation(summary = "좋아요",
+        description = "좋아요 혹은 좋아요 취소를 합니다.")
+    @GetMapping("/like/{cmnId}/{memberId}")
+    public Boolean likeCmn(@PathVariable Long memberId,
+                           @PathVariable Long cmnId) {
+        Member member = validator.getMember(memberId);
+        OeBoard board = validator.getBoard(cmnId);
+        return cmnService.cmnLike(member, board);
+    }
+
 
 //    @GetMapping("/test")
 //    public void test() {

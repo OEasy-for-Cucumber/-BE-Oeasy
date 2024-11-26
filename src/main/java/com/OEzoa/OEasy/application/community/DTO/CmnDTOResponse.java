@@ -17,8 +17,9 @@ public class CmnDTOResponse {
     private LocalDateTime createdAt;
     private long likes;
     private List<String> imageUrlList;
+    private boolean liked;
 
-    public static CmnDTOResponse of(OeBoard board){
+    public static CmnDTOResponse of(OeBoard board, boolean liked){
         List<String> imageUrlList = new ArrayList<>();
         if(!board.getImages().isEmpty()){
             for (String s : imageUrlList) {
@@ -32,6 +33,7 @@ public class CmnDTOResponse {
                 .createdAt(board.getBoardTimestamp())
                 .likes(board.getLikes().size())
                 .imageUrlList(imageUrlList)
+                .liked(liked)
                 .build();
 
     }
