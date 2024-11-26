@@ -1,4 +1,4 @@
-package com.OEzoa.OEasy.application.community.DTO;
+package com.OEzoa.OEasy.application.community.DTO.Cmn;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;

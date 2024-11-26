@@ -1,6 +1,6 @@
 package com.OEzoa.OEasy.domain.community;
 
-import com.OEzoa.OEasy.application.community.DTO.CmnCreateRequestDTO;
+import com.OEzoa.OEasy.application.community.DTO.Cmn.CmnCreateRequestDTO;
 import com.OEzoa.OEasy.domain.member.Member;
 import jakarta.persistence.*;
 import lombok.*;
