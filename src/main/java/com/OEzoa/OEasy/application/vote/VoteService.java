@@ -45,9 +45,10 @@ public class VoteService {
 
     public VoteInitResponseDTO voting(Member member, boolean hateAndLike){
         //hateAndLike true : 좋아요, false : 싫어요
-        Optional<OeVote> oVote = oeVoteRepository.findByMemberAndDate(member, LocalDate.now());
+        LocalDate today = LocalDate.now();
+        Optional<OeVote> oVote = oeVoteRepository.findByMemberAndDate(member, today);
         String isVoting;
-        log.info("java time is {}", LocalDate.now());
+        log.info("java time is {}", today);
         OeVote vote;
         if(oVote.isPresent()){
             vote= oVote.get();
@@ -61,7 +62,7 @@ public class VoteService {
         }else{
             vote = OeVote.builder().member(member)
                     .vote(hateAndLike)
-                    .date(LocalDate.now()).build();
+                    .date(today).build();
             vote = oeVoteRepository.save(vote);
 
             log.info("mySql time is {}", vote.getDate());

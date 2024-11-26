@@ -2,11 +2,12 @@ package com.OEzoa.OEasy.domain.community;
 
 import com.OEzoa.OEasy.domain.member.Member;
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 @Getter
-@Setter
+@Builder(toBuilder = true)
+@NoArgsConstructor
+@AllArgsConstructor
 @Entity
 @Table(name = "oe_board_comment", schema = "oeasy")
 public class OeBoardComment {
@@ -15,9 +16,6 @@ public class OeBoardComment {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "board_comment_pk", nullable = false)
     private Long boardCommentPk;
-
-    @Column(name = "title", nullable = false, length = 50)
-    private String title;
 
     @Column(name = "content", length = 5000)
     private String content;

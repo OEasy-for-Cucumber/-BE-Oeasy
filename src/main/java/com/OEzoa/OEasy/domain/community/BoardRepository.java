@@ -9,7 +9,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -39,7 +38,7 @@ public interface BoardRepository extends JpaRepository<OeBoard, Long> {
 //            nativeQuery = true)
 //    Page<CmnBoardListResponseDTO> findByTitle(@Param("title") String title, Pageable pageable);
     //제목 검색
-    @Query("SELECT new com.OEzoa.OEasy.application.community.DTO.CmnBoardListResponseDTO(" +
+    @Query("SELECT new com.OEzoa.OEasy.application.community.DTO.Cmn.CmnBoardListResponseDTO(" +
             "b.boardPk, " +
             "b.title, " +
             "b.viewCnt, " +
@@ -56,7 +55,7 @@ public interface BoardRepository extends JpaRepository<OeBoard, Long> {
             "WHERE b.title LIKE CONCAT('%', :title, '%')")
     Page<CmnBoardListResponseDTO> findByTitle(@Param("title") String title, Pageable pageable);
     //제목 & 내용 검색
-    @Query("SELECT new com.OEzoa.OEasy.application.community.DTO.CmnBoardListResponseDTO(" +
+    @Query("SELECT new com.OEzoa.OEasy.application.community.DTO.Cmn.CmnBoardListResponseDTO(" +
             "b.boardPk, " +
             "b.title, " +
             "b.viewCnt, " +
@@ -74,7 +73,7 @@ public interface BoardRepository extends JpaRepository<OeBoard, Long> {
     Page<CmnBoardListResponseDTO> findByTitleOrContent(@Param("keyword") String keyword, Pageable pageable);
 
     //닉네임 검색
-    @Query("SELECT new com.OEzoa.OEasy.application.community.DTO.CmnBoardListResponseDTO(" +
+    @Query("SELECT new com.OEzoa.OEasy.application.community.DTO.Cmn.CmnBoardListResponseDTO(" +
             "b.boardPk, " +
             "b.title, " +
             "b.viewCnt, " +
@@ -91,6 +90,6 @@ public interface BoardRepository extends JpaRepository<OeBoard, Long> {
             "WHERE (m.nickname LIKE CONCAT('%', :keyword, '%') )")
     Page<CmnBoardListResponseDTO> findByNickname(@Param("keyword") String keyword, Pageable pageable);
 
-    Optional<OeBoard> findByMember(Member member);
+    Optional<OeBoard> findByMemberAndBoardPk(Member member,OeBoard boardPk);
 
 }

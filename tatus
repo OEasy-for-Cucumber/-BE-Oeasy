@@ -1,0 +1,139 @@
+[33mcommit 61a703e13f921008f5be438d8549734ccf1fcd0d[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mdev[m[33m)[m
+Merge: ed525cc 570f4af
+Author: qkrwlstn1 <75283640+qkrwlstn1@users.noreply.github.com>
+Date:   Thu Oct 31 16:27:27 2024 +0900
+
+    Merge branch 'dev' of https://github.com/qkrwlstn1/-BE-Oeasy into dev
+
+[33mcommit ed525cc0b860cca9c78f2311670663696270eb85[m
+Author: qkrwlstn1 <75283640+qkrwlstn1@users.noreply.github.com>
+Date:   Thu Oct 31 16:26:35 2024 +0900
+
+    [fix] 한 자릿수 시간대는 api를 불러오지 못하는 버그 수정
+
+[33mcommit 3caced73aff59c08d091815b7c72d6f6b067d2a0[m
+Author: qkrwlstn1 <75283640+qkrwlstn1@users.noreply.github.com>
+Date:   Thu Oct 31 16:25:49 2024 +0900
+
+    [chore] timeZone "Asia/Seoul" 명시
+
+[33mcommit 570f4afa9fb206cd08e7ff9585875930fea8215e[m[33m ([m[1;31morigin/dev[m[33m)[m
+Merge: 176e0db fab398f
+Author: 김현빈 <96505736+khv9786@users.noreply.github.com>
+Date:   Thu Oct 31 10:18:33 2024 +0900
+
+    Merge pull request #5 from qkrwlstn1/dev
+    
+    오이지수 개발
+
+[33mcommit fab398fc877bd364e66b3c14c1d02f30821ced81[m
+Author: qkrwlstn1 <75283640+qkrwlstn1@users.noreply.github.com>
+Date:   Wed Oct 30 22:40:38 2024 +0900
+
+    [feat] 오이 지수 기능 개발
+
+[33mcommit 1176e8aacf33cbc989ebd94c1fb2dfae8806fbf6[m
+Author: qkrwlstn1 <75283640+qkrwlstn1@users.noreply.github.com>
+Date:   Wed Oct 30 22:38:55 2024 +0900
+
+    [feat] 오이 지수 스케줄러 기능
+
+[33mcommit 822945b390543af34a0916935898a791295f7363[m
+Author: qkrwlstn1 <75283640+qkrwlstn1@users.noreply.github.com>
+Date:   Wed Oct 30 22:37:06 2024 +0900
+
+    [init] 스웨거 config 세팅
+
+[33mcommit 55e5ac458ef6566829e1f56a948d4af3f1d44252[m
+Author: 김현빈 <96505736+khv9786@users.noreply.github.com>
+Date:   Wed Oct 30 16:44:49 2024 +0900
+
+    [chore] 빌드파일 서브모듈 수정
+
+[33mcommit 4300f6f6be6ad1adf1827753595e6e2e0f58e8fd[m
+Author: 김현빈 <96505736+khv9786@users.noreply.github.com>
+Date:   Wed Oct 30 15:29:33 2024 +0900
+
+    [chore] 서브모듈 SSH키 관련 이슈 수정
+
+[33mcommit 176e0db27e3c4d012cf9778bbc330fec24683735[m
+Merge: 4e834b2 10c6a00
+Author: 김현빈 <96505736+khv9786@users.noreply.github.com>
+Date:   Tue Oct 29 17:26:38 2024 +0900
+
+    Merge pull request #4 from OEasy-for-Cucumber/dev
+    
+    [chore] Jwt, 시큐리티
+
+[33mcommit 10c6a00e8af4949aacab1f955d5262b2e1e077e0[m
+Merge: b4fd5b0 ee2a850
+Author: 김현빈 <96505736+khv9786@users.noreply.github.com>
+Date:   Tue Oct 29 17:18:11 2024 +0900
+
+    [chore] Jwt, Json, 시큐리티 수정
+    
+    [chore] Jwt, Json, 시큐리티 수정
+
+[33mcommit ee2a850b74d6a7be2869f2e3ee894a6f786dd3e6[m
+Author: 김현빈 <96505736+khv9786@users.noreply.github.com>
+Date:   Tue Oct 29 17:16:47 2024 +0900
+
+    [chore] Git ignore 수정
+
+[33mcommit 8326f334b52d4efcb3a053d9002f0df7338ba79e[m
+Author: 김현빈 <96505736+khv9786@users.noreply.github.com>
+Date:   Tue Oct 29 17:16:31 2024 +0900
+
+    [chore] JWT, JsonObject, 시큐리티 설정
+
+[33mcommit 4e834b2810f75b61b563c4065415c93b5aa3e063[m
+Author: 김현빈 <96505736+khv9786@users.noreply.github.com>
+Date:   Tue Oct 29 15:36:19 2024 +0900
+
+    [feat] 서브모듈 세팅
+
+[33mcommit 6848b06eeacabb6acf7b768d428f363dfe758790[m
+Merge: bdef2ff b4fd5b0
+Author: 김현빈 <96505736+khv9786@users.noreply.github.com>
+Date:   Tue Oct 29 10:53:59 2024 +0900
+
+    Merge branch 'OEasy-for-Cucumber:main' into main
+
+[33mcommit b4fd5b0723c379c7b94335158708a5742259d592[m
+Merge: ed55b7f da0511b
+Author: 김현빈 <96505736+khv9786@users.noreply.github.com>
+Date:   Mon Oct 28 17:01:25 2024 +0900
+
+    Merge pull request #2 from OEasy-for-Cucumber/dev
+    
+    Dev to Main
+
+[33mcommit da0511b67b710f16d1789e6258fea1fe66240cd5[m
+Author: 김현빈 <96505736+khv9786@users.noreply.github.com>
+Date:   Mon Oct 28 16:33:02 2024 +0900
+
+    [feat] Entity 생성 및 파일구조 생성
+
+[33mcommit cb53d5f8f870379afa101cf0d635e58d18ec6c2a[m
+Author: 김현빈 <96505736+khv9786@users.noreply.github.com>
+Date:   Mon Oct 28 16:32:41 2024 +0900
+
+    [feat] Swagger Config
+
+[33mcommit 6ca59d3a78d414539671f425d4a1b412bb201183[m
+Author: 김현빈 <96505736+khv9786@users.noreply.github.com>
+Date:   Mon Oct 28 16:31:35 2024 +0900
+
+    [build] Swagger, Kafka, OpenWeatherMap 세팅
+
+[33mcommit ed55b7fd303c6928165eca840d8a37c3a4eeb6a3[m
+Author: 김현빈 <96505736+khv9786@users.noreply.github.com>
+Date:   Fri Oct 25 11:49:00 2024 +0900
+
+    [init] git ignore, dependence 세팅
+
+[33mcommit bdef2ffe45ff7c8b6193f85bc145368a09f74885[m
+Author: 김현빈 <96505736+khv9786@users.noreply.github.com>
+Date:   Fri Oct 25 10:30:50 2024 +0900
+
+    Initial commit

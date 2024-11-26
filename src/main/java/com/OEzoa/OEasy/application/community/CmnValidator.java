@@ -1,7 +1,9 @@
 package com.OEzoa.OEasy.application.community;
 
+import com.OEzoa.OEasy.domain.community.BoardCommentRepository;
 import com.OEzoa.OEasy.domain.community.BoardRepository;
 import com.OEzoa.OEasy.domain.community.OeBoard;
+import com.OEzoa.OEasy.domain.community.OeBoardComment;
 import com.OEzoa.OEasy.domain.member.Member;
 import com.OEzoa.OEasy.domain.member.MemberRepository;
 import com.OEzoa.OEasy.exception.GlobalException;
@@ -14,6 +16,7 @@ import org.springframework.stereotype.Component;
 public class CmnValidator {
 
     private final MemberRepository memberRepository;
+    private final BoardCommentRepository boardCommentRepository;
     private final BoardRepository boardRepository;
     public Member getMember(long pk){
         System.out.println("pk = " + pk);
@@ -21,7 +24,11 @@ public class CmnValidator {
     }
 
     public OeBoard getBoard(long id){
+        System.out.println("id = " + id);
         return boardRepository.findById(id).orElseThrow(()->new GlobalException(GlobalExceptionCode.COMMUNITY_NOT_FIND));
+    }
+    public OeBoardComment getBoardComment(long id){
+        return boardCommentRepository.findById(id).orElseThrow(()->new GlobalException(GlobalExceptionCode.COMMUNITY_COMMENT_NOT_FIND));
     }
 
     /**
@@ -32,7 +39,16 @@ public class CmnValidator {
      */
     public OeBoard myBoardCheck(long memberPk, long boardPk){
         Member member = getMember(memberPk);
-        return boardRepository.findByMember(member).orElseThrow(()-> new GlobalException(GlobalExceptionCode.COMMUNITY_NOT_FOUND_BOARD));
+        OeBoard board = getBoard(boardPk);
+        return boardRepository.findByMemberAndBoardPk(member, board).orElseThrow(()-> new GlobalException(GlobalExceptionCode.COMMUNITY_NOT_FOUND_BOARD));
+    }
+
+    public OeBoardComment myCommentCheck(long memberPk, long commentPk){
+        Member member = getMember(memberPk);
+        OeBoardComment comment = getBoardComment(commentPk);
+
+        return boardCommentRepository.findByBoardCommentPkAndMember(commentPk,member).orElseThrow(()-> new GlobalException(GlobalExceptionCode.BAD_REQUEST));
+
     }
 
 
