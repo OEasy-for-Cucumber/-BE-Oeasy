@@ -1,7 +1,7 @@
 package com.OEzoa.OEasy.api.community;
 
 import com.OEzoa.OEasy.application.community.*;
-import com.OEzoa.OEasy.application.community.DTO.*;
+import com.OEzoa.OEasy.application.community.DTO.Cmn.*;
 import com.OEzoa.OEasy.domain.community.OeBoard;
 import com.OEzoa.OEasy.domain.member.Member;
 import io.swagger.v3.oas.annotations.Operation;

@@ -1,4 +1,4 @@
-package com.OEzoa.OEasy.application.community.DTO;
+package com.OEzoa.OEasy.application.community.DTO.Cmn;
 
 import com.OEzoa.OEasy.domain.community.OeBoard;
 import lombok.Builder;

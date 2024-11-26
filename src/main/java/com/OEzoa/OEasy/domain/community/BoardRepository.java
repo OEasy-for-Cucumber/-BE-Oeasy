@@ -1,6 +1,6 @@
 package com.OEzoa.OEasy.domain.community;
 
-import com.OEzoa.OEasy.application.community.DTO.CmnBoardListResponseDTO;
+import com.OEzoa.OEasy.application.community.DTO.Cmn.CmnBoardListResponseDTO;
 import com.OEzoa.OEasy.domain.member.Member;
 import io.lettuce.core.dynamic.annotation.Param;
 import org.springframework.data.domain.Page;
