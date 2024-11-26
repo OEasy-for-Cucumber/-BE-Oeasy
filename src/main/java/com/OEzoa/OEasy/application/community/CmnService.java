@@ -16,10 +16,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.swing.*;
-import java.awt.print.Pageable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -30,9 +29,9 @@ public class CmnService {
     
     private final BoardRepository boardRepository;
     private final BoardImgRepository boardImgRepository;
+    private final BoardLikeRepository boardLikeRepository;
     private final MemberRepository memberRepository;
     private final FileUploader fileUploader;
-    private final BoardLikeRepository boardLikeRepository;
 
     /**
      * 게시글 작성
@@ -53,8 +52,11 @@ public class CmnService {
         }
     }
 
-    public CmnDTOResponse getCmn(OeBoard board){
-        return CmnDTOResponse.of(board);
+    public CmnDTOResponse getCmn(OeBoard board, Member member){
+        Optional<OeBoardLike> oeBoardLike = boardLikeRepository.findByBoardAndMember(board, member);
+        if(oeBoardLike.isPresent()){
+            return CmnDTOResponse.of(board, true);
+        }else return CmnDTOResponse.of(board, false);
     }
 
     // s3버킷 리팩토링할 것
@@ -120,6 +122,22 @@ public class CmnService {
             case "nickname" -> boardRepository.findByNickname(dto.getSearchKeyword(), pageable);
             default -> throw new GlobalException(GlobalExceptionCode.BAD_REQUEST);
         };
+    }
+
+    public boolean cmnLike(Member member, OeBoard board){
+        Optional<OeBoardLike> boardLike = boardLikeRepository.findByBoardAndMember(board, member);
+
+        if(boardLike.isPresent()){
+            boardLikeRepository.delete(boardLike.get());
+            return false;
+        }else{
+            boardLikeRepository.save(OeBoardLike.builder()
+                            .board(board)
+                            .member(member)
+                    .build());
+            return true;
+        }
+
     }
 
 }

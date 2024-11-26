@@ -1,14 +1,12 @@
 package com.OEzoa.OEasy.application.community.DTO;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
 @Builder(toBuilder = true)
+@Setter
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
