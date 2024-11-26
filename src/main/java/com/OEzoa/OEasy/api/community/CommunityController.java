@@ -23,26 +23,20 @@ public class CommunityController {
 
     @Operation(summary = "게시물 작성하기",
             description = "게시물을 작성")
-    //@PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @PostMapping
-    //public ResponseEntity<String> createCmn(@ModelAttribute CmnCreateRequestDTO cmn) {
-    public ResponseEntity<String> createCmn(@RequestParam("file") MultipartFile file) {
-
-            System.out.println("file = " + file.getName());
-
-
-//        System.out.println("cmn.getImgList().get(0).getName() = " + cmn.getImgList().size());
-//        System.out.println("cmn.getImgList().get(0).getName() = " + cmn.getImgList().get(0).getName());
-//        Member member = validator.getMember(cmn.getUserId());
-//        cmnService.createCmn(cmn, member);
+    public ResponseEntity<String> createCmn(@RequestBody CmnCreateRequestDTO cmn) {
+        System.out.println("cmn.getImgList().get(0).getName() = " + cmn.getImgList().size());
+        System.out.println("cmn.getImgList().get(0).getName() = " + cmn.getImgList().get(0).getName());
+        Member member = validator.getMember(cmn.getUserId());
+        cmnService.createCmn(cmn, member);
         return ResponseEntity.ok("성공!");
     }
 
 
     @Operation(summary = "게시물 수정하기",
             description = "게시물을 수정")
-    @PatchMapping(consumes = "multipart/from-data")
-    public ResponseEntity<String> updateCmn(@ModelAttribute CmnUpdateRequestDTO cmn) {
+    @PatchMapping
+    public ResponseEntity<String> updateCmn(@RequestBody CmnUpdateRequestDTO cmn) {
         OeBoard board = validator.myBoardCheck(cmn.getUserId(), cmn.getCommunityId());
         cmnService.updateCmn(board, cmn);
         return ResponseEntity.ok("성공!");
