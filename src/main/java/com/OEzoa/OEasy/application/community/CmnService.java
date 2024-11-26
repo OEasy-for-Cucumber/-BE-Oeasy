@@ -1,6 +1,6 @@
 package com.OEzoa.OEasy.application.community;
 
-import com.OEzoa.OEasy.application.community.DTO.*;
+import com.OEzoa.OEasy.application.community.DTO.Cmn.*;
 import com.OEzoa.OEasy.domain.community.*;
 import com.OEzoa.OEasy.domain.member.Member;
 import com.OEzoa.OEasy.domain.member.MemberRepository;
