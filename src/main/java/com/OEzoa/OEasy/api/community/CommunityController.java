@@ -94,7 +94,7 @@ public class CommunityController {
     @GetMapping("/view/{communityId}")
     public void plusView(@PathVariable Long communityId){
         OeBoard board = validator.getBoard(communityId);
-        cmnService.plusView(board);
+        cmnService.plusView(communityId);
     }
 
 //    @GetMapping("/test")

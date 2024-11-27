@@ -140,7 +140,7 @@ public class CmnService {
 
     }
 
-    public void plusView(OeBoard board){
+    public void plusView(long board){
         boardRepository.updatePlusView(board);
     }
 
