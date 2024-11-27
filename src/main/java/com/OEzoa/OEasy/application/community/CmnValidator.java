@@ -40,7 +40,7 @@ public class CmnValidator {
     public OeBoard myBoardCheck(long memberPk, long boardPk){
         Member member = getMember(memberPk);
         OeBoard board = getBoard(boardPk);
-        return boardRepository.findByMemberAndBoardPk(member, board).orElseThrow(()-> new GlobalException(GlobalExceptionCode.COMMUNITY_NOT_FOUND_BOARD));
+        return boardRepository.findByMemberAndBoardPk(member, boardPk).orElseThrow(()-> new GlobalException(GlobalExceptionCode.COMMUNITY_NOT_FOUND_BOARD));
     }
 
     public OeBoardComment myCommentCheck(long memberPk, long commentPk){

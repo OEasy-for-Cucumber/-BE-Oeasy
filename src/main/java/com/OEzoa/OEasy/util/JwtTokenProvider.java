@@ -18,7 +18,7 @@ public class JwtTokenProvider {
     @Value("${jwt.secret-key}")
     private String secretKeyPlain;  // 설정 파일로부터 읽어올 비밀 키 (평문 상태)
 
-    private final long TOKEN_VALIDITY = 1000L * 60 * 60 * 12;  // 액세스 토큰 유효 시간: 12시간
+    private final long TOKEN_VALIDITY = 1000L * 60 * 5;  // 액세스 토큰 유효 시간: 10분
     private final long REFRESH_TOKEN_VALIDITY = 1000L * 60 * 60 * 24 * 7;  // 리프레시 토큰 유효 시간: 7일
     private SecretKey secretKey;  // 실제 서명 및 검증에 사용할 인코딩된 비밀 키
 

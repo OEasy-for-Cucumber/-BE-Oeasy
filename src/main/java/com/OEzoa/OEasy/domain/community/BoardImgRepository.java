@@ -8,5 +8,6 @@ import java.util.List;
 @Repository
 public interface BoardImgRepository extends JpaRepository<OeBoardImg, Long> {
 
+
     void deleteByBoard(OeBoard board);
 }
