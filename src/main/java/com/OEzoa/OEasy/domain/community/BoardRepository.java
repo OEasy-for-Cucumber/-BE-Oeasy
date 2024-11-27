@@ -91,7 +91,7 @@ public interface BoardRepository extends JpaRepository<OeBoard, Long> {
             "WHERE (m.nickname LIKE CONCAT('%', :keyword, '%') )")
     Page<CmnBoardListResponseDTO> findByNickname(@Param("keyword") String keyword, Pageable pageable);
 
-    Optional<OeBoard> findByMemberAndBoardPk(Member member,OeBoard boardPk);
+    Optional<OeBoard> findByMemberAndBoardPk(Member member,long boardPk);
 
     @Modifying
     @Query("UPDATE OeBoard SET viewCnt = viewCnt+1 WHERE boardPk= :board")

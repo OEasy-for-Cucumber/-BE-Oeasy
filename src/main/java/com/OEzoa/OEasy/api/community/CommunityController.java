@@ -6,6 +6,7 @@ import com.OEzoa.OEasy.domain.community.OeBoard;
 import com.OEzoa.OEasy.domain.member.Member;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
@@ -23,8 +24,9 @@ public class CommunityController {
 
     @Operation(summary = "게시물 작성하기",
             description = "게시물을 작성")
-    @PostMapping
-    public ResponseEntity<String> createCmn(@RequestBody CmnCreateRequestDTO cmn) {
+    @PostMapping(consumes = {"multipart/form-data"})
+    public ResponseEntity<String> createCmn(@ModelAttribute CmnCreateRequestDTO cmn) {
+        System.out.println("cmn.getContent() = " + cmn.getContent());
         System.out.println("cmn.getImgList().get(0).getName() = " + cmn.getImgList().size());
         System.out.println("cmn.getImgList().get(0).getName() = " + cmn.getImgList().get(0).getName());
         Member member = validator.getMember(cmn.getUserId());
@@ -35,8 +37,8 @@ public class CommunityController {
 
     @Operation(summary = "게시물 수정하기",
             description = "게시물을 수정")
-    @PatchMapping
-    public ResponseEntity<String> updateCmn(@RequestBody CmnUpdateRequestDTO cmn) {
+    @PatchMapping(consumes = {"multipart/form-data"})
+    public ResponseEntity<String> updateCmn(@ModelAttribute CmnUpdateRequestDTO cmn) {
         OeBoard board = validator.myBoardCheck(cmn.getUserId(), cmn.getCommunityId());
         cmnService.updateCmn(board, cmn);
         return ResponseEntity.ok("성공!");
