@@ -26,9 +26,6 @@ public class CommunityController {
             description = "게시물을 작성")
     @PostMapping(consumes = {"multipart/form-data"})
     public ResponseEntity<String> createCmn(@ModelAttribute CmnCreateRequestDTO cmn) {
-        System.out.println("cmn.getContent() = " + cmn.getContent());
-        System.out.println("cmn.getImgList().get(0).getName() = " + cmn.getImgList().size());
-        System.out.println("cmn.getImgList().get(0).getName() = " + cmn.getImgList().get(0).getName());
         Member member = validator.getMember(cmn.getUserId());
         cmnService.createCmn(cmn, member);
         return ResponseEntity.ok("성공!");

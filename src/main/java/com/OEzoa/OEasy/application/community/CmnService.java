@@ -42,7 +42,7 @@ public class CmnService {
         OeBoard board = OeBoard.of(cmn, member);
         board = boardRepository.save(board);
         
-        if(!cmn.getImgList().isEmpty()){
+        if(cmn.getImgList() != null){
             List<OeBoardImg> urlList = new ArrayList<>();
             for (MultipartFile multipartFile : cmn.getImgList()) {
                 String uniqueImageKey = member.getNickname() + "_" + UUID.randomUUID();
