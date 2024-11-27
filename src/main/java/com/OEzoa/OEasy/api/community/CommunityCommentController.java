@@ -52,6 +52,7 @@ public class CommunityCommentController {
         cmnCommentService.deleteComment(comment);
     }
 
+    @Operation(summary = "댓글 수정")
     @PatchMapping
     public void updateComment(@RequestBody UpdateCommentRequestDTO dto){
         OeBoardComment comment = validator.myCommentCheck(dto.getMemberId(), dto.getCommentId());

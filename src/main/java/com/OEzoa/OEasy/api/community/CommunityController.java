@@ -90,6 +90,12 @@ public class CommunityController {
         return cmnService.cmnLike(member, board);
     }
 
+    @Operation(summary = "뷰 올리기")
+    @GetMapping("/view/{communityId}")
+    public void plusView(@PathVariable Long communityId){
+        OeBoard board = validator.getBoard(communityId);
+        cmnService.plusView(board);
+    }
 
 //    @GetMapping("/test")
 //    public void test() {
