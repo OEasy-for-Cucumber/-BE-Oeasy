@@ -47,8 +47,8 @@ public class CorsConfig {
         config.setAllowedOrigins(Arrays.asList("http://localhost:3000", "https://oeasy.world"));
         config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH")); // PATCH 포함
         config.setAllowCredentials(true);
-        config.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type", "X-Requested-With", "Accept", "Origin"));
-        config.setExposedHeaders(Arrays.asList("Authorization", "X-Refresh-Token"));
+        config.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type", "X-Requested-With", "Accept", "Origin", "Access-Control-Allow-Origin"));
+        config.setExposedHeaders(Arrays.asList("Authorization", "X-Refresh-Token", "Content-Disposition"));
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", config);
