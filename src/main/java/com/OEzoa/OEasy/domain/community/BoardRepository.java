@@ -92,4 +92,6 @@ public interface BoardRepository extends JpaRepository<OeBoard, Long> {
 
     Optional<OeBoard> findByMemberAndBoardPk(Member member,OeBoard boardPk);
 
+    @Query("UPDATE OeBoard SET viewCnt = viewCnt+1 WHERE boardPk = :board")
+    void updatePlusView(OeBoard board);
 }
