@@ -5,7 +5,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
-@Builder(toBuilder = true)
+
 @Setter
 @Getter
 @AllArgsConstructor
