@@ -1,6 +1,8 @@
 package com.OEzoa.OEasy.application.community.DTO.Cmn;
 
 import com.OEzoa.OEasy.domain.community.OeBoard;
+import com.OEzoa.OEasy.domain.community.OeBoardImg;
+import com.OEzoa.OEasy.domain.image.OeImage;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -22,8 +24,8 @@ public class CmnDTOResponse {
     public static CmnDTOResponse of(OeBoard board, boolean liked){
         List<String> imageUrlList = new ArrayList<>();
         if(!board.getImages().isEmpty()){
-            for (String s : imageUrlList) {
-                imageUrlList.add(s);
+            for (OeBoardImg image : board.getImages()) {
+                imageUrlList.add(image.getS3ImgAddress());
             }
         }
         return CmnDTOResponse.builder()
