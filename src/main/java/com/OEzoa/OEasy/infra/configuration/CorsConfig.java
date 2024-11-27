@@ -42,7 +42,7 @@ public class CorsConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
-        config.setAllowedOrigins(Arrays.asList("http://localhost:3000", "https://oeasy.world")); // 허용할 Origin
+        config.setAllowedOrigins(Arrays.asList("http://localhost:3000", "https://oeasy.world, *")); // 허용할 Origin
         config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH")); // 허용할 메서드
         config.setAllowCredentials(true); // 인증 정보 허용
         config.setAllowedHeaders(Arrays.asList(
