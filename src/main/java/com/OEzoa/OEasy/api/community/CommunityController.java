@@ -55,6 +55,7 @@ public class CommunityController {
             @RequestParam(required = false) String sortKeyword,
             @RequestParam(required = false) Boolean sortType
     ) {
+        if(searchKeyword == null) searchKeyword = "";
         CmnBoardListRequestDTO dto = new CmnBoardListRequestDTO(page, size, searchKeyword, searchType, sortKeyword, sortType);
         return ResponseEntity.ok(cmnService.searchBoard(dto));
     }
