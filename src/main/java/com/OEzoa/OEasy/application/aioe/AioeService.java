@@ -37,17 +37,29 @@ public class AioeService {
     public AioeIntroMessageDTO startChatbot(String accessToken) {
         Member member = tokenValidator.validateAccessTokenAndReturnMember(accessToken);
 
-        if (aioeRepository.findByMember(member).isPresent()) {
-            throw new GlobalException(GlobalExceptionCode.MEMBER_ALREADY_CONNECTED);
+        // 이미 챗봇이 연결되어 있는 경우 기존 데이터를 반환
+        Optional<AiOe> existingAiOe = aioeRepository.findByMember(member);
+        if (existingAiOe.isPresent()) {
+            AiOe aiOe = existingAiOe.get();
+
+            // 기존 초기 메시지 검색
+            ChatMessage initialMessage = chatMessageRepository.findFirstByAiOeAndTypeOrderByDateTimeAsc(aiOe, "aioe");
+            if (initialMessage != null) {
+                return ChatMessageMapper.toStartResponseDto(initialMessage);
+            }
         }
+
+        // 새로운 챗봇 연결 생성
         AiOe aiOe = ChatMessageMapper.toAiOe(member);
         aioeRepository.save(aiOe);
 
+        // 초기 메시지 생성 및 저장
         ChatMessage initialMessage = ChatMessageMapper.toEntity(
                 "안녕하세오이? 저는 AI 오이입니다오이! 오이에 관련된 질문을 해주세오이! 🥒", "aioe", aiOe
         );
         chatMessageRepository.save(initialMessage);
 
+        // 새로운 초기 메시지를 반환
         return ChatMessageMapper.toStartResponseDto(initialMessage);
     }
 
