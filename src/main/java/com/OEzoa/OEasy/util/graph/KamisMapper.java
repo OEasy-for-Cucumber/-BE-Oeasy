@@ -1,8 +1,8 @@
-package com.OEzoa.OEasy.util;
+package com.OEzoa.OEasy.util.graph;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlElementWrapper;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Data;
 
 import java.util.List;
@@ -25,16 +25,16 @@ public class KamisMapper {
     @Data
     @JsonIgnoreProperties(ignoreUnknown = true) // 매핑되지 않은 item의 필드 무시
     public static class ItemNode {
-        @JacksonXmlProperty(localName = "yyyy")
-        private String yyyy;
-
-        @JacksonXmlProperty(localName = "regday")
-        private String regday;
+        @JacksonXmlProperty(localName = "countyname")
+        private String countyname; // 지역명 (평균, 최고값, 최저값 등 포함)
 
         @JacksonXmlProperty(localName = "price")
-        private String price;
+        private String price; // 가격 (숫자 또는 "-")
 
-        @JacksonXmlProperty(localName = "countyname")
-        public String countyname;
+        @JacksonXmlProperty(localName = "yyyy")
+        private String yyyy; // 연도 (평균 데이터용)
+
+        @JacksonXmlProperty(localName = "regday")
+        private String regday; // 날짜 (평균 데이터용)
     }
 }

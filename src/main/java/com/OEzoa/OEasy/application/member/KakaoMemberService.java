@@ -5,7 +5,7 @@ import com.OEzoa.OEasy.application.member.dto.MemberLoginResponseDTO;
 import com.OEzoa.OEasy.domain.member.Member;
 import com.OEzoa.OEasy.domain.member.MemberRepository;
 import com.OEzoa.OEasy.infra.api.KakaoService;
-import com.OEzoa.OEasy.util.JwtTokenProvider;
+import com.OEzoa.OEasy.util.member.JwtTokenProvider;
 import jakarta.servlet.http.HttpSession;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -1,4 +1,4 @@
-package com.OEzoa.OEasy.util;
+package com.OEzoa.OEasy.util.member;
 
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
