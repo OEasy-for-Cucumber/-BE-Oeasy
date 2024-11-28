@@ -1,32 +1,32 @@
 package com.OEzoa.OEasy.application.community.DTO.Cmn;
 
-import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
+import org.springframework.data.domain.Page;
+
+import java.util.List;
 
 @Getter
-@Setter
-@AllArgsConstructor
+@Builder
 @NoArgsConstructor
+@AllArgsConstructor
 public class CmnBoardListResponseDTO {
 
-    @Schema(description = "보드 pk")
-    private Long boardPk;
+    private List<CmnBoardListDTO> contents;
 
-    @Schema(description = "제목")
-    private String title;
+    private long totalElements;
+    private long totalPages;
+    private long size;
 
-    @Schema(description = "조회수")
-    private Integer viewCnt;
+    public static CmnBoardListResponseDTO of(Page<CmnBoardListDTO> dto){
+        return CmnBoardListResponseDTO.builder()
+                .contents(dto.getContent())
+                .totalElements(dto.getTotalElements())
+                .totalPages(dto.getTotalPages())
+                .size(dto.getSize())
+                .build();
+    }
 
-    @Schema(description = "좋아요")
-    private Integer likeCnt;
-
-    @Schema(description = "닉네임")
-    private String nickname;
-
-    @Schema(description = "썸네일 이미지 URL")
-    private String thumbnailUrl;
 }
