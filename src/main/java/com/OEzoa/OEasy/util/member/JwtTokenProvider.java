@@ -25,10 +25,8 @@ public class JwtTokenProvider {
     @PostConstruct
     protected void init() {
         // Base64 인코딩된 secretKeyPlain을 디코딩하여 SecretKey 생성
-        System.out.println("플레인 시크릿 키 (Base64 인코딩된 값): " + secretKeyPlain);
         byte[] decodedKey = Base64.getDecoder().decode(secretKeyPlain);
         secretKey = Keys.hmacShaKeyFor(decodedKey);  // Base64 디코딩된 바이트 배열로 SecretKey 생성
-        System.out.println("시크릿 키 (디코딩 후 SecretKey 객체): " + secretKey);
     }
 
     // JWT 액세스 토큰 생성 메서드

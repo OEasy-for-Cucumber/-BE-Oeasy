@@ -1,5 +1,6 @@
 package com.OEzoa.OEasy.application.community;
 
+import com.OEzoa.OEasy.application.community.DTO.Cmn.CmnBoardListRequestDTO;
 import com.OEzoa.OEasy.domain.community.BoardCommentRepository;
 import com.OEzoa.OEasy.domain.community.BoardRepository;
 import com.OEzoa.OEasy.domain.community.OeBoard;
@@ -51,5 +52,15 @@ public class CmnValidator {
 
     }
 
+    public void pageCheck(CmnBoardListRequestDTO dto){
+        if(!dto.getSearchType().equals("titleAndContent") &&
+                !dto.getSearchType().equals("title") &&
+                !dto.getSearchType().equals("nickname")){
+            throw new GlobalException(GlobalExceptionCode.COMMUNITY_INVALID_SEARCH_TYPE);
+        }else if(!dto.getSortKeyword().equals("likeCnt") &&
+                !dto.getSortKeyword().equals("boardPk")){
+            throw new GlobalException(GlobalExceptionCode.COMMUNITY_INVALID_SORT_KEYWORD);
+        }
+    }
 
 }

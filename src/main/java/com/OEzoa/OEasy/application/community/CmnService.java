@@ -1,5 +1,8 @@
 package com.OEzoa.OEasy.application.community;
 
+
+
+
 import com.OEzoa.OEasy.application.community.DTO.Cmn.*;
 import com.OEzoa.OEasy.domain.community.*;
 import com.OEzoa.OEasy.domain.member.Member;
@@ -113,7 +116,7 @@ public class CmnService {
         }
     }
 
-    public Page<CmnBoardListResponseDTO> searchBoard(CmnBoardListRequestDTO dto){
+    public CmnBoardListResponseDTO searchBoard(CmnBoardListRequestDTO dto){
         Pageable pageable;
         if(dto.isSortType()) {
             pageable = PageRequest.of(dto.getPage(), dto.getSize(), Sort.by(Sort.Direction.ASC, dto.getSortKeyword()));
@@ -122,9 +125,9 @@ public class CmnService {
         }
 
         return switch (dto.getSearchType()) {
-            case "titleAndContent" -> boardRepository.findByTitleOrContent(dto.getSearchKeyword(), pageable);
-            case "title" -> boardRepository.findByTitle(dto.getSearchKeyword(), pageable);
-            case "nickname" -> boardRepository.findByNickname(dto.getSearchKeyword(), pageable);
+            case "titleAndContent" -> CmnBoardListResponseDTO.of(boardRepository.findByTitleOrContent(dto.getSearchKeyword().trim(), pageable));
+            case "title" -> CmnBoardListResponseDTO.of(boardRepository.findByTitle(dto.getSearchKeyword().trim(), pageable));
+            case "nickname" -> CmnBoardListResponseDTO.of(boardRepository.findByNickname(dto.getSearchKeyword().trim(), pageable));
             default -> throw new GlobalException(GlobalExceptionCode.BAD_REQUEST);
         };
     }

@@ -35,13 +35,14 @@ public class AioeController {
     @PostMapping("/start")
     @Operation(
             summary = "챗봇 시작",
-            description = "챗봇과 연결되며 기본 메세지를 출력합니다.")
+            description = "챗봇과 연결되며 기본 메시지를 반환합니다. 이미 연결된 경우 기존 초기 메시지를 반환합니다."
+    )
     @ApiResponse(responseCode = "200", description = "챗봇이 성공적으로 시작되었습니다.")
-    @ApiResponse(responseCode = "400", description = "잘못된 토큰 또는, 이미 연결")
-    public ResponseEntity<AioeIntroMessageDTO> startChatbot(@RequestHeader("Authorization") String authorizationHeader) {
+    @ApiResponse(responseCode = "400", description = "잘못된 토큰 또는 요청")
+    public ResponseEntity<AioeIntroMessageDTO> startChatbot(
+            @RequestHeader("Authorization") String authorizationHeader) {
         String accessToken = extractTokenFromHeader(authorizationHeader);
         AioeIntroMessageDTO response = aioeService.startChatbot(accessToken);
-
         return ResponseEntity.ok(response);
     }
 
@@ -58,7 +59,8 @@ public class AioeController {
             @RequestHeader(name = "Authorization") String authorizationHeader,
             @RequestBody AioeRequestDTO questionRequest) {
         String accessToken = extractTokenFromHeader(authorizationHeader);
-        AioeResponseDTO response = aioeService.handleUserQuestionWithTimestamp(questionRequest.getQuestion(), accessToken);
+        AioeResponseDTO response = aioeService.handleUserQuestionWithTimestamp(questionRequest.getQuestion(),
+                accessToken);
         return ResponseEntity.ok(response);
     }
 
@@ -88,7 +90,7 @@ public class AioeController {
     public ResponseEntity<String> deleteChatHistory(
             @RequestHeader(name = "Authorization") String authorizationHeader) {
         String accessToken = extractTokenFromHeader(authorizationHeader);
-        aioeService.deleteChatbotConnection(accessToken); // 메서드 이름 수정
-        return ResponseEntity.ok("채팅 로그와 챗봇 연결이 삭제되었습니다.");
+        String resultMessage = aioeService.deleteChatbotConnection(accessToken);
+        return ResponseEntity.ok(resultMessage);
     }
 }

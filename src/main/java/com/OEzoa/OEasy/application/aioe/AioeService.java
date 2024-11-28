@@ -15,6 +15,7 @@ import com.OEzoa.OEasy.exception.GlobalException;
 import com.OEzoa.OEasy.exception.GlobalExceptionCode;
 import com.OEzoa.OEasy.infra.api.aioe.OpenAIClient;
 import java.util.List;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -36,17 +37,29 @@ public class AioeService {
     public AioeIntroMessageDTO startChatbot(String accessToken) {
         Member member = tokenValidator.validateAccessTokenAndReturnMember(accessToken);
 
-        if (aioeRepository.findByMember(member).isPresent()) {
-            throw new GlobalException(GlobalExceptionCode.MEMBER_ALREADY_CONNECTED);
+        // 이미 챗봇이 연결되어 있는 경우 기존 데이터를 반환
+        Optional<AiOe> existingAiOe = aioeRepository.findByMember(member);
+        if (existingAiOe.isPresent()) {
+            AiOe aiOe = existingAiOe.get();
+
+            // 기존 초기 메시지 검색
+            ChatMessage initialMessage = chatMessageRepository.findFirstByAiOeAndTypeOrderByDateTimeAsc(aiOe, "aioe");
+            if (initialMessage != null) {
+                return ChatMessageMapper.toStartResponseDto(initialMessage);
+            }
         }
+
+        // 새로운 챗봇 연결 생성
         AiOe aiOe = ChatMessageMapper.toAiOe(member);
         aioeRepository.save(aiOe);
 
+        // 초기 메시지 생성 및 저장
         ChatMessage initialMessage = ChatMessageMapper.toEntity(
                 "안녕하세오이? 저는 AI 오이입니다오이! 오이에 관련된 질문을 해주세오이! 🥒", "aioe", aiOe
         );
         chatMessageRepository.save(initialMessage);
 
+        // 새로운 초기 메시지를 반환
         return ChatMessageMapper.toStartResponseDto(initialMessage);
     }
 
@@ -84,10 +97,19 @@ public class AioeService {
 
     // 대화 내용 삭제
     @Transactional
-    public void deleteChatbotConnection(String accessToken) {
+    public String deleteChatbotConnection(String accessToken) {
         Member member = tokenValidator.validateAccessTokenAndReturnMember(accessToken);
-        AiOe aiOe = aioeValidator.validateChatbotConnection(member);
+
+        // 챗봇 연결 여부 확인
+        Optional<AiOe> optionalAiOe = aioeRepository.findByMember(member);
+        if (optionalAiOe.isEmpty()) {
+            return "삭제할 데이터가 없습니다."; // 연결이 없는 경우 메시지 반환
+        }
+
+        AiOe aiOe = optionalAiOe.get();
         chatMessageRepository.deleteByAiOe(aiOe); // 챗봇 대화 메시지 삭제
         aioeRepository.delete(aiOe);             // 챗봇 연결 삭제
+
+        return "채팅 로그와 챗봇 연결이 삭제되었습니다.";
     }
 }
