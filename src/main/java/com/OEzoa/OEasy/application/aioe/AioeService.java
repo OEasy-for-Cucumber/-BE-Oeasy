@@ -15,6 +15,7 @@ import com.OEzoa.OEasy.exception.GlobalException;
 import com.OEzoa.OEasy.exception.GlobalExceptionCode;
 import com.OEzoa.OEasy.infra.api.aioe.OpenAIClient;
 import java.util.List;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -84,10 +85,19 @@ public class AioeService {
 
     // 대화 내용 삭제
     @Transactional
-    public void deleteChatbotConnection(String accessToken) {
+    public String deleteChatbotConnection(String accessToken) {
         Member member = tokenValidator.validateAccessTokenAndReturnMember(accessToken);
-        AiOe aiOe = aioeValidator.validateChatbotConnection(member);
+
+        // 챗봇 연결 여부 확인
+        Optional<AiOe> optionalAiOe = aioeRepository.findByMember(member);
+        if (optionalAiOe.isEmpty()) {
+            return "삭제할 데이터가 없습니다."; // 연결이 없는 경우 메시지 반환
+        }
+
+        AiOe aiOe = optionalAiOe.get();
         chatMessageRepository.deleteByAiOe(aiOe); // 챗봇 대화 메시지 삭제
         aioeRepository.delete(aiOe);             // 챗봇 연결 삭제
+
+        return "채팅 로그와 챗봇 연결이 삭제되었습니다.";
     }
 }
