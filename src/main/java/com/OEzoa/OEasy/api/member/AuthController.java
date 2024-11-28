@@ -2,16 +2,9 @@ package com.OEzoa.OEasy.api.member;
 
 import com.OEzoa.OEasy.application.member.AuthService;
 import com.OEzoa.OEasy.application.member.dto.AuthTokenResponseDTO;
-import com.OEzoa.OEasy.domain.member.MemberToken;
-import com.OEzoa.OEasy.domain.member.MemberTokenRepository;
-import com.OEzoa.OEasy.util.JwtTokenProvider;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import java.util.Map;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestHeader;

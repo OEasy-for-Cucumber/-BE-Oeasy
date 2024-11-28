@@ -52,7 +52,9 @@ public enum GlobalExceptionCode {
     TOKEN_MEMBER_NOT_FOUND(HttpStatus.NOT_FOUND, "회원 정보를 찾을 수 없습니다.", "리프레시 토큰에서 추출한 사용자 ID가 존재하지 않음"),
     //---------------recipe-------------------
     RECIPE_OUT_OF_VALID_RANGE(HttpStatus.BAD_REQUEST, "범위를 벗어났습니다", "범위를 벗어난 데이터를 요청"),
-    RECIPE_ID_NOT_FOUND(HttpStatus.NOT_FOUND, "id를 확인해 주세요", "요청한 id에 해당하는 값이 없습니다.")
+    RECIPE_ID_NOT_FOUND(HttpStatus.NOT_FOUND, "id를 확인해 주세요", "요청한 id에 해당하는 값이 없습니다."),
+   //---------------graph-------------------
+    DATE_FORMAT_INVALID(HttpStatus.BAD_REQUEST, "잘못된 날짜 형식입니다. yyyy-MM-dd 형식을 사용하세요.", "사용자가 입력한 날짜 형식이 잘못됨"),
     ;
 
     private final HttpStatus httpStatus;

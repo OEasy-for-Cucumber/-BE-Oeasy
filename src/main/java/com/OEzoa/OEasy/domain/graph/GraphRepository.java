@@ -7,4 +7,6 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface GraphRepository extends JpaRepository<OeGraph, String> {
     List<OeGraph> findByDateBetween(String startDate, String endDate);
+    // 중복 검증용
+    boolean existsByDate(String date);
 }
