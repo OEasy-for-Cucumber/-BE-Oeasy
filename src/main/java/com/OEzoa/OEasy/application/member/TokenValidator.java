@@ -5,7 +5,7 @@ import com.OEzoa.OEasy.domain.member.MemberRepository;
 import com.OEzoa.OEasy.domain.member.MemberTokenRepository;
 import com.OEzoa.OEasy.exception.GlobalException;
 import com.OEzoa.OEasy.exception.GlobalExceptionCode;
-import com.OEzoa.OEasy.util.JwtTokenProvider;
+import com.OEzoa.OEasy.util.member.JwtTokenProvider;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.UnsupportedJwtException;
