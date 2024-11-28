@@ -4,6 +4,8 @@ import com.OEzoa.OEasy.application.member.dto.KakaoDTO;
 import com.OEzoa.OEasy.application.member.dto.MemberLoginResponseDTO;
 import com.OEzoa.OEasy.domain.member.Member;
 import com.OEzoa.OEasy.domain.member.MemberRepository;
+import com.OEzoa.OEasy.domain.member.MemberToken;
+import com.OEzoa.OEasy.domain.member.MemberTokenRepository;
 import com.OEzoa.OEasy.infra.api.KakaoService;
 import com.OEzoa.OEasy.util.member.JwtTokenProvider;
 import jakarta.servlet.http.HttpSession;
@@ -17,6 +19,8 @@ public class KakaoMemberService {
 
     @Autowired
     private MemberRepository memberRepository;
+    @Autowired
+    private MemberTokenRepository memberTokenRepository;
 
     @Autowired
     private JwtTokenProvider jwtTokenProvider;
@@ -54,7 +58,28 @@ public class KakaoMemberService {
         session.setAttribute("refreshToken", jwtRefreshToken);
 
         log.info("카카오 로그인 성공. 생성된 액세스 토큰: {}, 리프레시 토큰: {}", jwtAccessToken, jwtRefreshToken);
+        // MemberToken 저장 및 업데이트
+        MemberToken memberToken = memberTokenRepository.findById(member.getMemberPk()).orElse(null);
+        if (memberToken == null) {
+            // 신규 MemberToken 생성
+            memberToken = MemberToken.builder()
+                    .member(member)
+                    .accessToken(jwtAccessToken)
+                    .refreshToken(jwtRefreshToken)
+                    .build();
+            log.info("신규 MemberToken 생성: {}", memberToken);
+        } else {
+            // 기존 MemberToken 업데이트
+            memberToken = memberToken.toBuilder()
+                    .accessToken(jwtAccessToken)
+                    .refreshToken(jwtRefreshToken)
+                    .build();
+            log.info("기존 MemberToken 업데이트: {}", memberToken);
+        }
+        memberTokenRepository.save(memberToken);
+        log.info("MemberToken 저장 완료: {}", memberToken);
 
+        log.info("카카오 로그인 성공. 생성된 액세스 토큰: {}, 리프레시 토큰: {}", jwtAccessToken, jwtRefreshToken);
         return MemberLoginResponseDTO.builder()
                 .accessToken(jwtAccessToken)
                 .refreshToken(jwtRefreshToken)
