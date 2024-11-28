@@ -11,6 +11,7 @@ import com.OEzoa.OEasy.util.timeTrace.TimeTrace;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -42,7 +43,7 @@ public class CmnService {
         OeBoard board = OeBoard.of(cmn, member);
         board = boardRepository.save(board);
         
-        if(!cmn.getImgList().isEmpty()){
+        if(cmn.getImgList() != null){
             List<OeBoardImg> urlList = new ArrayList<>();
             for (MultipartFile multipartFile : cmn.getImgList()) {
                 String uniqueImageKey = member.getNickname() + "_" + UUID.randomUUID();
@@ -61,27 +62,28 @@ public class CmnService {
 
     // s3버킷 리팩토링할 것
     public void updateCmn(OeBoard board, CmnUpdateRequestDTO dto){
+
         for (OeBoardImg image : board.getImages()) {
-            System.out.println("image.getS3ImgAddress() = " + image.getS3ImgAddress());
             String key = fileUploader.extractKeyFromUrl(image.getS3ImgAddress());
-            System.out.println("key = " + key);
             fileUploader.deleteImage(key);
-        }
+            }
+
         boardImgRepository.deleteAll(board.getImages());
         board.getImages().clear();
         board.toBuilder().title(dto.getTitle())
                 .content(dto.getContent())
                 .build();
         //----이미지
-        for(MultipartFile multipartFile : dto.getImgList()){
-            String uniqueImageKey = board.getMember().getNickname() + "_" + UUID.randomUUID();
-            OeBoardImg oeBoardImg = OeBoardImg.builder()
-                    .board(board)
-                    .s3ImgAddress(fileUploader.uploadFile(multipartFile, uniqueImageKey))
-                    .build();
-            boardImgRepository.save(oeBoardImg);
+        if(dto.getImgList() != null) {
+            for (MultipartFile multipartFile : dto.getImgList()) {
+                String uniqueImageKey = board.getMember().getNickname() + "_" + UUID.randomUUID();
+                OeBoardImg oeBoardImg = OeBoardImg.builder()
+                        .board(board)
+                        .s3ImgAddress(fileUploader.uploadFile(multipartFile, uniqueImageKey))
+                        .build();
+                boardImgRepository.save(oeBoardImg);
+            }
         }
-
 
     }
 
@@ -112,8 +114,7 @@ public class CmnService {
     }
 
     public Page<CmnBoardListResponseDTO> searchBoard(CmnBoardListRequestDTO dto){
-
-        org.springframework.data.domain.Pageable pageable;
+        Pageable pageable;
         if(dto.isSortType()) {
             pageable = PageRequest.of(dto.getPage(), dto.getSize(), Sort.by(Sort.Direction.ASC, dto.getSortKeyword()));
         }else{

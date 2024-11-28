@@ -25,30 +25,29 @@ public class CommunityController {
     @Operation(summary = "게시물 작성하기",
             description = "게시물을 작성")
     @PostMapping(consumes = {"multipart/form-data"})
-    public ResponseEntity<String> createCmn(@ModelAttribute CmnCreateRequestDTO cmn) {
-        System.out.println("cmn.getContent() = " + cmn.getContent());
-        System.out.println("cmn.getImgList().get(0).getName() = " + cmn.getImgList().size());
-        System.out.println("cmn.getImgList().get(0).getName() = " + cmn.getImgList().get(0).getName());
+    public ResponseEntity<Page<CmnBoardListResponseDTO>> createCmn(@ModelAttribute CmnCreateRequestDTO cmn) {
         Member member = validator.getMember(cmn.getUserId());
         cmnService.createCmn(cmn, member);
-        return ResponseEntity.ok("성공!");
+        CmnBoardListRequestDTO dto = new CmnBoardListRequestDTO(0, 15, "", "titleAndContent", "boardPk", false);
+        return ResponseEntity.ok(cmnService.searchBoard(dto));
     }
 
 
     @Operation(summary = "게시물 수정하기",
             description = "게시물을 수정")
     @PatchMapping(consumes = {"multipart/form-data"})
-    public ResponseEntity<String> updateCmn(@ModelAttribute CmnUpdateRequestDTO cmn) {
+    public ResponseEntity<CmnDTOResponse> updateCmn(@ModelAttribute CmnUpdateRequestDTO cmn) {
         OeBoard board = validator.myBoardCheck(cmn.getUserId(), cmn.getCommunityId());
         cmnService.updateCmn(board, cmn);
-        return ResponseEntity.ok("성공!");
+        Member member = validator.getMember(cmn.getUserId());
+        return ResponseEntity.ok(cmnService.getCmn(board, member));
     }
 
 
     @Operation(summary = "커뮤니티 게시판 불러오기",
             description = "게시글들을 페이징 하여 불러옵니다.")
     @GetMapping
-    public Page<CmnBoardListResponseDTO> getAllCmn(
+    public ResponseEntity<Page<CmnBoardListResponseDTO>> getAllCmn(
             @RequestParam int page,
             @RequestParam int size,
             @RequestParam(required = false) String searchKeyword,
@@ -56,8 +55,9 @@ public class CommunityController {
             @RequestParam(required = false) String sortKeyword,
             @RequestParam(required = false) Boolean sortType
     ) {
+        if(searchKeyword == null) searchKeyword = "";
         CmnBoardListRequestDTO dto = new CmnBoardListRequestDTO(page, size, searchKeyword, searchType, sortKeyword, sortType);
-        return cmnService.searchBoard(dto);
+        return ResponseEntity.ok(cmnService.searchBoard(dto));
     }
 
 
@@ -74,22 +74,23 @@ public class CommunityController {
     @Operation(summary = "게시글 삭제",
             description = "본인의 게시글인 것을 확인 후 삭제합니다.")
     @DeleteMapping
-    public ResponseEntity<String> deleteCmn(@RequestBody CmnDeleteRequestDTO cmn) {
+    public ResponseEntity<Page<CmnBoardListResponseDTO>> deleteCmn(@RequestBody CmnDeleteRequestDTO cmn) {
         validator.getMember(cmn.getUserId());
         OeBoard board = validator.getBoard(cmn.getCmnId());
 
         cmnService.deleteCmn(board);
-        return ResponseEntity.ok("성공!");
+        CmnBoardListRequestDTO dto = new CmnBoardListRequestDTO(0, 15, "", "titleAndContent", "boardPk", false);
+        return ResponseEntity.ok(cmnService.searchBoard(dto));
     }
 
     @Operation(summary = "좋아요",
         description = "좋아요 혹은 좋아요 취소를 합니다.")
     @GetMapping("/like/{cmnId}/{memberId}")
-    public Boolean likeCmn(@PathVariable Long memberId,
+    public ResponseEntity<Boolean> likeCmn(@PathVariable Long memberId,
                            @PathVariable Long cmnId) {
         Member member = validator.getMember(memberId);
         OeBoard board = validator.getBoard(cmnId);
-        return cmnService.cmnLike(member, board);
+        return ResponseEntity.ok(cmnService.cmnLike(member, board));
     }
 
     @Operation(summary = "뷰 올리기")
