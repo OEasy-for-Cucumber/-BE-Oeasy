@@ -88,7 +88,7 @@ public class AioeController {
     public ResponseEntity<String> deleteChatHistory(
             @RequestHeader(name = "Authorization") String authorizationHeader) {
         String accessToken = extractTokenFromHeader(authorizationHeader);
-        aioeService.deleteChatbotConnection(accessToken); // 메서드 이름 수정
-        return ResponseEntity.ok("채팅 로그와 챗봇 연결이 삭제되었습니다.");
+        String resultMessage = aioeService.deleteChatbotConnection(accessToken);
+        return ResponseEntity.ok(resultMessage);
     }
 }
