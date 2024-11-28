@@ -61,27 +61,28 @@ public class CmnService {
 
     // s3버킷 리팩토링할 것
     public void updateCmn(OeBoard board, CmnUpdateRequestDTO dto){
+
         for (OeBoardImg image : board.getImages()) {
-            System.out.println("image.getS3ImgAddress() = " + image.getS3ImgAddress());
             String key = fileUploader.extractKeyFromUrl(image.getS3ImgAddress());
-            System.out.println("key = " + key);
             fileUploader.deleteImage(key);
-        }
+            }
+
         boardImgRepository.deleteAll(board.getImages());
         board.getImages().clear();
         board.toBuilder().title(dto.getTitle())
                 .content(dto.getContent())
                 .build();
         //----이미지
-        for(MultipartFile multipartFile : dto.getImgList()){
-            String uniqueImageKey = board.getMember().getNickname() + "_" + UUID.randomUUID();
-            OeBoardImg oeBoardImg = OeBoardImg.builder()
-                    .board(board)
-                    .s3ImgAddress(fileUploader.uploadFile(multipartFile, uniqueImageKey))
-                    .build();
-            boardImgRepository.save(oeBoardImg);
+        if(dto.getImgList() != null) {
+            for (MultipartFile multipartFile : dto.getImgList()) {
+                String uniqueImageKey = board.getMember().getNickname() + "_" + UUID.randomUUID();
+                OeBoardImg oeBoardImg = OeBoardImg.builder()
+                        .board(board)
+                        .s3ImgAddress(fileUploader.uploadFile(multipartFile, uniqueImageKey))
+                        .build();
+                boardImgRepository.save(oeBoardImg);
+            }
         }
-
 
     }
 
