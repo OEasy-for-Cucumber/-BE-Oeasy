@@ -119,9 +119,17 @@ public class CmnService {
         };
     }
 
-//    public CmnBoardListResponseDTO getAllMyCmn(){
-//
-//    }
+    public CmnBoardListResponseDTO getAllLikesCmn(Member member, int page, int size){
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "boardPk"));
+        return CmnBoardListResponseDTO.of(boardRepository.findByMyLikes(member, pageable));
+    }
+
+    public CmnBoardListResponseDTO getAllMyCmn(Member member, int page, int size){
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "boardPk"));
+        return CmnBoardListResponseDTO.of(boardRepository.findByMyCmn(member, pageable));
+    }
+
+
 
     public boolean cmnLike(Member member, OeBoard board){
         Optional<OeBoardLike> boardLike = boardLikeRepository.findByBoardAndMember(board, member);
