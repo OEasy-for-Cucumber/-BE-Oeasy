@@ -20,12 +20,10 @@ public class CmnValidator {
     private final BoardCommentRepository boardCommentRepository;
     private final BoardRepository boardRepository;
     public Member getMember(long pk){
-        System.out.println("pk = " + pk);
         return memberRepository.findById(pk).orElseThrow(() -> new GlobalException(GlobalExceptionCode.NOT_FIND_MEMBER));
     }
 
     public OeBoard getBoard(long id){
-        System.out.println("id = " + id);
         return boardRepository.findById(id).orElseThrow(()->new GlobalException(GlobalExceptionCode.COMMUNITY_NOT_FIND));
     }
     public OeBoardComment getBoardComment(long id){
@@ -60,6 +58,12 @@ public class CmnValidator {
         }else if(!dto.getSortKeyword().equals("likeCnt") &&
                 !dto.getSortKeyword().equals("boardPk")){
             throw new GlobalException(GlobalExceptionCode.COMMUNITY_INVALID_SORT_KEYWORD);
+        }
+    }
+
+    public void sizeValueCheck(int size){
+        if(size <= 0){
+            throw new GlobalException(GlobalExceptionCode.COMMUNITY_INVALID_SIZE);
         }
     }
 

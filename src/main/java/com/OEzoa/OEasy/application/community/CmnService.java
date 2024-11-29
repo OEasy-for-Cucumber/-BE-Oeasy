@@ -104,17 +104,6 @@ public class CmnService {
                     .build());
         }
     }
-    public void testCnt(Long boardId){
-        System.out.println("boardId = " + boardId);
-        boardLikeRepository.countByBoard(boardRepository.findById(boardId).get());
-    }
-
-    public void notFoundTest(){
-        List<Member> memberList = memberRepository.findAll();
-        for(Member member : memberList){
-            System.out.println("member pk = "+member.getMemberPk()+"\ncnt = "+boardLikeRepository.countByMember(member));
-        }
-    }
 
     public CmnBoardListResponseDTO searchBoard(CmnBoardListRequestDTO dto){
         Pageable pageable;
@@ -137,12 +126,14 @@ public class CmnService {
 
         if(boardLike.isPresent()){
             boardLikeRepository.delete(boardLike.get());
+            boardRepository.updateMinusLike(board.getBoardPk());
             return false;
         }else{
             boardLikeRepository.save(OeBoardLike.builder()
                             .board(board)
                             .member(member)
                     .build());
+            boardRepository.updatePlusLike(board.getBoardPk());
             return true;
         }
 
