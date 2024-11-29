@@ -96,7 +96,7 @@ public class WeatherScheduler {
 
         weather = Weather.builder()
                 .temperature(temperature)
-                .weatherImg(weatherImgRepository.findById(imgNum).get())
+                .weatherWebImg(weatherImgRepository.findById(imgNum).get())
                 .weatherTimestamp(LocalDateTime.now())
                 .state(parsePrecipitation(weatherNum))
                 .build();
