@@ -40,6 +40,7 @@ public class Weather {
                 .weatherState(weather.state)
                 .imgUrl(weather.weatherWebImg.getImageUrl())
                 .temperature(weather.temperature)
+                .word(weather.getWeatherWebImg().getOeWord())
                 .dateTime(weather.weatherTimestamp.withMinute(0))
                 .build();
     }
