@@ -15,5 +15,6 @@ public class CmnUpdateRequestDTO {
     private long communityId;
     private String title;
     private String content;
+    private List<String> deleteList;
     private List<MultipartFile> imgList;
 }
