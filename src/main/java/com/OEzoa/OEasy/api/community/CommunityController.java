@@ -58,6 +58,17 @@ public class CommunityController {
         return ResponseEntity.ok(cmnService.searchBoard(dto));
     }
 
+//    @Operation(summary = "내가 작성한 게시판 불러오기",
+//            description = "게시글들을 페이징 하여 불러옵니다.")
+//    @GetMapping
+//    public ResponseEntity<CmnBoardListResponseDTO> getAllMyCmn(
+//            @RequestParam(required = false) int page,
+//            @RequestParam(required = false) int size
+//    ) {
+//
+//        return ResponseEntity.ok(cmnService.searchBoard(dto));
+//    }
+
 
     @Operation(summary = "커뮤니티 게시글 불러오기",
             description = "게시글을 불러옵니다.")
