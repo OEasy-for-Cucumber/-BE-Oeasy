@@ -21,6 +21,9 @@ public class GetAllCommentDTO {
     @Schema(name = "닉네임")
     private String nickname;
 
+    @Schema(name = "프로필 이미지")
+    private String profileImg;
+
     @Schema(name = "날짜")
     private LocalDateTime createTime;
 }

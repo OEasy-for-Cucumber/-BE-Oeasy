@@ -22,6 +22,7 @@ public interface BoardCommentRepository extends JpaRepository<OeBoardComment, Lo
             "boardCommentPk, " +
             "content, " +
             "member.nickname, " +
+            "member.memberImage, " +
             "boardCommentTimestamp )" +
             "FROM OeBoardComment " +
             "WHERE board = :board")
