@@ -65,17 +65,15 @@ public class CmnService {
 
     // s3버킷 리팩토링할 것
     public void updateCmn(OeBoard board, CmnUpdateRequestDTO dto){
-
-        for (OeBoardImg image : board.getImages()) {
-            String key = fileUploader.extractKeyFromUrl(image.getS3ImgAddress());
-            fileUploader.deleteImage(key);
+        if(dto.getDeleteList() != null) {
+            for (String url : dto.getDeleteList()) {
+                String key = fileUploader.extractKeyFromUrl(url);
+                fileUploader.deleteImage(key);
+                boardImgRepository.deleteByS3ImgAddress(url);
             }
+        }
+        board.of(dto.getTitle(), dto.getContent());
 
-        boardImgRepository.deleteAll(board.getImages());
-        board.getImages().clear();
-        board.toBuilder().title(dto.getTitle())
-                .content(dto.getContent())
-                .build();
         //----이미지
         if(dto.getImgList() != null) {
             for (MultipartFile multipartFile : dto.getImgList()) {
@@ -120,6 +118,10 @@ public class CmnService {
             default -> throw new GlobalException(GlobalExceptionCode.BAD_REQUEST);
         };
     }
+
+//    public CmnBoardListResponseDTO getAllMyCmn(){
+//
+//    }
 
     public boolean cmnLike(Member member, OeBoard board){
         Optional<OeBoardLike> boardLike = boardLikeRepository.findByBoardAndMember(board, member);

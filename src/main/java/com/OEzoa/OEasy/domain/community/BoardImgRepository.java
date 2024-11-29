@@ -10,4 +10,6 @@ public interface BoardImgRepository extends JpaRepository<OeBoardImg, Long> {
 
 
     void deleteByBoard(OeBoard board);
+
+    void deleteByS3ImgAddress(String s3ImgAddress);
 }

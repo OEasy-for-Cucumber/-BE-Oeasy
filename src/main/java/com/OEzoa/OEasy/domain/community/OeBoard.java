@@ -62,4 +62,9 @@ public class OeBoard {
                 .content(cmn.getContent())
                 .build();
     }
+
+    public void of(String title, String content){
+        this.title = title;
+        this.content = content;
+    }
 }
