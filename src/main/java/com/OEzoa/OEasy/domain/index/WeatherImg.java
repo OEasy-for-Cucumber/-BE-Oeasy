@@ -21,6 +21,9 @@ public class WeatherImg {
     @Column(name="type", nullable = false)
     private String type;
 
+    @Column(name = "oe_word")
+    private String oeWord;
+
     @Column(name="image_url", nullable = false)
     private String imageUrl;
 
