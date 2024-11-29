@@ -111,4 +111,12 @@ public interface BoardRepository extends JpaRepository<OeBoard, Long> {
     @Modifying
     @Query("UPDATE OeBoard SET viewCnt = viewCnt+1 WHERE boardPk= :board")
     void updatePlusView(long board);
+
+    @Modifying
+    @Query("UPDATE OeBoard  SET likeCnt = likeCnt + 1 WHERE boardPk = :board")
+    void updatePlusLike(long board);
+
+    @Modifying
+    @Query("UPDATE OeBoard  SET likeCnt = likeCnt - 1 WHERE boardPk = :board")
+    void updateMinusLike(long board);
 }
