@@ -35,8 +35,8 @@ public class CommunityController {
     @PatchMapping(consumes = {"multipart/form-data"})
     public ResponseEntity<CmnDTOResponse> updateCmn(@ModelAttribute CmnUpdateRequestDTO cmn) {
         OeBoard board = validator.myBoardCheck(cmn.getUserId(), cmn.getCommunityId());
-        cmnService.updateCmn(board, cmn);
         Member member = validator.getMember(cmn.getUserId());
+        cmnService.updateCmn(board, cmn);
         return ResponseEntity.ok(cmnService.getCmn(board, member));
     }
 
@@ -58,17 +58,29 @@ public class CommunityController {
         return ResponseEntity.ok(cmnService.searchBoard(dto));
     }
 
-//    @Operation(summary = "내가 작성한 게시판 불러오기",
-//            description = "게시글들을 페이징 하여 불러옵니다.")
-//    @GetMapping
-//    public ResponseEntity<CmnBoardListResponseDTO> getAllMyCmn(
-//            @RequestParam(required = false) int page,
-//            @RequestParam(required = false) int size
-//    ) {
-//
-//        return ResponseEntity.ok(cmnService.searchBoard(dto));
-//    }
+    @Operation(summary = "좋아요를 누른 게시판 불러오기",
+            description = "게시글들을 페이징 하여 불러옵니다.")
+    @GetMapping("/my-likes")
+    public ResponseEntity<CmnBoardListResponseDTO> getAllMyLikes(
+            @RequestParam(required = false) int page,
+            @RequestParam(required = false) int size,
+            @RequestParam(required = false) int memberId
+    ) {
+        Member member = validator.getMember(memberId);
+        return ResponseEntity.ok(cmnService.getAllLikesCmn(member, page, size));
+    }
 
+    @Operation(summary = "내가 작성한 게시판 불러오기",
+            description = "게시글들을 페이징 하여 불러옵니다.")
+    @GetMapping("/my-Cmn")
+    public ResponseEntity<CmnBoardListResponseDTO> getAllMyCmn(
+            @RequestParam(required = false) int page,
+            @RequestParam(required = false) int size,
+            @RequestParam(required = false) int memberId
+    ) {
+        Member member = validator.getMember(memberId);
+        return ResponseEntity.ok(cmnService.getAllMyCmn(member, page, size));
+    }
 
     @Operation(summary = "커뮤니티 게시글 불러오기",
             description = "게시글을 불러옵니다.")

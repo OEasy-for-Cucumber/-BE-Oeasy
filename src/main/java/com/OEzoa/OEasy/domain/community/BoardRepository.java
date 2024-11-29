@@ -106,6 +106,53 @@ public interface BoardRepository extends JpaRepository<OeBoard, Long> {
             "WHERE (m.nickname LIKE CONCAT('%', :keyword, '%') )")
     Page<CmnBoardListDTO> findByNickname(@Param("keyword") String keyword, Pageable pageable);
 
+    @Query("SELECT new com.OEzoa.OEasy.application.community.DTO.Cmn.CmnBoardListDTO(" +
+            "b.boardPk, " +
+            "b.title, " +
+            "b.viewCnt, " +
+            "b.likeCnt, " +
+            "m.nickname, " +
+            "b.boardTimestamp, " +
+            "(SELECT bi.s3ImgAddress " +
+            " FROM OeBoardImg bi " +
+            " WHERE bi.boardImgPk = (SELECT MIN(bi2.boardImgPk) " +
+            "                                        FROM OeBoardImg bi2 " +
+            "                                        WHERE bi2.board = b)) " +
+            ", " +
+            "(SELECT COUNT(c.boardCommentPk) " +
+            " FROM OeBoardComment c " +
+            " WHERE c.board = b" +
+            ")) " +
+            "FROM OeBoard b " +
+            "JOIN b.member m " +
+            "JOIN OeBoardLike ol ON ol.board = b " +
+            "WHERE ol.member = :member")
+    Page<CmnBoardListDTO> findByMyLikes(@Param("member") Member member, Pageable pageable);
+
+    @Query("SELECT new com.OEzoa.OEasy.application.community.DTO.Cmn.CmnBoardListDTO(" +
+            "b.boardPk, " +
+            "b.title, " +
+            "b.viewCnt, " +
+            "b.likeCnt, " +
+            "m.nickname, " +
+            "b.boardTimestamp, " +
+            "(SELECT bi.s3ImgAddress " +
+            " FROM OeBoardImg bi " +
+            " WHERE bi.boardImgPk = (SELECT MIN(bi2.boardImgPk) " +
+            "                                        FROM OeBoardImg bi2 " +
+            "                                        WHERE bi2.board = b)) " +
+            ", " +
+            "(SELECT COUNT(c.boardCommentPk) " +
+            " FROM OeBoardComment c " +
+            " WHERE c.board = b" +
+            ")) " +
+            "FROM OeBoard b " +
+            "JOIN b.member m " +
+            "WHERE b.member = :member")
+    Page<CmnBoardListDTO> findByMyCmn(@Param("member") Member member, Pageable pageable);
+
+
+
     Optional<OeBoard> findByMemberAndBoardPk(Member member,long boardPk);
 
     @Modifying
