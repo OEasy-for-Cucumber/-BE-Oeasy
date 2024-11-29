@@ -4,6 +4,8 @@ import com.OEzoa.OEasy.domain.member.Member;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDateTime;
+
 @Getter
 @Builder(toBuilder = true)
 @NoArgsConstructor
@@ -19,6 +21,9 @@ public class OeBoardComment {
 
     @Column(name = "content", length = 5000)
     private String content;
+
+    @Column(name = "board_comment_timestamp")
+    private LocalDateTime boardCommentTimestamp;
 
     @ManyToOne
     @JoinColumn(name = "board_pk", nullable = false)

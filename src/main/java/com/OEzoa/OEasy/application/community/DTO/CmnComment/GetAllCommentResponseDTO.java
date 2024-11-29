@@ -1,21 +1,29 @@
 package com.OEzoa.OEasy.application.community.DTO.CmnComment;
 
-import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
+import org.springframework.data.domain.Page;
+
+import java.util.List;
 
 @Getter
+@Builder
 @AllArgsConstructor
+@NoArgsConstructor
 public class GetAllCommentResponseDTO {
-    @Schema(name = "유저pk")
-    private long memberId;
+    private List<GetAllCommentDTO> contents;
+    private Long totalElements;
+    private int totalPages;
+    private int size;
 
-    @Schema(name = "댓글pk")
-    private long commentPk;
-
-    @Schema(name = "내용")
-    private String content;
-
-    @Schema(name = "닉네임")
-    private String nickname;
+    public static GetAllCommentResponseDTO of(Page<GetAllCommentDTO> page) {
+        return GetAllCommentResponseDTO.builder()
+                .contents(page.getContent())
+                .totalElements(page.getTotalElements())
+                .totalPages(page.getTotalPages())
+                .size(page.getSize())
+                .build();
+    }
 }

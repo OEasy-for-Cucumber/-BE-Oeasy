@@ -12,22 +12,25 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
+
 @Service
 @RequiredArgsConstructor
 public class CmnCommentService {
 
     private final BoardCommentRepository boardCommentRepository;
 
-    public Page<GetAllCommentResponseDTO> getAllComment(int page, int size, OeBoard board) {
+    public GetAllCommentResponseDTO getAllComment(int page, int size, OeBoard board) {
         Pageable pageable = PageRequest.of(page, size, Sort.Direction.DESC, "boardCommentPk");
-       return boardCommentRepository.findByBoard(board, pageable);
+       return GetAllCommentResponseDTO.of(boardCommentRepository.findByBoard(board, pageable));
     }
 
-    public Page<GetAllCommentResponseDTO> createComment(Member member, OeBoard board, String content, int size){
+    public GetAllCommentResponseDTO createComment(Member member, OeBoard board, String content, int size){
         boardCommentRepository.save(OeBoardComment.builder()
                         .content(content)
                         .board(board)
                         .member(member)
+                        .boardCommentTimestamp(LocalDateTime.now())
                 .build());
         return getAllComment(0, size, board);
     }
