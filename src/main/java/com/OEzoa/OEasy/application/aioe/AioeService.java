@@ -8,11 +8,9 @@ import com.OEzoa.OEasy.application.aioe.validator.AioeValidator;
 import com.OEzoa.OEasy.application.member.TokenValidator;
 import com.OEzoa.OEasy.domain.aioe.AiOe;
 import com.OEzoa.OEasy.domain.aioe.AioeRepository;
-import com.OEzoa.OEasy.domain.aioe.ChatMessage;
+import com.OEzoa.OEasy.domain.aioe.AiOeChatMessage;
 import com.OEzoa.OEasy.domain.aioe.ChatMessageRepository;
 import com.OEzoa.OEasy.domain.member.Member;
-import com.OEzoa.OEasy.exception.GlobalException;
-import com.OEzoa.OEasy.exception.GlobalExceptionCode;
 import com.OEzoa.OEasy.infra.api.aioe.OpenAIClient;
 import java.util.List;
 import java.util.Optional;
@@ -43,7 +41,7 @@ public class AioeService {
             AiOe aiOe = existingAiOe.get();
 
             // 기존 초기 메시지 검색
-            ChatMessage initialMessage = chatMessageRepository.findFirstByAiOeAndTypeOrderByDateTimeAsc(aiOe, "aioe");
+            AiOeChatMessage initialMessage = chatMessageRepository.findFirstByAiOeAndTypeOrderByDateTimeAsc(aiOe, "aioe");
             if (initialMessage != null) {
                 return ChatMessageMapper.toStartResponseDto(initialMessage);
             }
@@ -54,7 +52,7 @@ public class AioeService {
         aioeRepository.save(aiOe);
 
         // 초기 메시지 생성 및 저장
-        ChatMessage initialMessage = ChatMessageMapper.toEntity(
+        AiOeChatMessage initialMessage = ChatMessageMapper.toEntity(
                 "안녕하세오이? 저는 AI 오이입니다오이! 오이에 관련된 질문을 해주세오이! 🥒", "aioe", aiOe
         );
         chatMessageRepository.save(initialMessage);
@@ -74,12 +72,12 @@ public class AioeService {
         aioeValidator.validateQuestionContent(question);
 
         // 사용자 질문 저장
-        ChatMessage userMessage = ChatMessageMapper.toEntity(question, "user", aiOe);
+        AiOeChatMessage userMessage = ChatMessageMapper.toEntity(question, "user", aiOe);
         chatMessageRepository.save(userMessage);
 
 
         String gptResponse = openAIClient.askQuestion(question);
-        ChatMessage gptMessage = ChatMessageMapper.toEntity(gptResponse, "aioe", aiOe);
+        AiOeChatMessage gptMessage = ChatMessageMapper.toEntity(gptResponse, "aioe", aiOe);
         chatMessageRepository.save(gptMessage);
 
         return ChatMessageMapper.toResponseDto(gptMessage);
@@ -91,8 +89,8 @@ public class AioeService {
         Member member = tokenValidator.validateAccessTokenAndReturnMember(accessToken);
         AiOe aiOe = aioeValidator.validateChatbotConnection(member);
 
-        List<ChatMessage> chatMessages = chatMessageRepository.findByAiOeOrderByDateTimeAsc(aiOe);
-        return ChatMessageMapper.toChatHistoryDto(chatMessages);
+        List<AiOeChatMessage> aiOeChatMessages = chatMessageRepository.findByAiOeOrderByDateTimeAsc(aiOe);
+        return ChatMessageMapper.toChatHistoryDto(aiOeChatMessages);
     }
 
     // 대화 내용 삭제

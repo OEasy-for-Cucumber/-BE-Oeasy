@@ -12,7 +12,6 @@ import com.OEzoa.OEasy.exception.GlobalExceptionCode;
 import com.OEzoa.OEasy.util.s3Bucket.FileUploader;
 import com.OEzoa.OEasy.util.timeTrace.TimeTrace;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -56,11 +55,11 @@ public class CmnService {
         }
     }
 
-    public CmnDTOResponse getCmn(OeBoard board, Member member){
+    public CmnDTOResponseDTO getCmn(OeBoard board, Member member){
         Optional<OeBoardLike> oeBoardLike = boardLikeRepository.findByBoardAndMember(board, member);
         if(oeBoardLike.isPresent()){
-            return CmnDTOResponse.of(board, true);
-        }else return CmnDTOResponse.of(board, false);
+            return CmnDTOResponseDTO.of(board, true);
+        }else return CmnDTOResponseDTO.of(board, false);
     }
 
     // s3버킷 리팩토링할 것

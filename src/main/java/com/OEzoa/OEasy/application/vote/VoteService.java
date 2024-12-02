@@ -2,6 +2,7 @@ package com.OEzoa.OEasy.application.vote;
 
 import com.OEzoa.OEasy.application.vote.DTO.ChattingResponseDTO;
 import com.OEzoa.OEasy.application.vote.DTO.VoteInitResponseDTO;
+import com.OEzoa.OEasy.application.vote.DTO.VoteStatusRequestDTO;
 import com.OEzoa.OEasy.domain.member.Member;
 import com.OEzoa.OEasy.domain.vote.OeChatting;
 import com.OEzoa.OEasy.domain.vote.OeChattingRepository;
@@ -95,6 +96,29 @@ public class VoteService {
                 .like(oeVoteRepository.countByVote(true))
                 .isVoting(isVoting)
                 .chattingList(dtoList)
+                .build();
+    }
+
+    public VoteInitResponseDTO init(){
+
+        List<OeChatting> OeChattingList= oeChattingRepository.findAllByOrderByIdDescLimit50();
+        List<ChattingResponseDTO> dtoList = new ArrayList<>();
+
+        for (OeChatting oeChatting : OeChattingList) {
+            dtoList.add(ChattingResponseDTO.of(oeChatting));
+        }
+
+        return VoteInitResponseDTO.builder()
+                .hate(oeVoteRepository.countByVote(false))
+                .like(oeVoteRepository.countByVote(true))
+                .chattingList(dtoList)
+                .build();
+    }
+
+    public VoteStatusRequestDTO getVoteStatus(){
+        return VoteStatusRequestDTO.builder()
+                .hate(oeVoteRepository.countByVote(false))
+                .like(oeVoteRepository.countByVote(true))
                 .build();
     }
 }
