@@ -48,6 +48,7 @@ public class CmnService {
         if(cmn.getImgList() != null){
             List<OeBoardImg> urlList = new ArrayList<>();
             for (MultipartFile multipartFile : cmn.getImgList()) {
+                if (multipartFile == null) continue;
                 String uniqueImageKey = member.getNickname() + "_" + UUID.randomUUID();
                 urlList.add(OeBoardImg.of(board, fileUploader.uploadFile(multipartFile, uniqueImageKey)));
             }
@@ -72,10 +73,11 @@ public class CmnService {
             }
         }
         board.of(dto.getTitle(), dto.getContent());
-
+    
         //----이미지
         if(dto.getImgList() != null) {
             for (MultipartFile multipartFile : dto.getImgList()) {
+                if(multipartFile == null) continue;
                 String uniqueImageKey = board.getMember().getNickname() + "_" + UUID.randomUUID();
                 OeBoardImg oeBoardImg = OeBoardImg.builder()
                         .board(board)
