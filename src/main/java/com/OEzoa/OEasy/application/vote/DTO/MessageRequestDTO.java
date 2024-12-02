@@ -5,7 +5,7 @@ import lombok.Getter;
 
 @Getter
 @Builder(toBuilder = true)
-public class MessageRequest {
+public class MessageRequestDTO {
     private long userPk;
     private String content;
 }

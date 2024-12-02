@@ -33,7 +33,7 @@ public class CommunityController {
     @Operation(summary = "게시물 수정하기",
             description = "게시물을 수정")
     @PatchMapping(consumes = {"multipart/form-data"})
-    public ResponseEntity<CmnDTOResponse> updateCmn(@ModelAttribute CmnUpdateRequestDTO cmn) {
+    public ResponseEntity<CmnDTOResponseDTO> updateCmn(@ModelAttribute CmnUpdateRequestDTO cmn) {
         OeBoard board = validator.myBoardCheck(cmn.getUserId(), cmn.getCommunityId());
         Member member = validator.getMember(cmn.getUserId());
         cmnService.updateCmn(board, cmn);
@@ -85,8 +85,8 @@ public class CommunityController {
     @Operation(summary = "커뮤니티 게시글 불러오기",
             description = "게시글을 불러옵니다.")
     @GetMapping("{cmnId}/{memberId}")
-    public ResponseEntity<CmnDTOResponse> getCmn(@PathVariable Long cmnId,
-                                                 @PathVariable Long memberId) {
+    public ResponseEntity<CmnDTOResponseDTO> getCmn(@PathVariable Long cmnId,
+                                                    @PathVariable Long memberId) {
         OeBoard board = validator.getBoard(cmnId);
         Member member = validator.getMember(memberId);
         return ResponseEntity.ok(cmnService.getCmn(board, member));
