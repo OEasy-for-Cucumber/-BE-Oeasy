@@ -19,6 +19,7 @@ public class CmnDTOResponseDTO {
     private LocalDateTime createdAt;
     private String content;
     private long likes;
+    private long view;
     private List<String> imageUrlList;
     private boolean liked;
 
@@ -37,6 +38,7 @@ public class CmnDTOResponseDTO {
                 .nickname(board.getMember().getNickname())
                 .createdAt(board.getBoardTimestamp())
                 .likes(board.getLikes().size())
+                .view(board.getViewCnt())
                 .imageUrlList(imageUrlList)
                 .liked(liked)
                 .build();
