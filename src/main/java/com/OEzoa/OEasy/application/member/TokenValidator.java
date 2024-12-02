@@ -9,22 +9,16 @@ import com.OEzoa.OEasy.util.member.JwtTokenProvider;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.UnsupportedJwtException;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 @Slf4j
 @Component
+@RequiredArgsConstructor
 public class TokenValidator {
     private final JwtTokenProvider jwtTokenProvider;
     private final MemberRepository memberRepository;
-    private final MemberTokenRepository memberTokenRepository;
-
-    public TokenValidator(JwtTokenProvider jwtTokenProvider, MemberRepository memberRepository,
-                          MemberTokenRepository memberTokenRepository) {
-        this.jwtTokenProvider = jwtTokenProvider;
-        this.memberRepository = memberRepository;
-        this.memberTokenRepository = memberTokenRepository;
-    }
 
     public Member validateAccessTokenAndReturnMember(String accessToken)   {
         log.info("Access token 유효성 검사 시작: {}", accessToken); // 토큰 유효성 검사 로그
