@@ -21,7 +21,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(name = "aioe_chatmessage", schema = "oeasy")
-public class ChatMessage {
+public class AiOeChatMessage {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

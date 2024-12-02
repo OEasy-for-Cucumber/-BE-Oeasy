@@ -7,7 +7,6 @@ import com.OEzoa.OEasy.application.aioe.dto.AioeIntroMessageDTO;
 import com.OEzoa.OEasy.application.aioe.dto.AioeRequestDTO;
 import com.OEzoa.OEasy.application.aioe.dto.AioeResponseDTO;
 import com.OEzoa.OEasy.application.aioe.dto.ChatHistoryDTO;
-import com.OEzoa.OEasy.domain.aioe.ChatMessage;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
