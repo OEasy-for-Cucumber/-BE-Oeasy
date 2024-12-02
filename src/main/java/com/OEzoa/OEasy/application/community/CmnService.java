@@ -1,5 +1,8 @@
 package com.OEzoa.OEasy.application.community;
 
+
+
+
 import com.OEzoa.OEasy.application.community.DTO.Cmn.*;
 import com.OEzoa.OEasy.domain.community.*;
 import com.OEzoa.OEasy.domain.member.Member;
@@ -62,17 +65,15 @@ public class CmnService {
 
     // s3버킷 리팩토링할 것
     public void updateCmn(OeBoard board, CmnUpdateRequestDTO dto){
-
-        for (OeBoardImg image : board.getImages()) {
-            String key = fileUploader.extractKeyFromUrl(image.getS3ImgAddress());
-            fileUploader.deleteImage(key);
+        if(dto.getDeleteList() != null) {
+            for (String url : dto.getDeleteList()) {
+                String key = fileUploader.extractKeyFromUrl(url);
+                fileUploader.deleteImage(key);
+                boardImgRepository.deleteByS3ImgAddress(url);
             }
+        }
+        board.of(dto.getTitle(), dto.getContent());
 
-        boardImgRepository.deleteAll(board.getImages());
-        board.getImages().clear();
-        board.toBuilder().title(dto.getTitle())
-                .content(dto.getContent())
-                .build();
         //----이미지
         if(dto.getImgList() != null) {
             for (MultipartFile multipartFile : dto.getImgList()) {
@@ -101,19 +102,8 @@ public class CmnService {
                     .build());
         }
     }
-    public void testCnt(Long boardId){
-        System.out.println("boardId = " + boardId);
-        boardLikeRepository.countByBoard(boardRepository.findById(boardId).get());
-    }
 
-    public void notFoundTest(){
-        List<Member> memberList = memberRepository.findAll();
-        for(Member member : memberList){
-            System.out.println("member pk = "+member.getMemberPk()+"\ncnt = "+boardLikeRepository.countByMember(member));
-        }
-    }
-
-    public Page<CmnBoardListResponseDTO> searchBoard(CmnBoardListRequestDTO dto){
+    public CmnBoardListResponseDTO searchBoard(CmnBoardListRequestDTO dto){
         Pageable pageable;
         if(dto.isSortType()) {
             pageable = PageRequest.of(dto.getPage(), dto.getSize(), Sort.by(Sort.Direction.ASC, dto.getSortKeyword()));
@@ -122,24 +112,38 @@ public class CmnService {
         }
 
         return switch (dto.getSearchType()) {
-            case "titleAndContent" -> boardRepository.findByTitleOrContent(dto.getSearchKeyword(), pageable);
-            case "title" -> boardRepository.findByTitle(dto.getSearchKeyword(), pageable);
-            case "nickname" -> boardRepository.findByNickname(dto.getSearchKeyword(), pageable);
+            case "titleAndContent" -> CmnBoardListResponseDTO.of(boardRepository.findByTitleOrContent(dto.getSearchKeyword().trim(), pageable));
+            case "title" -> CmnBoardListResponseDTO.of(boardRepository.findByTitle(dto.getSearchKeyword().trim(), pageable));
+            case "nickname" -> CmnBoardListResponseDTO.of(boardRepository.findByNickname(dto.getSearchKeyword().trim(), pageable));
             default -> throw new GlobalException(GlobalExceptionCode.BAD_REQUEST);
         };
     }
+
+    public CmnBoardListResponseDTO getAllLikesCmn(Member member, int page, int size){
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "boardPk"));
+        return CmnBoardListResponseDTO.of(boardRepository.findByMyLikes(member, pageable));
+    }
+
+    public CmnBoardListResponseDTO getAllMyCmn(Member member, int page, int size){
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "boardPk"));
+        return CmnBoardListResponseDTO.of(boardRepository.findByMyCmn(member, pageable));
+    }
+
+
 
     public boolean cmnLike(Member member, OeBoard board){
         Optional<OeBoardLike> boardLike = boardLikeRepository.findByBoardAndMember(board, member);
 
         if(boardLike.isPresent()){
             boardLikeRepository.delete(boardLike.get());
+            boardRepository.updateMinusLike(board.getBoardPk());
             return false;
         }else{
             boardLikeRepository.save(OeBoardLike.builder()
                             .board(board)
                             .member(member)
                     .build());
+            boardRepository.updatePlusLike(board.getBoardPk());
             return true;
         }
 

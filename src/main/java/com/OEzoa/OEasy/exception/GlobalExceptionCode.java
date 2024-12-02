@@ -22,6 +22,9 @@ public enum GlobalExceptionCode {
     COMMUNITY_NOT_SAME(HttpStatus.BAD_REQUEST, "본인 게시글만 수정, 삭제가 가능합니다.", "게시글의 요청자와 소유자가 다름"),
     COMMUNITY_NOT_FOUND_BOARD(HttpStatus.NOT_FOUND, "권한이 없거나 게시글을 찾을 수 없습니다.", "본인 게시물이 아니거라 board 조회를 실패"),
     COMMUNITY_COMMENT_NOT_FIND(HttpStatus.NOT_FOUND, "댓글을 찾을 수 없습니다.", "잘못 들어온 pk"),
+    COMMUNITY_INVALID_SEARCH_TYPE(HttpStatus.BAD_REQUEST, "검색 타입을 확인해 주세요.", "잘못된 검색 타입"),
+    COMMUNITY_INVALID_SORT_KEYWORD(HttpStatus.BAD_REQUEST, "정렬 키워드를 확인해 주세요.","잘못된 정렬 타입"),
+    COMMUNITY_INVALID_SIZE(HttpStatus.BAD_REQUEST, "size가 0과 같거나 작을 수 없습니다.", "size가 0과 같거나 작을 수 없습니다."),
 
     //---------------member---------------------
     NOT_FIND_MEMBER(HttpStatus.NOT_FOUND, "회원을 찾을 수 없습니다", "잘못 들어온 pk"),

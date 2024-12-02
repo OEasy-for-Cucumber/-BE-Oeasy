@@ -18,7 +18,7 @@ public class CmnBoardListRequestDTO {
     @Schema(description = "검색어")
     private String searchKeyword;
 
-    @Schema(description = "검색 타입", example = "1. titleAndContent 2. title\n3. nickname")
+    @Schema(description = "검색 타입", example = "1. titleAndContent 2. title\n3. nickname", required = true)
     private String searchType;
 
     @Schema(description = "정렬할 키워드", example = "1. 좋아요 : likeCnt\n2. 시간 : boardPk")

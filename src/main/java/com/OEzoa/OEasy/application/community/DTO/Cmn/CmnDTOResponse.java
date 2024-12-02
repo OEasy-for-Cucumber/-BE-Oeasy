@@ -17,6 +17,7 @@ public class CmnDTOResponse {
     private String title;
     private String nickname;
     private LocalDateTime createdAt;
+    private String content;
     private long likes;
     private List<String> imageUrlList;
     private boolean liked;
@@ -30,6 +31,7 @@ public class CmnDTOResponse {
         }
         return CmnDTOResponse.builder()
                 .id(board.getBoardPk())
+                .content(board.getContent())
                 .title(board.getTitle())
                 .nickname(board.getMember().getNickname())
                 .createdAt(board.getBoardTimestamp())

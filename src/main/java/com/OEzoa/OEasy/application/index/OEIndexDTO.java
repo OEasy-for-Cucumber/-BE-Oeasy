@@ -20,6 +20,9 @@ public class OEIndexDTO {
     @Schema(description = "이미지 URL", example = "https://example.com/image.jpg")
     private String imgUrl;
 
+    @Schema(description = "오이의 대사")
+    private String word;
+
     @Schema(description = "날씨 상태", example = "맑음")
     private String weatherState;
 

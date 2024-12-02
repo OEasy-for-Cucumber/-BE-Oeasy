@@ -22,8 +22,8 @@ public class Weather {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name="weather_img_pk", nullable = false)
-    private WeatherImg weatherImg;
+    @JoinColumn(name="weather_web_img_pk", nullable = false)
+    private WeatherImg weatherWebImg;
 
     @Column(name="temperature", nullable = false)
     private double temperature;
@@ -36,10 +36,11 @@ public class Weather {
 
     public static OEIndexDTO of(Weather weather) {
         return OEIndexDTO.builder()
-                .cucumberType(weather.weatherImg.getType())
+                .cucumberType(weather.weatherWebImg.getType())
                 .weatherState(weather.state)
-                .imgUrl(weather.weatherImg.getImageUrl())
+                .imgUrl(weather.weatherWebImg.getImageUrl())
                 .temperature(weather.temperature)
+                .word(weather.getWeatherWebImg().getOeWord())
                 .dateTime(weather.weatherTimestamp.withMinute(0))
                 .build();
     }

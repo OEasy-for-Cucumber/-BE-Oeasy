@@ -1,6 +1,6 @@
 package com.OEzoa.OEasy.domain.community;
 
-import com.OEzoa.OEasy.application.community.DTO.Cmn.CmnBoardListResponseDTO;
+import com.OEzoa.OEasy.application.community.DTO.Cmn.CmnBoardListDTO;
 import com.OEzoa.OEasy.domain.member.Member;
 import io.lettuce.core.dynamic.annotation.Param;
 import org.springframework.data.domain.Page;
@@ -39,61 +39,131 @@ public interface BoardRepository extends JpaRepository<OeBoard, Long> {
 //            nativeQuery = true)
 //    Page<CmnBoardListResponseDTO> findByTitle(@Param("title") String title, Pageable pageable);
     //제목 검색
-    @Query("SELECT new com.OEzoa.OEasy.application.community.DTO.Cmn.CmnBoardListResponseDTO(" +
+    @Query("SELECT new com.OEzoa.OEasy.application.community.DTO.Cmn.CmnBoardListDTO(" +
             "b.boardPk, " +
             "b.title, " +
             "b.viewCnt, " +
             "b.likeCnt, " +
             "m.nickname, " +
+            "b.boardTimestamp, " +
             "(SELECT bi.s3ImgAddress " +
             " FROM OeBoardImg bi " +
             " WHERE bi.boardImgPk = (SELECT MIN(bi2.boardImgPk) " +
             "                                        FROM OeBoardImg bi2 " +
             "                                        WHERE bi2.board = b)) " +
-            ") " +
+            ", " +
+            "(SELECT COUNT(c.boardCommentPk) " +
+            " FROM OeBoardComment c " +
+            " WHERE c.board = b" +
+            ")) " +
             "FROM OeBoard b " +
             "JOIN b.member m " +
             "WHERE b.title LIKE CONCAT('%', :title, '%')")
-    Page<CmnBoardListResponseDTO> findByTitle(@Param("title") String title, Pageable pageable);
+    Page<CmnBoardListDTO> findByTitle(@Param("title") String title, Pageable pageable);
     //제목 & 내용 검색
-    @Query("SELECT new com.OEzoa.OEasy.application.community.DTO.Cmn.CmnBoardListResponseDTO(" +
+    @Query("SELECT new com.OEzoa.OEasy.application.community.DTO.Cmn.CmnBoardListDTO(" +
             "b.boardPk, " +
             "b.title, " +
             "b.viewCnt, " +
             "b.likeCnt, " +
             "m.nickname, " +
+            "b.boardTimestamp, " +
             "(SELECT bi.s3ImgAddress " +
             " FROM OeBoardImg bi " +
             " WHERE bi.boardImgPk = (SELECT MIN(bi2.boardImgPk) " +
             "                                        FROM OeBoardImg bi2 " +
             "                                        WHERE bi2.board = b)) " +
-            ") " +
+            ", " +
+            "(SELECT COUNT(c.boardCommentPk) " +
+            " FROM OeBoardComment c " +
+            " WHERE c.board = b" +
+            ")) " +
             "FROM OeBoard b " +
             "JOIN b.member m " +
             "WHERE (b.title LIKE CONCAT('%', :keyword, '%') OR b.content LIKE CONCAT('%', :keyword, '%'))")
-    Page<CmnBoardListResponseDTO> findByTitleOrContent(@Param("keyword") String keyword, Pageable pageable);
+    Page<CmnBoardListDTO> findByTitleOrContent(@Param("keyword") String keyword, Pageable pageable);
 
     //닉네임 검색
-    @Query("SELECT new com.OEzoa.OEasy.application.community.DTO.Cmn.CmnBoardListResponseDTO(" +
+    @Query("SELECT new com.OEzoa.OEasy.application.community.DTO.Cmn.CmnBoardListDTO(" +
             "b.boardPk, " +
             "b.title, " +
             "b.viewCnt, " +
             "b.likeCnt, " +
             "m.nickname, " +
+            "b.boardTimestamp, " +
             "(SELECT bi.s3ImgAddress " +
             " FROM OeBoardImg bi " +
             " WHERE bi.boardImgPk = (SELECT MIN(bi2.boardImgPk) " +
             "                                        FROM OeBoardImg bi2 " +
             "                                        WHERE bi2.board = b)) " +
-            ") " +
+            ", " +
+            "(SELECT COUNT(c.boardCommentPk) " +
+            " FROM OeBoardComment c " +
+            " WHERE c.board = b" +
+            ")) " +
             "FROM OeBoard b " +
             "JOIN b.member m " +
             "WHERE (m.nickname LIKE CONCAT('%', :keyword, '%') )")
-    Page<CmnBoardListResponseDTO> findByNickname(@Param("keyword") String keyword, Pageable pageable);
+    Page<CmnBoardListDTO> findByNickname(@Param("keyword") String keyword, Pageable pageable);
+
+    @Query("SELECT new com.OEzoa.OEasy.application.community.DTO.Cmn.CmnBoardListDTO(" +
+            "b.boardPk, " +
+            "b.title, " +
+            "b.viewCnt, " +
+            "b.likeCnt, " +
+            "m.nickname, " +
+            "b.boardTimestamp, " +
+            "(SELECT bi.s3ImgAddress " +
+            " FROM OeBoardImg bi " +
+            " WHERE bi.boardImgPk = (SELECT MIN(bi2.boardImgPk) " +
+            "                                        FROM OeBoardImg bi2 " +
+            "                                        WHERE bi2.board = b)) " +
+            ", " +
+            "(SELECT COUNT(c.boardCommentPk) " +
+            " FROM OeBoardComment c " +
+            " WHERE c.board = b" +
+            ")) " +
+            "FROM OeBoard b " +
+            "JOIN b.member m " +
+            "JOIN OeBoardLike ol ON ol.board = b " +
+            "WHERE ol.member = :member")
+    Page<CmnBoardListDTO> findByMyLikes(@Param("member") Member member, Pageable pageable);
+
+    @Query("SELECT new com.OEzoa.OEasy.application.community.DTO.Cmn.CmnBoardListDTO(" +
+            "b.boardPk, " +
+            "b.title, " +
+            "b.viewCnt, " +
+            "b.likeCnt, " +
+            "m.nickname, " +
+            "b.boardTimestamp, " +
+            "(SELECT bi.s3ImgAddress " +
+            " FROM OeBoardImg bi " +
+            " WHERE bi.boardImgPk = (SELECT MIN(bi2.boardImgPk) " +
+            "                                        FROM OeBoardImg bi2 " +
+            "                                        WHERE bi2.board = b)) " +
+            ", " +
+            "(SELECT COUNT(c.boardCommentPk) " +
+            " FROM OeBoardComment c " +
+            " WHERE c.board = b" +
+            ")) " +
+            "FROM OeBoard b " +
+            "JOIN b.member m " +
+            "WHERE b.member = :member")
+    Page<CmnBoardListDTO> findByMyCmn(@Param("member") Member member, Pageable pageable);
+
+
 
     Optional<OeBoard> findByMemberAndBoardPk(Member member,long boardPk);
 
     @Modifying
     @Query("UPDATE OeBoard SET viewCnt = viewCnt+1 WHERE boardPk= :board")
     void updatePlusView(long board);
+
+    @Modifying
+    @Query("UPDATE OeBoard  SET likeCnt = likeCnt + 1 WHERE boardPk = :board")
+    void updatePlusLike(long board);
+
+    @Modifying
+    @Query("UPDATE OeBoard  SET likeCnt = likeCnt - 1 WHERE boardPk = :board")
+    void updateMinusLike(long board);
 }
