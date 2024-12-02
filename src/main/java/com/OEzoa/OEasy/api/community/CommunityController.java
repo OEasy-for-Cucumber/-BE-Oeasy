@@ -6,12 +6,9 @@ import com.OEzoa.OEasy.domain.community.OeBoard;
 import com.OEzoa.OEasy.domain.member.Member;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequestMapping("/api/community")
@@ -25,7 +22,7 @@ public class CommunityController {
     @Operation(summary = "게시물 작성하기",
             description = "게시물을 작성")
     @PostMapping(consumes = {"multipart/form-data"})
-    public ResponseEntity<Page<CmnBoardListResponseDTO>> createCmn(@ModelAttribute CmnCreateRequestDTO cmn) {
+    public ResponseEntity<CmnBoardListResponseDTO> createCmn(@ModelAttribute CmnCreateRequestDTO cmn) {
         Member member = validator.getMember(cmn.getUserId());
         cmnService.createCmn(cmn, member);
         CmnBoardListRequestDTO dto = new CmnBoardListRequestDTO(0, 15, "", "titleAndContent", "boardPk", false);
@@ -38,8 +35,8 @@ public class CommunityController {
     @PatchMapping(consumes = {"multipart/form-data"})
     public ResponseEntity<CmnDTOResponse> updateCmn(@ModelAttribute CmnUpdateRequestDTO cmn) {
         OeBoard board = validator.myBoardCheck(cmn.getUserId(), cmn.getCommunityId());
-        cmnService.updateCmn(board, cmn);
         Member member = validator.getMember(cmn.getUserId());
+        cmnService.updateCmn(board, cmn);
         return ResponseEntity.ok(cmnService.getCmn(board, member));
     }
 
@@ -47,7 +44,7 @@ public class CommunityController {
     @Operation(summary = "커뮤니티 게시판 불러오기",
             description = "게시글들을 페이징 하여 불러옵니다.")
     @GetMapping
-    public ResponseEntity<Page<CmnBoardListResponseDTO>> getAllCmn(
+    public ResponseEntity<CmnBoardListResponseDTO> getAllCmn(
             @RequestParam int page,
             @RequestParam int size,
             @RequestParam(required = false) String searchKeyword,
@@ -57,9 +54,33 @@ public class CommunityController {
     ) {
         if(searchKeyword == null) searchKeyword = "";
         CmnBoardListRequestDTO dto = new CmnBoardListRequestDTO(page, size, searchKeyword, searchType, sortKeyword, sortType);
+        validator.pageCheck(dto);
         return ResponseEntity.ok(cmnService.searchBoard(dto));
     }
 
+    @Operation(summary = "좋아요를 누른 게시판 불러오기",
+            description = "게시글들을 페이징 하여 불러옵니다.")
+    @GetMapping("/my-likes")
+    public ResponseEntity<CmnBoardListResponseDTO> getAllMyLikes(
+            @RequestParam(required = false) int page,
+            @RequestParam(required = false) int size,
+            @RequestParam(required = false) int memberId
+    ) {
+        Member member = validator.getMember(memberId);
+        return ResponseEntity.ok(cmnService.getAllLikesCmn(member, page, size));
+    }
+
+    @Operation(summary = "내가 작성한 게시판 불러오기",
+            description = "게시글들을 페이징 하여 불러옵니다.")
+    @GetMapping("/my-Cmn")
+    public ResponseEntity<CmnBoardListResponseDTO> getAllMyCmn(
+            @RequestParam(required = false) int page,
+            @RequestParam(required = false) int size,
+            @RequestParam(required = false) int memberId
+    ) {
+        Member member = validator.getMember(memberId);
+        return ResponseEntity.ok(cmnService.getAllMyCmn(member, page, size));
+    }
 
     @Operation(summary = "커뮤니티 게시글 불러오기",
             description = "게시글을 불러옵니다.")
@@ -74,7 +95,7 @@ public class CommunityController {
     @Operation(summary = "게시글 삭제",
             description = "본인의 게시글인 것을 확인 후 삭제합니다.")
     @DeleteMapping
-    public ResponseEntity<Page<CmnBoardListResponseDTO>> deleteCmn(@RequestBody CmnDeleteRequestDTO cmn) {
+    public ResponseEntity<CmnBoardListResponseDTO> deleteCmn(@RequestBody CmnDeleteRequestDTO cmn) {
         validator.getMember(cmn.getUserId());
         OeBoard board = validator.getBoard(cmn.getCmnId());
 

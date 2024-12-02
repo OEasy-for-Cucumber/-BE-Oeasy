@@ -28,16 +28,16 @@ public class CommunityCommentController {
 
     @Operation(summary = "댓글 쓰기")
     @PostMapping
-    public Page<GetAllCommentResponseDTO> createComment(@RequestBody CreateCommentRequestDTO DTO){
-        OeBoard board = validator.getBoard(DTO.getCommunityId());
-        Member member = validator.getMember(DTO.getMemberId());
-
-        return cmnCommentService.createComment(member, board, DTO.getContent(), DTO.getSize());
+    public GetAllCommentResponseDTO createComment(@RequestBody CreateCommentRequestDTO dto){
+        OeBoard board = validator.getBoard(dto.getCommunityId());
+        Member member = validator.getMember(dto.getMemberId());
+        validator.sizeValueCheck(dto.getSize());
+        return cmnCommentService.createComment(member, board, dto.getContent(), dto.getSize());
     }
 
     @Operation(summary = "댓글 불러오기")
     @GetMapping
-    public Page<GetAllCommentResponseDTO> getAllComment(@RequestParam Long communityPk,
+    public GetAllCommentResponseDTO getAllComment(@RequestParam Long communityPk,
                                                        @RequestParam int page,
                                                        @RequestParam int size) {
         OeBoard board = validator.getBoard(communityPk);
