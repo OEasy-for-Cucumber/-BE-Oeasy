@@ -6,14 +6,21 @@ import com.OEzoa.OEasy.domain.community.OeBoard;
 import com.OEzoa.OEasy.domain.member.Member;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.beans.PropertyEditorSupport;
 
 @RestController
 @RequestMapping("/api/community")
 @Tag(name = "Community API", description = "커뮤니티 게시판입니다.")
 @RequiredArgsConstructor
+@Slf4j
 public class CommunityController {
 
     private final CmnService cmnService;
@@ -33,13 +40,24 @@ public class CommunityController {
     @Operation(summary = "게시물 수정하기",
             description = "게시물을 수정")
     @PatchMapping(consumes = {"multipart/form-data"})
-    public ResponseEntity<CmnDTOResponseDTO> updateCmn(@ModelAttribute CmnUpdateRequestDTO cmn) {
+    public ResponseEntity<CmnDTOResponseDTO> updateCmn(@ModelAttribute @Valid CmnUpdateRequestDTO cmn) {
         OeBoard board = validator.myBoardCheck(cmn.getUserId(), cmn.getCommunityId());
         Member member = validator.getMember(cmn.getUserId());
         cmnService.updateCmn(board, cmn);
         return ResponseEntity.ok(cmnService.getCmn(board, member));
     }
+    @InitBinder
+    public void initBinder(WebDataBinder binder) throws Exception {
+        binder.registerCustomEditor(MultipartFile.class, new PropertyEditorSupport() {
 
+            @Override
+            public void setAsText(String text) {
+                log.debug("initBinder MultipartFile.class: {}; set null;", text);
+                setValue(null);
+            }
+
+        });
+    }
 
     @Operation(summary = "커뮤니티 게시판 불러오기",
             description = "게시글들을 페이징 하여 불러옵니다.")
