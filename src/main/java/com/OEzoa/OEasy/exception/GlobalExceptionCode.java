@@ -35,8 +35,11 @@ public enum GlobalExceptionCode {
     MALFORMED_TOKEN(HttpStatus.BAD_REQUEST, "잘못된 토큰 형식입니다.", "JWT 토큰 형식 오류"),
 
     //---------------sign up-------------------
+    INVALID_SIGNUP_FLOW(HttpStatus.BAD_REQUEST, "회원 가입 데이터를 확인해 주십시오", "이메일 PW 닉네임 중 누락"),
     EMAIL_DUPLICATION(HttpStatus.CONFLICT, "이미 사용 중인 이메일입니다.", "중복된 이메일 요청"),
-    INVALID_PASSWORD(HttpStatus.BAD_REQUEST, "비밀번호는 필수 항목입니다.", "비밀번호 입력 누락"),
+    INVALID_EMAIL(HttpStatus.BAD_REQUEST, "이메일은 필수 항목입니다.", "이메일 입력 누락"),
+    INVALID_NICKNAME(HttpStatus.BAD_REQUEST, "올바르지 않은 닉네임 입니다.", "닉네임 확인 필요"),
+    INVALID_PASSWORD(HttpStatus.BAD_REQUEST, "올바르지 않은 비밀번호 입니다..", "비밀번호 확인 필요"),
     INVALID_VALID_SENTENCE(HttpStatus.BAD_REQUEST, "탈퇴 문구를 정확히 입력하세요.", "올바르지 않은 탈퇴 문구"),
     //---------------nickname-------------------
     NICKNAME_EMPTY(HttpStatus.BAD_REQUEST, "닉네임을 입력해주세요.", "닉네임이 null이거나 빈 문자열"),
@@ -57,8 +60,8 @@ public enum GlobalExceptionCode {
     RECIPE_OUT_OF_VALID_RANGE(HttpStatus.BAD_REQUEST, "범위를 벗어났습니다", "범위를 벗어난 데이터를 요청"),
     RECIPE_ID_NOT_FOUND(HttpStatus.NOT_FOUND, "id를 확인해 주세요", "요청한 id에 해당하는 값이 없습니다."),
    //---------------graph-------------------
-    DATE_FORMAT_INVALID(HttpStatus.BAD_REQUEST, "잘못된 날짜 형식입니다. yyyy-MM-dd 형식을 사용하세요.", "사용자가 입력한 날짜 형식이 잘못됨"),
-    ;
+    DATE_FORMAT_INVALID(HttpStatus.BAD_REQUEST, "잘못된 날짜 형식입니다. yyyy-MM-dd 형식을 사용하세요.", "사용자가 입력한 날짜 형식이 잘못됨");
+
 
     private final HttpStatus httpStatus;
     private final String message;
