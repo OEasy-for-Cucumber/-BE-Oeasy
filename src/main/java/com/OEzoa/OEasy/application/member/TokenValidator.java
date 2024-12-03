@@ -9,6 +9,8 @@ import com.OEzoa.OEasy.util.member.JwtTokenProvider;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.UnsupportedJwtException;
+import io.jsonwebtoken.io.DecodingException;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -44,6 +46,9 @@ public class TokenValidator {
         } catch (MalformedJwtException e) {
             log.error("잘못된 JWT 토큰 형식입니다.", e);
             throw new GlobalException(GlobalExceptionCode.MALFORMED_TOKEN);
+        } catch (DecodingException e) {
+            log.error("JWT 디코딩 중 오류가 발생했습니다. 토큰: {}", accessToken, e);
+            throw new GlobalException(GlobalExceptionCode.INVALID_ACCESS_TOKEN);
         } catch (Exception e) {
             log.error("유효하지 않은 토큰입니다.", e);
             throw new GlobalException(GlobalExceptionCode.INVALID_ACCESS_TOKEN);
