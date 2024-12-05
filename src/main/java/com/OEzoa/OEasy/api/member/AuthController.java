@@ -32,8 +32,9 @@ public class AuthController {
                     @ApiResponse(responseCode = "400", description = "잘못된 요청 또는 토큰 갱신 중 오류 발생.")
             }
     )
-    public ResponseEntity<AuthTokenResponseDTO> refreshAccessToken(@RequestHeader(name = "Authorization") String authorizationHeader) {
-        AuthTokenResponseDTO tokens = authService.refreshAccessToken(authorizationHeader);
+    public ResponseEntity<AuthTokenResponseDTO> refreshAccessToken(
+            @RequestHeader("Authorization") String refreshTokenHeader) {
+        AuthTokenResponseDTO tokens = authService.refreshAccessToken(refreshTokenHeader);
         return ResponseEntity.ok(tokens);
     }
 }
