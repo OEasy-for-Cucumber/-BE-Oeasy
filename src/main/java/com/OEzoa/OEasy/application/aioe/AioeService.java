@@ -56,8 +56,6 @@ public class AioeService {
                 "안녕하세오이? 저는 AI 오이입니다오이! 오이에 관련된 질문을 해주세오이! 🥒", "aioe", aiOe
         );
         chatMessageRepository.save(initialMessage);
-
-        // 새로운 초기 메시지를 반환
         return ChatMessageMapper.toStartResponseDto(initialMessage);
     }
 
@@ -74,7 +72,6 @@ public class AioeService {
         // 사용자 질문 저장
         AiOeChatMessage userMessage = ChatMessageMapper.toEntity(question, "user", aiOe);
         chatMessageRepository.save(userMessage);
-
 
         String gptResponse = openAIClient.askQuestion(question);
         AiOeChatMessage gptMessage = ChatMessageMapper.toEntity(gptResponse, "aioe", aiOe);

@@ -193,7 +193,7 @@ public class MemberService {
         Member member = tokenValidator.validateAccessTokenAndReturnMember(accessToken);
         String newSalt = PasswordUtil.generateSalt();
         String hashedNewPassword = PasswordUtil.hashPassword(passwordChangeRequest.getNewPw(), newSalt);
-        member = member.toBuilder().pw(hashedNewPassword).salt(newSalt).build();
+        member = memberMapper.updatePassword(member, newSalt, hashedNewPassword);
         memberRepository.save(member);
     }
 
