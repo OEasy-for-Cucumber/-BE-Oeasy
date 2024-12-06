@@ -62,10 +62,10 @@ public class MemberMapper {
                 .nickname(newNickname.trim())
                 .build();
     }
-
-
-
-
-
-
+    public Member updatePassword(Member member,  String newSalt, String newHashedPassword) {
+        return member.toBuilder()
+                .salt(newSalt)
+                .pw(newHashedPassword)
+                .build();
+    }
 }

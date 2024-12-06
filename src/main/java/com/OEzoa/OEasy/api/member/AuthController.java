@@ -33,7 +33,7 @@ public class AuthController {
             }
     )
     public ResponseEntity<AuthTokenResponseDTO> refreshAccessToken(
-            @RequestHeader("Authorization") String refreshTokenHeader) {
+            @RequestHeader(name = "Authorization", required = false) String refreshTokenHeader) {
         AuthTokenResponseDTO tokens = authService.refreshAccessToken(refreshTokenHeader);
         return ResponseEntity.ok(tokens);
     }
