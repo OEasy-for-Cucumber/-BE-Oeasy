@@ -2,6 +2,7 @@ package com.OEzoa.OEasy.application.member;
 
 import com.OEzoa.OEasy.application.member.dto.KakaoDTO;
 import com.OEzoa.OEasy.application.member.dto.MemberLoginResponseDTO;
+import com.OEzoa.OEasy.application.member.mapper.KakaoMapper;
 import com.OEzoa.OEasy.application.member.mapper.MemberMapper;
 import com.OEzoa.OEasy.domain.member.Member;
 import com.OEzoa.OEasy.domain.member.MemberRepository;
@@ -27,7 +28,7 @@ public class KakaoMemberService {
     @Autowired
     private KakaoService kakaoService;
     @Autowired
-    private MemberMapper memberMapper;
+    private KakaoMapper kakaoMapper;
 
     // 카카오 로그인 처리 (JWT 발급)
     public MemberLoginResponseDTO loginWithKakao(String code, HttpSession session) throws Exception {
@@ -36,7 +37,7 @@ public class KakaoMemberService {
 
         Member member = memberRepository.findByKakaoId(kakaoInfo.getId()).orElse(null);
         if (member == null) {
-            memberMapper.toEntity(kakaoInfo.getEmail(), kakaoInfo.getNickname(), null, null);
+            member = kakaoMapper.toMember(kakaoInfo);
             member = memberRepository.save(member);
             log.info("신규 사용자 저장 완료: " + member);
         } else {
@@ -54,14 +55,14 @@ public class KakaoMemberService {
 
         if (memberToken == null) {
             log.info("신규 MemberToken 생성 진행");
-            memberToken = memberMapper.createMemberToken(member, jwtAccessToken, jwtRefreshToken);
+            memberToken = kakaoMapper.createMemberToken(member, jwtAccessToken, jwtRefreshToken);
         } else {
             log.info("기존 MemberToken 업데이트 진행");
-            memberToken = memberMapper.updateMemberToken(memberToken, jwtAccessToken, jwtRefreshToken);
+            memberToken = kakaoMapper.updateMemberToken(memberToken, jwtAccessToken, jwtRefreshToken);
         }
 
         memberTokenRepository.save(memberToken);
         log.info("MemberToken 저장 완료: {}", memberToken);
-        return memberMapper.toLoginResponseDTO(member, jwtAccessToken, jwtRefreshToken);
+        return kakaoMapper.toLoginResponseDTO(member, jwtAccessToken, jwtRefreshToken);
     }
 }
