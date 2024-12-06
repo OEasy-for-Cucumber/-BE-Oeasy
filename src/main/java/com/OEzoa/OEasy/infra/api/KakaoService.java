@@ -68,7 +68,7 @@ public class KakaoService {
 
             accessToken = (String) jsonObj.get("access_token");
         } catch (Exception e) {
-            throw new Exception("액세스토큰 발급에 실패했습니다.");
+            throw new Exception("카카오 액세스토큰 발급에 실패했습니다.");
         }
 
         return getUserInfoWithToken(accessToken);
