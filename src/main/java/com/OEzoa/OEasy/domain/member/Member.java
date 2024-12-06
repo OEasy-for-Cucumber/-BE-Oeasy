@@ -1,6 +1,7 @@
 package com.OEzoa.OEasy.domain.member;
 
 import com.OEzoa.OEasy.domain.aioe.AiOe;
+import com.OEzoa.OEasy.domain.aioe.AioeUsage;
 import com.OEzoa.OEasy.domain.community.OeBoard;
 import com.OEzoa.OEasy.domain.community.OeBoardComment;
 import com.OEzoa.OEasy.domain.community.OeBoardLike;
@@ -15,6 +16,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
+import java.util.ArrayList;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -72,4 +74,7 @@ public class Member {
 
     @OneToMany(mappedBy = "member", cascade = CascadeType.REMOVE, orphanRemoval = true) // 채팅 삭제
     private List<OeChatting> oeChatting;
+
+    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<AioeUsage> usages = new ArrayList<>();
 }

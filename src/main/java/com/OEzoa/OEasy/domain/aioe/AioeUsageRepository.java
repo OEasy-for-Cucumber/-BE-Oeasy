@@ -5,7 +5,6 @@ import java.time.LocalDate;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface AioeRepository extends JpaRepository<AiOe, Long> {
-    // 사용자 챗봇 가져오는 메서드
-    Optional<AiOe> findByMember(Member member);
+public interface AioeUsageRepository extends JpaRepository<AioeUsage, Long> {
+    Optional<AioeUsage> findByMemberAndUsageDate(Member member, LocalDate usageDate);
 }
