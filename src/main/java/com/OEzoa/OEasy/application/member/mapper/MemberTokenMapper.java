@@ -6,10 +6,9 @@ import org.springframework.stereotype.Component;
 @Component
 public class MemberTokenMapper {
 
-    public MemberToken updateToken(MemberToken memberToken, String newAccessToken, String newRefreshToken) {
+    public MemberToken updateToken(MemberToken memberToken, String newAccessToken) {
         return memberToken.toBuilder()
                 .accessToken(newAccessToken)
-                .refreshToken(newRefreshToken)
                 .build();
     }
 }

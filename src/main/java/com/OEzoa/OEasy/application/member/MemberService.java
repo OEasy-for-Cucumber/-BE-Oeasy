@@ -23,6 +23,7 @@ import com.OEzoa.OEasy.util.s3Bucket.FileUploader;
 import jakarta.servlet.http.HttpSession;
 import java.util.Map;
 import java.util.UUID;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -106,11 +107,9 @@ public class MemberService {
         return memberMapper.toDto(member);
     }
 
-
-    // 일반 로그인 처리 (JWT 발급)
+    // 로그인 (JWT 발급)
     @Transactional
-    public MemberLoginResponseDTO login(MemberLoginDTO memberLoginDTO, HttpSession session) {
-
+    public MemberLoginResponseDTO login(MemberLoginDTO memberLoginDTO, HttpServletResponse response) {
         Member member = memberRepository.findByEmail(memberLoginDTO.getEmail())
                 .orElseThrow(() -> new GlobalException(GlobalExceptionCode.NOT_FIND_MEMBER));
 
@@ -119,26 +118,10 @@ public class MemberService {
             throw new GlobalException(GlobalExceptionCode.INVALID_OLD_PASSWORD);
         }
 
-        String jwtAccessToken = jwtTokenProvider.generateToken(member.getMemberPk());
-        String jwtRefreshToken = jwtTokenProvider.generateRefreshToken(member.getMemberPk());
-        session.setAttribute("accessToken", jwtAccessToken);
-        session.setAttribute("refreshToken", jwtRefreshToken);
-        log.info("로그인 성공. 생성된 액세스 토큰: " + jwtAccessToken);
-        log.info("로그인 성공. 생성된 리프레시 토큰: " + jwtRefreshToken);
+        String accessToken = jwtTokenProvider.generateToken(member.getMemberPk());
+        jwtTokenProvider.createRefreshTokenCookie(member.getMemberPk(), response);
 
-        // MemberToken 저장 & 업데이트
-        MemberToken memberToken = memberTokenRepository.findById(member.getMemberPk()).orElse(null);
-        if (memberToken == null) {
-            memberToken = memberMapper.createMemberToken(member, jwtAccessToken, jwtRefreshToken);
-            log.info("신규 MemberToken 생성: {}", memberToken);
-        } else {
-            memberToken = memberMapper.updateMemberToken(memberToken, jwtAccessToken, jwtRefreshToken);
-            log.info("기존 MemberToken 업데이트: {}", memberToken);
-        }
-        memberToken = memberTokenRepository.save(memberToken);
-        log.info("MemberToken 저장 완료: " + memberToken);
-
-        return memberMapper.toLoginResponseDTO(member, jwtAccessToken, jwtRefreshToken);
+        return new MemberLoginResponseDTO(accessToken, member.getEmail(), member.getNickname());
     }
 
     // 닉네임 변경
