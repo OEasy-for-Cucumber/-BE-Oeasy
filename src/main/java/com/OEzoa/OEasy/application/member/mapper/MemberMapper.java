@@ -24,21 +24,6 @@ public class MemberMapper {
                 .build();
     }
 
-    public MemberToken createMemberToken(Member member, String accessToken, String refreshToken) {
-        return MemberToken.builder()
-                .member(member)
-                .accessToken(accessToken)
-                .refreshToken(refreshToken)
-                .build();
-    }
-
-    public MemberToken updateMemberToken(MemberToken memberToken, String accessToken, String refreshToken) {
-        return memberToken.toBuilder()
-                .accessToken(accessToken)
-                .refreshToken(refreshToken)
-                .build();
-    }
-
     public Member toEntity(String email, String nickname, String hashedPassword, String salt) {
         return Member.builder()
                 .email(email)
@@ -48,10 +33,9 @@ public class MemberMapper {
                 .build();
     }
 
-    public MemberLoginResponseDTO toLoginResponseDTO(Member member, String accessToken, String refreshToken) {
+    public MemberLoginResponseDTO toLoginResponseDTO(Member member, String accessToken) {
         return MemberLoginResponseDTO.builder()
                 .accessToken(accessToken)
-                .refreshToken(refreshToken)
                 .email(member.getEmail())
                 .nickname(member.getNickname())
                 .build();
