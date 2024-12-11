@@ -1,5 +1,8 @@
 package com.OEzoa.OEasy.application.recipe;
 
+import com.OEzoa.OEasy.domain.member.Member;
+import com.OEzoa.OEasy.domain.member.MemberRepository;
+import com.OEzoa.OEasy.domain.recipe.OeRecipe;
 import com.OEzoa.OEasy.domain.recipe.OeRecipeRepository;
 import com.OEzoa.OEasy.exception.GlobalException;
 import com.OEzoa.OEasy.exception.GlobalExceptionCode;
@@ -11,6 +14,7 @@ import org.springframework.stereotype.Component;
 public class RecipeValidator {
 
     private final OeRecipeRepository oeRecipeRepository;
+    private final MemberRepository memberRepository;
 
     public void isValidValue(long id){
         long top = oeRecipeRepository.findTopId();
@@ -29,6 +33,13 @@ public class RecipeValidator {
             throw new GlobalException(GlobalExceptionCode.RECIPE_OUT_OF_VALID_RANGE);
         }
 
+    }
+
+    public OeRecipe getRecipeById(long id){
+        return oeRecipeRepository.findById(id).orElseThrow(()-> new GlobalException(GlobalExceptionCode.RECIPE_ID_NOT_FOUND));
+    }
+    public Member getMemberById(long id){
+        return memberRepository.findById(id).orElseThrow(() -> new GlobalException(GlobalExceptionCode.NOT_FIND_MEMBER));
     }
 
 }

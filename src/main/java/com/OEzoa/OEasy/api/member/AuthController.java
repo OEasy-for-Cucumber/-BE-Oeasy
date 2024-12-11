@@ -5,7 +5,9 @@ import com.OEzoa.OEasy.application.member.dto.AuthTokenResponseDTO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -32,8 +34,10 @@ public class AuthController {
                     @ApiResponse(responseCode = "400", description = "잘못된 요청 또는 토큰 갱신 중 오류 발생.")
             }
     )
-    public ResponseEntity<AuthTokenResponseDTO> refreshAccessToken(@RequestHeader("Authorization") String refreshTokenHeader) {
-        AuthTokenResponseDTO tokens = authService.refreshAccessToken(refreshTokenHeader);
-        return ResponseEntity.ok(tokens);
+    public ResponseEntity<AuthTokenResponseDTO> refreshAccessToken(
+            @CookieValue(name = "refreshToken", required = false) String refreshToken,
+            HttpServletResponse response) {
+        String newAccessToken = authService.refreshAccessToken(refreshToken, response);
+        return ResponseEntity.ok(new AuthTokenResponseDTO(newAccessToken));
     }
 }

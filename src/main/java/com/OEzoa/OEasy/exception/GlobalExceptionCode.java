@@ -35,8 +35,11 @@ public enum GlobalExceptionCode {
     MALFORMED_TOKEN(HttpStatus.BAD_REQUEST, "잘못된 토큰 형식입니다.", "JWT 토큰 형식 오류"),
 
     //---------------sign up-------------------
+    INVALID_SIGNUP_FLOW(HttpStatus.BAD_REQUEST, "회원 가입 데이터를 확인해 주십시오", "이메일 PW 닉네임 중 누락"),
     EMAIL_DUPLICATION(HttpStatus.CONFLICT, "이미 사용 중인 이메일입니다.", "중복된 이메일 요청"),
-    INVALID_PASSWORD(HttpStatus.BAD_REQUEST, "비밀번호는 필수 항목입니다.", "비밀번호 입력 누락"),
+    INVALID_EMAIL(HttpStatus.BAD_REQUEST, "이메일은 필수 항목입니다.", "이메일 입력 누락"),
+    INVALID_NICKNAME(HttpStatus.BAD_REQUEST, "올바르지 않은 닉네임 입니다.", "닉네임 확인 필요"),
+    INVALID_PASSWORD(HttpStatus.BAD_REQUEST, "올바르지 않은 비밀번호 입니다..", "비밀번호 확인 필요"),
     INVALID_VALID_SENTENCE(HttpStatus.BAD_REQUEST, "탈퇴 문구를 정확히 입력하세요.", "올바르지 않은 탈퇴 문구"),
     //---------------nickname-------------------
     NICKNAME_EMPTY(HttpStatus.BAD_REQUEST, "닉네임을 입력해주세요.", "닉네임이 null이거나 빈 문자열"),
@@ -50,6 +53,7 @@ public enum GlobalExceptionCode {
     QUESTION_TOO_LONG(HttpStatus.BAD_REQUEST,"질문이 너무 길어오이ㅠ 조금 더 간단히 해주세오이!🥒", "100자 이내로 질문해주세요"),
     INVALID_INPUT(HttpStatus.BAD_REQUEST,"죄송하지만 오이와 관련된 질문만 답변할 수 있어오이!🥒","오이를 포함해 질문해 주세요"),
     DB_SAVE_FAILURE(HttpStatus.INTERNAL_SERVER_ERROR, "데이터 저장 중 오류가 발생했습니다.", "Hibernate insert 쿼리가 실패했습니다."),
+    MAX_USAGE_EXCEEDED(HttpStatus.TOO_MANY_REQUESTS,"오늘 사용가능한 질문 10회를 모두 사용하셨습니다!🥒","aioe 채팅 제한"),
     //---------------auth service-------------------
     INVALID_REFRESH_TOKEN(HttpStatus.UNAUTHORIZED, "유효하지 않은 리프레시 토큰입니다.", "리프레시 토큰이 만료되었거나 잘못된 형식입니다."),
     TOKEN_MEMBER_NOT_FOUND(HttpStatus.NOT_FOUND, "회원 정보를 찾을 수 없습니다.", "리프레시 토큰에서 추출한 사용자 ID가 존재하지 않음"),
@@ -57,8 +61,8 @@ public enum GlobalExceptionCode {
     RECIPE_OUT_OF_VALID_RANGE(HttpStatus.BAD_REQUEST, "범위를 벗어났습니다", "범위를 벗어난 데이터를 요청"),
     RECIPE_ID_NOT_FOUND(HttpStatus.NOT_FOUND, "id를 확인해 주세요", "요청한 id에 해당하는 값이 없습니다."),
    //---------------graph-------------------
-    DATE_FORMAT_INVALID(HttpStatus.BAD_REQUEST, "잘못된 날짜 형식입니다. yyyy-MM-dd 형식을 사용하세요.", "사용자가 입력한 날짜 형식이 잘못됨"),
-    ;
+    DATE_FORMAT_INVALID(HttpStatus.BAD_REQUEST, "잘못된 날짜 형식입니다. yyyy-MM-dd 형식을 사용하세요.", "사용자가 입력한 날짜 형식이 잘못됨");
+
 
     private final HttpStatus httpStatus;
     private final String message;

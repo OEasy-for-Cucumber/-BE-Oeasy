@@ -17,7 +17,7 @@ public class GraphScheduler {
 
     private final GraphService graphService;
 
-    @Scheduled(cron = "0 0 6 * * ?") // 매일 오전 6시
+    @Scheduled(cron = "0 0 12 * * ?") // 매일 12시
     public void scheduleCucumberDataFetch() {
         String today = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
 

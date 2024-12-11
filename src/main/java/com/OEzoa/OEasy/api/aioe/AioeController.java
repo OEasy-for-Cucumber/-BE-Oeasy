@@ -3,15 +3,22 @@ package com.OEzoa.OEasy.api.aioe;
 import static com.OEzoa.OEasy.util.HeaderUtils.extractTokenFromHeader;
 
 import com.OEzoa.OEasy.application.aioe.AioeService;
+import com.OEzoa.OEasy.application.aioe.AioeUsageService;
 import com.OEzoa.OEasy.application.aioe.dto.AioeIntroMessageDTO;
 import com.OEzoa.OEasy.application.aioe.dto.AioeRequestDTO;
 import com.OEzoa.OEasy.application.aioe.dto.AioeResponseDTO;
 import com.OEzoa.OEasy.application.aioe.dto.ChatHistoryDTO;
+import com.OEzoa.OEasy.application.aioe.validator.AioeValidator;
+import com.OEzoa.OEasy.application.member.MemberService;
+import com.OEzoa.OEasy.application.member.TokenValidator;
+import com.OEzoa.OEasy.domain.aioe.AioeUsage;
+import com.OEzoa.OEasy.domain.member.Member;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -28,7 +35,14 @@ import org.springframework.web.bind.annotation.RestController;
 @Tag(name = "AI OE API", description = "서비스 챗봇 AI OE로 응답메세지를 생성합니다.")
 public class AioeController {
 
-    private final AioeService aioeService;
+    @Autowired
+    private AioeService aioeService;
+    @Autowired
+    private TokenValidator tokenValidator;
+    @Autowired
+    private AioeUsageService aioeUsageService;
+    @Autowired
+    private AioeValidator aioeValidator;
 
     // 챗봇 시작
     @PostMapping("/start")
@@ -58,6 +72,7 @@ public class AioeController {
             @RequestHeader(name = "Authorization") String authorizationHeader,
             @RequestBody AioeRequestDTO questionRequest) {
         String accessToken = extractTokenFromHeader(authorizationHeader);
+        Member member = tokenValidator.validateAccessTokenAndReturnMember(accessToken);
         AioeResponseDTO response = aioeService.handleUserQuestionWithTimestamp(questionRequest.getQuestion(),
                 accessToken);
         return ResponseEntity.ok(response);

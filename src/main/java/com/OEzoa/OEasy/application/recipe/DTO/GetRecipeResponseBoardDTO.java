@@ -13,4 +13,5 @@ public class GetRecipeResponseBoardDTO {
     private long id;
     private String title;
     private String imgUrl;
+    private long like;
 }

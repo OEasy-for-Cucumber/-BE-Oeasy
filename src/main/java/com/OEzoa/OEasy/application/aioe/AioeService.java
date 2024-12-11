@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,11 +25,18 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class AioeService {
 
-    private final TokenValidator tokenValidator;
-    private final AioeRepository aioeRepository;
-    private final ChatMessageRepository chatMessageRepository;
-    private final OpenAIClient openAIClient;
-    private final AioeValidator aioeValidator;
+    @Autowired
+    private  TokenValidator tokenValidator;
+    @Autowired
+    private  AioeRepository aioeRepository;
+    @Autowired
+    private  ChatMessageRepository chatMessageRepository;
+    @Autowired
+    private  OpenAIClient openAIClient;
+    @Autowired
+    private  AioeValidator aioeValidator;
+    @Autowired
+    private AioeUsageService aioeUsageService;
 
     // 챗봇 시작 로직
     @Transactional
@@ -56,8 +64,6 @@ public class AioeService {
                 "안녕하세오이? 저는 AI 오이입니다오이! 오이에 관련된 질문을 해주세오이! 🥒", "aioe", aiOe
         );
         chatMessageRepository.save(initialMessage);
-
-        // 새로운 초기 메시지를 반환
         return ChatMessageMapper.toStartResponseDto(initialMessage);
     }
 
@@ -71,10 +77,11 @@ public class AioeService {
         aioeValidator.validateQuestionLength(question);
         aioeValidator.validateQuestionContent(question);
 
+        // 횟수 검증 및 증가
+        aioeUsageService.validateAndIncrementUsage(member);
         // 사용자 질문 저장
         AiOeChatMessage userMessage = ChatMessageMapper.toEntity(question, "user", aiOe);
         chatMessageRepository.save(userMessage);
-
 
         String gptResponse = openAIClient.askQuestion(question);
         AiOeChatMessage gptMessage = ChatMessageMapper.toEntity(gptResponse, "aioe", aiOe);

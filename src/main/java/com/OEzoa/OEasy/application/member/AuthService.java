@@ -7,41 +7,36 @@ import com.OEzoa.OEasy.domain.member.MemberTokenRepository;
 import com.OEzoa.OEasy.exception.GlobalException;
 import com.OEzoa.OEasy.exception.GlobalExceptionCode;
 import com.OEzoa.OEasy.util.member.JwtTokenProvider;
+import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+@RequiredArgsConstructor
 @Service
+@Slf4j
 public class AuthService {
 
-    private final JwtTokenProvider jwtTokenProvider;
-    private final MemberTokenRepository memberTokenRepository;
-    private final MemberTokenMapper memberTokenMapper;
-
-    public AuthService(JwtTokenProvider jwtTokenProvider, MemberTokenRepository memberTokenRepository, MemberTokenMapper memberTokenMapper) {
-        this.jwtTokenProvider = jwtTokenProvider;
-        this.memberTokenRepository = memberTokenRepository;
-        this.memberTokenMapper = memberTokenMapper;
-    }
+    @Autowired
+    private JwtTokenProvider jwtTokenProvider;
+    @Autowired
+    private MemberTokenRepository memberTokenRepository;
+    @Autowired
+    private MemberTokenMapper memberTokenMapper;
 
     @Transactional
-    public AuthTokenResponseDTO refreshAccessToken(String refreshTokenHeader) {
-        String refreshToken = refreshTokenHeader.replace("Bearer ", "").trim();
-
-        if (jwtTokenProvider.isRefreshTokenExpired(refreshToken)) {
-            throw new GlobalException(GlobalExceptionCode.INVALID_REFRESH_TOKEN);
-        }
-
+    public String refreshAccessToken(String refreshToken, HttpServletResponse response) {
         Long memberId = jwtTokenProvider.getMemberIdFromToken(refreshToken);
         MemberToken memberToken = memberTokenRepository.findByMemberPk(memberId)
                 .orElseThrow(() -> new GlobalException(GlobalExceptionCode.MEMBER_NOT_FOUND));
 
         String newAccessToken = jwtTokenProvider.generateToken(memberId);
-        String newRefreshToken = jwtTokenProvider.generateRefreshToken(memberId);
-
-        MemberToken updatedToken = memberTokenMapper.updateToken(memberToken, newAccessToken, newRefreshToken);
+        MemberToken updatedToken = memberTokenMapper.updateToken(memberToken, newAccessToken );
         memberTokenRepository.save(updatedToken);
-
-        return new AuthTokenResponseDTO(newAccessToken, newRefreshToken);
+        log.info("액세스 토큰 갱신 성공 유저 email : {}", updatedToken.getMember().getEmail());
+        return refreshToken;
     }
 }
 

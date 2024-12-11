@@ -8,7 +8,7 @@ import com.OEzoa.OEasy.domain.member.MemberToken;
 import com.OEzoa.OEasy.domain.member.MemberTokenRepository;
 import com.OEzoa.OEasy.infra.api.KakaoService;
 import com.OEzoa.OEasy.util.member.JwtTokenProvider;
-import jakarta.servlet.http.HttpSession;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -29,7 +29,7 @@ public class KakaoMemberService {
     private KakaoService kakaoService;
 
     // 카카오 로그인 처리 (JWT 발급)
-    public MemberLoginResponseDTO loginWithKakao(String code, HttpSession session) throws Exception {
+    public MemberLoginResponseDTO loginWithKakao(String code, HttpServletResponse response)  throws Exception {
         // 카카오 API를 사용하여 사용자 정보 가져오기
         KakaoDTO kakaoInfo = kakaoService.getKakaoInfo(code);
         log.info("카카오 사용자 정보 수신: " + kakaoInfo);
@@ -51,13 +51,9 @@ public class KakaoMemberService {
 
         // JWT 액세스 토큰 및 리프레시 토큰 발급
         String jwtAccessToken = jwtTokenProvider.generateToken(member.getMemberPk());
-        String jwtRefreshToken = jwtTokenProvider.generateRefreshToken(member.getMemberPk());
+        jwtTokenProvider.createRefreshTokenCookie(member.getMemberPk(), response);
+        log.info("카카오 로그인 성공. 생성된 액세스 토큰: {}", jwtAccessToken);
 
-        // 세션에 액세스 및 리프레시 토큰 저장
-        session.setAttribute("accessToken", jwtAccessToken);
-        session.setAttribute("refreshToken", jwtRefreshToken);
-
-        log.info("카카오 로그인 성공. 생성된 액세스 토큰: {}, 리프레시 토큰: {}", jwtAccessToken, jwtRefreshToken);
         // MemberToken 저장 및 업데이트
         MemberToken memberToken = memberTokenRepository.findById(member.getMemberPk()).orElse(null);
         if (memberToken == null) {
@@ -65,24 +61,21 @@ public class KakaoMemberService {
             memberToken = MemberToken.builder()
                     .member(member)
                     .accessToken(jwtAccessToken)
-                    .refreshToken(jwtRefreshToken)
                     .build();
             log.info("신규 MemberToken 생성: {}", memberToken);
         } else {
             // 기존 MemberToken 업데이트
             memberToken = memberToken.toBuilder()
                     .accessToken(jwtAccessToken)
-                    .refreshToken(jwtRefreshToken)
                     .build();
             log.info("기존 MemberToken 업데이트: {}", memberToken);
         }
         memberTokenRepository.save(memberToken);
         log.info("MemberToken 저장 완료: {}", memberToken);
 
-        log.info("카카오 로그인 성공. 생성된 액세스 토큰: {}, 리프레시 토큰: {}", jwtAccessToken, jwtRefreshToken);
+        log.info("카카오 로그인 성공. 생성된 액세스 토큰: {}", jwtAccessToken);
         return MemberLoginResponseDTO.builder()
                 .accessToken(jwtAccessToken)
-                .refreshToken(jwtRefreshToken)
                 .email(member.getEmail())
                 .nickname(kakaoInfo.getNickname())
                 .build();

@@ -1,5 +1,6 @@
 package com.OEzoa.OEasy.application.member;
 
+import com.OEzoa.OEasy.application.member.dto.MemberDTO;
 import com.OEzoa.OEasy.application.member.dto.MemberDeleteRequestDTO;
 import com.OEzoa.OEasy.application.member.dto.MemberLoginDTO;
 import com.OEzoa.OEasy.application.member.dto.MemberLoginResponseDTO;
@@ -15,11 +16,15 @@ import com.OEzoa.OEasy.domain.member.MemberToken;
 import com.OEzoa.OEasy.domain.member.MemberTokenRepository;
 import com.OEzoa.OEasy.exception.GlobalException;
 import com.OEzoa.OEasy.exception.GlobalExceptionCode;
+import com.OEzoa.OEasy.util.HeaderUtils;
 import com.OEzoa.OEasy.util.member.JwtTokenProvider;
 import com.OEzoa.OEasy.util.member.PasswordUtil;
 import com.OEzoa.OEasy.util.s3Bucket.FileUploader;
 import jakarta.servlet.http.HttpSession;
+import java.util.Map;
 import java.util.UUID;
+import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -29,6 +34,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class MemberService {
 
     @Autowired
@@ -41,38 +47,69 @@ public class MemberService {
     private JwtTokenProvider jwtTokenProvider;
     @Autowired
     private FileUploader fileUploader;
+    @Autowired
+    private MemberMapper memberMapper;
 
     // 일반 회원 가입
     @Transactional
-    public MemberSignUpResponseDTO registerMember(MemberSignUpDTO memberSignUpDTO)  {
-        if (memberRepository.findByEmail(memberSignUpDTO.getEmail()).isPresent()) {
-            throw new GlobalException(GlobalExceptionCode.EMAIL_DUPLICATION);
-        }
-        if (memberRepository.existsByNickname(memberSignUpDTO.getNickname())) {
-            throw new GlobalException(GlobalExceptionCode.NICKNAME_DUPLICATION);
-        }
-        if (memberSignUpDTO.getPw() == null || memberSignUpDTO.getPw().isEmpty()) {
-            throw new GlobalException(GlobalExceptionCode.INVALID_PASSWORD);
-        }
-        // 비밀번호 해싱
-        String salt = PasswordUtil.generateSalt();
-        String hashedPassword = PasswordUtil.hashPassword(memberSignUpDTO.getPw(), salt);
+    public MemberSignUpResponseDTO registerMember(String token) {
+        Map<String, Object> data = jwtTokenProvider.extractDataFromToken(token);
 
-        Member member = Member.builder()
-                .email(memberSignUpDTO.getEmail())
-                .pw(hashedPassword)
-                .salt(salt)
-                .nickname(memberSignUpDTO.getNickname())
-                .build();
+        String email = (String) data.get("email");
+        String nickname = (String) data.get("nickname");
+        String password = (String) data.get("password");
+
+        if (email == null || nickname == null || password == null) {
+            throw new GlobalException(GlobalExceptionCode.INVALID_SIGNUP_FLOW);
+        }
+
+        String salt = PasswordUtil.generateSalt();
+        String hashedPassword = PasswordUtil.hashPassword(password, salt);
+
+        Member member = memberMapper.toEntity(email, nickname, hashedPassword, salt);
         memberRepository.save(member);
-        log.info("신규 회원 저장 완료: " + member);
-        return new MemberSignUpResponseDTO(member.getNickname());
+
+        return memberMapper.toSignUpResponseDTO(member);
     }
 
-    // 일반 로그인 처리 (JWT 발급)
-    @Transactional
-    public MemberLoginResponseDTO login(MemberLoginDTO memberLoginDTO, HttpSession session) {
+    public String checkEmailAndGenerateToken(String email) {
+        if (memberRepository.findByEmail(email).isPresent()) {
+            throw new GlobalException(GlobalExceptionCode.EMAIL_DUPLICATION);
+        }
+        return jwtTokenProvider.generateTokenWithData(Map.of("email", email));
+    }
 
+    public String checkNicknameAndUpdateToken(String token, String nickname) {
+        Map<String, Object> data = jwtTokenProvider.extractDataFromToken(token);
+        if (memberRepository.existsByNickname(nickname)) {
+            throw new GlobalException(GlobalExceptionCode.NICKNAME_DUPLICATION);
+        }
+        data.put("nickname", nickname);
+        return jwtTokenProvider.generateTokenWithData(data);
+    }
+
+    public String validatePasswordAndUpdateToken(String token, String password) {
+        Map<String, Object> data = jwtTokenProvider.extractDataFromToken(token);
+
+        if (password == null || password.isEmpty()) {
+            throw new GlobalException(GlobalExceptionCode.INVALID_PASSWORD);
+        }
+        data.put("password", password);
+        return jwtTokenProvider.generateTokenWithData(data);
+    }
+
+    // 회원 정보 조회
+    public MemberDTO getProfile(String authorizationHeader) {
+        String accessToken = HeaderUtils.extractTokenFromHeader(authorizationHeader);
+        Member member = tokenValidator.validateAccessTokenAndReturnMember(accessToken);
+
+        log.info("회원정보 조회 성공 email: {}", member.getEmail());
+        return memberMapper.toDto(member);
+    }
+
+    // 로그인 (JWT 발급)
+    @Transactional
+    public MemberLoginResponseDTO login(MemberLoginDTO memberLoginDTO, HttpServletResponse response) {
         Member member = memberRepository.findByEmail(memberLoginDTO.getEmail())
                 .orElseThrow(() -> new GlobalException(GlobalExceptionCode.NOT_FIND_MEMBER));
 
@@ -81,41 +118,10 @@ public class MemberService {
             throw new GlobalException(GlobalExceptionCode.INVALID_OLD_PASSWORD);
         }
 
-        String jwtAccessToken = jwtTokenProvider.generateToken(member.getMemberPk());
-        String jwtRefreshToken = jwtTokenProvider.generateRefreshToken(member.getMemberPk());
-        session.setAttribute("accessToken", jwtAccessToken);
-        session.setAttribute("refreshToken", jwtRefreshToken);
-        log.info("로그인 성공. 생성된 액세스 토큰: " + jwtAccessToken);
-        log.info("로그인 성공. 생성된 리프레시 토큰: " + jwtRefreshToken);
+        String accessToken = jwtTokenProvider.generateToken(member.getMemberPk());
+        jwtTokenProvider.createRefreshTokenCookie(member.getMemberPk(), response);
 
-        // MemberToken 저장 & 업데이트
-        MemberToken memberToken = memberTokenRepository.findById(member.getMemberPk()).orElse(null);
-        if (memberToken == null) {
-            // 신규 MemberToken 생성
-            memberToken = MemberToken.builder()
-                    .member(member)
-                    .accessToken(jwtAccessToken)
-                    .refreshToken(jwtRefreshToken)
-                    .build();
-            log.info("신규 MemberToken 생성: " + memberToken);
-        } else {
-            // 기존 MemberToken 업데이트
-            memberToken = memberToken.toBuilder()
-                    .accessToken(jwtAccessToken)
-                    .refreshToken(jwtRefreshToken)
-                    .build();
-            log.info("기존 MemberToken 업데이트: " + memberToken);
-        }
-        memberToken = memberTokenRepository.save(memberToken);
-        log.info("MemberToken 저장 완료: " + memberToken);
-
-        // AccessToken, RefreshToken 반환
-        return MemberLoginResponseDTO.builder()
-                .accessToken(jwtAccessToken)
-                .refreshToken(jwtRefreshToken)
-                .email(member.getEmail())
-                .nickname(member.getNickname())
-                .build();
+        return new MemberLoginResponseDTO(accessToken, member.getEmail(), member.getNickname());
     }
 
     // 닉네임 변경
@@ -170,7 +176,7 @@ public class MemberService {
         Member member = tokenValidator.validateAccessTokenAndReturnMember(accessToken);
         String newSalt = PasswordUtil.generateSalt();
         String hashedNewPassword = PasswordUtil.hashPassword(passwordChangeRequest.getNewPw(), newSalt);
-        member = member.toBuilder().pw(hashedNewPassword).salt(newSalt).build();
+        member = memberMapper.updatePassword(member, newSalt, hashedNewPassword);
         memberRepository.save(member);
     }
 
