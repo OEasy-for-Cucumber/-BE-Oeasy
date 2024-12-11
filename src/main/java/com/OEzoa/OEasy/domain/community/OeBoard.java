@@ -22,7 +22,7 @@ public class OeBoard {
     @Column(name = "board_pk", nullable = false)
     private Long boardPk;
 
-    @Column(name = "title", nullable = false, length = 50)
+    @Column(name = "title", nullable = false, length = 70)
     private String title;
 
     @Column(name = "content", length = 5000)

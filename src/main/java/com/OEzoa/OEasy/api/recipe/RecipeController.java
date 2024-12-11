@@ -5,6 +5,8 @@ import com.OEzoa.OEasy.application.recipe.DTO.GetRecipeResponseDTO;
 import com.OEzoa.OEasy.application.recipe.DTO.GetRecipeResponseBoardAllDTD;
 import com.OEzoa.OEasy.application.recipe.RecipeService;
 import com.OEzoa.OEasy.application.recipe.RecipeValidator;
+import com.OEzoa.OEasy.domain.member.Member;
+import com.OEzoa.OEasy.domain.recipe.OeRecipe;
 import com.OEzoa.OEasy.domain.recipe.OeRecipeRepository;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -32,7 +34,7 @@ public class RecipeController {
     }
 
     @GetMapping
-    @Operation(summary = "레시피 가져오기", description = "id에 해당하는 데이터를 불러옵니다.")
+    @Operation(summary = "레시피 가져오기", description = "id에 해당하는 데이터를 불러옵니다.")// 좋아요 추가
     public ResponseEntity<GetRecipeResponseDTO> getRecipe(@RequestParam long id) {
         recipeValidator.isValidValue(id);
 
@@ -48,13 +50,25 @@ public class RecipeController {
 
     @GetMapping("board")
     @Operation(summary = "레시피 보드 가져오기",
-            description = "refId 보다 작은 값 들을 조회하여 view 만큼 가져오고 더 이상 가져올 값이 없다면 list는 null을 반환합니다")
+            description = "refId 보다 작은 값 들을 조회하여 view 만큼 가져오고 더 이상 가져올 값이 없다면 list는 null을 반환합니다")//좋아요추가
     public ResponseEntity<GetRecipeResponseBoardAllDTD> getRecipeBoard(
             @RequestParam("page") int page,
             @RequestParam("view") int view) {
         recipeValidator.isValidValue(page,view);
         return  ResponseEntity.ok(recipeService.getRecipeBoard(page, view));
     }
+
+    @GetMapping("like/{memberPk}/{recipePk}")
+    @Operation(summary = "좋아요"
+            , description = "memberPk와 recipePk를 통해서 좋아요 기록을 조회하고 있다면 삭제하고 false(좋아요 취소), 없다면 기록을 저장하고 true(좋아요)를 반환")
+    public boolean Like(@PathVariable long memberPk, @PathVariable long recipePk) {
+        OeRecipe recipe = recipeValidator.getRecipeById(recipePk);
+        Member member = recipeValidator.getMemberById(memberPk);
+
+        return recipeService.recipeLike(recipe, member);
+    }
+
+
 
 //    @GetMapping("del")
 //    @Transactional

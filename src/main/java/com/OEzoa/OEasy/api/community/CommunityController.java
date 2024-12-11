@@ -46,6 +46,7 @@ public class CommunityController {
         cmnService.updateCmn(board, cmn);
         return ResponseEntity.ok(cmnService.getCmn(board, member));
     }
+
     @InitBinder
     public void initBinder(WebDataBinder binder) throws Exception {
         binder.registerCustomEditor(MultipartFile.class, new PropertyEditorSupport() {

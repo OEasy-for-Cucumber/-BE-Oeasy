@@ -1,5 +1,7 @@
 package com.OEzoa.OEasy.domain.recipe;
 
+import com.OEzoa.OEasy.application.recipe.DTO.GetRecipeResponseBoardAllDTD;
+import com.OEzoa.OEasy.application.recipe.DTO.GetRecipeResponseBoardDTO;
 import io.lettuce.core.dynamic.annotation.Param;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -24,6 +26,16 @@ public interface OeRecipeRepository extends JpaRepository<OeRecipe, Long> {
     List<OeRecipe> findByRecipePkLessThanOrderByDescTopN(@Param("pk") long pk, @Param("limit") int limit);
 
     List<OeRecipe> findAllByOrderByRecipePkDesc(Pageable pageable);
+
+    @Query(value = "SELECT new com.OEzoa.OEasy.application.recipe.DTO.GetRecipeResponseBoardDTO(" +
+            "or.recipePk," +
+            "or.title," +
+            "or.img," +
+            "(SELECT count(*) " +
+            "FROM OeRecipeLike orl " +
+            "WHERE orl.recipe = or )) " +
+            "FROM OeRecipe or")
+    List<GetRecipeResponseBoardDTO> findByPage(Pageable pageable);
 
     @Query(value = "select recipe_pk from oe_recipe order by recipe_pk desc limit 1", nativeQuery = true)
     long findTopId();
