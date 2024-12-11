@@ -48,24 +48,7 @@ public class OeRecipe {
                 .build();
     }
 
-    public static GetRecipeResponseBoardAllDTD of(List<OeRecipe> Oelist, int nowPage, int totalPage, int view) {
-        List<GetRecipeResponseBoardDTO> list = new ArrayList<>();
 
-        for (OeRecipe recipe : Oelist) {
-            list.add(GetRecipeResponseBoardDTO.builder()
-                            .id(recipe.recipePk)
-                            .imgUrl(recipe.img)
-                            .title(recipe.title)
-                    .build());
-        }
-        return GetRecipeResponseBoardAllDTD.builder()
-                .hasNextPage(nowPage<totalPage)
-                .lastPage(totalPage)
-                .view(view)
-                .nowPage(nowPage)
-                .list(list)
-                .build();
-    }
 
 
 }
