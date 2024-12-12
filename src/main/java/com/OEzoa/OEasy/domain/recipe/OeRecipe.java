@@ -38,15 +38,7 @@ public class OeRecipe {
     @OneToMany(mappedBy = "recipe", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<OeRecipeManual> recipeManuals;
 
-    public static GetRecipeResponseDTO of(OeRecipe recipe, List<GetRecipeManualResponseDTO> list) {
-        return GetRecipeResponseDTO.builder()
-                .title(recipe.title)
-                .ingredients(recipe.ingredients)
-                .tip(recipe.tip)
-                .manualList(list)
-                .recipeImg(recipe.img)
-                .build();
-    }
+
 
 
 

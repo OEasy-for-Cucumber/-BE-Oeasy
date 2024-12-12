@@ -10,4 +10,7 @@ import java.util.Optional;
 @Repository
 public interface OeRecipeLikeRepository extends JpaRepository<OeRecipeLike, Long> {
     Optional<OeRecipeLike> findByRecipeAndMember(OeRecipe recipe, Member member);
+
+    boolean existsByRecipeAndMember(OeRecipe recipe, Member member);
+
 }
