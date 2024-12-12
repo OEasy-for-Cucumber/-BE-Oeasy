@@ -2,6 +2,7 @@ package com.OEzoa.OEasy.domain.recipe;
 
 import com.OEzoa.OEasy.application.recipe.DTO.GetRecipeResponseBoardAllDTD;
 import com.OEzoa.OEasy.application.recipe.DTO.GetRecipeResponseBoardDTO;
+import com.OEzoa.OEasy.domain.member.Member;
 import io.lettuce.core.dynamic.annotation.Param;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -19,11 +20,7 @@ public interface OeRecipeRepository extends JpaRepository<OeRecipe, Long> {
 
     Integer deleteByImgLike(String img);
 
-    @Query(value = "SELECT * " +
-            "FROM oe_recipe " +
-            "WHERE recipe_pk < :pk " +
-            "order by recipe_pk DESC limit :limit", nativeQuery = true)
-    List<OeRecipe> findByRecipePkLessThanOrderByDescTopN(@Param("pk") long pk, @Param("limit") int limit);
+
 
     List<OeRecipe> findAllByOrderByRecipePkDesc(Pageable pageable);
 
@@ -45,4 +42,15 @@ public interface OeRecipeRepository extends JpaRepository<OeRecipe, Long> {
 
     @Query(value = "SELECT recipe_pk from oe_recipe ORDER BY RAND() limit 1", nativeQuery = true)
     long findRandomPk();
+
+    @Query(value = "SELECT new com.OEzoa.OEasy.application.recipe.DTO.GetRecipeResponseBoardDTO(" +
+            "orl.recipe.recipePk," +
+            "orl.recipe.title," +
+            "orl.recipe.img," +
+            "(SELECT count(*) " +
+                "FROM OeRecipeLike or " +
+                "WHERE or = orl )) " +
+            "FROM OeRecipeLike orl " +
+            "WHERE orl.member = :member")
+    List<GetRecipeResponseBoardDTO> findByMyLiked(@Param("member") Member member);
 }

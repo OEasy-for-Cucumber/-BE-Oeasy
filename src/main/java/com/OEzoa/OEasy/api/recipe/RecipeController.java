@@ -1,8 +1,7 @@
 package com.OEzoa.OEasy.api.recipe;
 
 
-import com.OEzoa.OEasy.application.recipe.DTO.GetRecipeResponseDTO;
-import com.OEzoa.OEasy.application.recipe.DTO.GetRecipeResponseBoardAllDTD;
+import com.OEzoa.OEasy.application.recipe.DTO.*;
 import com.OEzoa.OEasy.application.recipe.RecipeService;
 import com.OEzoa.OEasy.application.recipe.RecipeValidator;
 import com.OEzoa.OEasy.domain.member.Member;
@@ -58,14 +57,36 @@ public class RecipeController {
         return  ResponseEntity.ok(recipeService.getRecipeBoard(page, view));
     }
 
+    @PostMapping("board/like-check")
+    @Operation(summary = "레시피 보드 좋아요 체크")//좋아요추가
+    public List<GetRecipeBoardLikesResponseDTO> getRecipeBoardLikes(@RequestBody GetRecipeBoardLikesRequestDTO dto) {
+        Member member = recipeValidator.getMemberById(dto.getMemberPk());
+        return recipeService.getRecipeBoardLikes(member, dto.getRecipeList());
+    }
+    @GetMapping("board/{memberPk}")
+    @Operation(summary = "좋아요 누른 게시물 가져오기")
+    public List<GetRecipeResponseBoardDTO> getRecipeLikedBoard(@PathVariable long memberPk) {
+        Member member = recipeValidator.getMemberById(memberPk);
+        return recipeService.getRecipeLikedBoard(member);
+
+    }
+
     @GetMapping("like/{memberPk}/{recipePk}")
     @Operation(summary = "좋아요"
             , description = "memberPk와 recipePk를 통해서 좋아요 기록을 조회하고 있다면 삭제하고 false(좋아요 취소), 없다면 기록을 저장하고 true(좋아요)를 반환")
-    public boolean Like(@PathVariable long memberPk, @PathVariable long recipePk) {
+    public boolean like(@PathVariable long memberPk, @PathVariable long recipePk) {
         OeRecipe recipe = recipeValidator.getRecipeById(recipePk);
         Member member = recipeValidator.getMemberById(memberPk);
 
         return recipeService.recipeLike(recipe, member);
+    }
+
+    @GetMapping("like-check/{memberPk}/{recipePk}")
+    @Operation(summary = "게시글 좋아요 체크")
+    public boolean likeCheck(@PathVariable long memberPk, @PathVariable long recipePk) {
+        OeRecipe recipe = recipeValidator.getRecipeById(recipePk);
+        Member member = recipeValidator.getMemberById(memberPk);
+        return recipeService.recipeLikeCheck(recipe, member);
     }
 
 
