@@ -1,5 +1,6 @@
 package com.OEzoa.OEasy.application.recipe.DTO;
 
+import com.OEzoa.OEasy.domain.recipe.OeRecipe;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 import lombok.Getter;
@@ -20,4 +21,14 @@ public class GetRecipeResponseDTO {
     private String title;
     @Builder.Default
     private List<GetRecipeManualResponseDTO> manualList = new ArrayList<>();
+
+    public static GetRecipeResponseDTO of(OeRecipe recipe, List<GetRecipeManualResponseDTO> list) {
+        return GetRecipeResponseDTO.builder()
+                .title(recipe.getTitle())
+                .ingredients(recipe.getIngredients())
+                .tip(recipe.getTip())
+                .manualList(list)
+                .recipeImg(recipe.getImg())
+                .build();
+    }
 }

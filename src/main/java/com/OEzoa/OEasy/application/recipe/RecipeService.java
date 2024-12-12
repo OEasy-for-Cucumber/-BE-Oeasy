@@ -1,9 +1,6 @@
 package com.OEzoa.OEasy.application.recipe;
 
-import com.OEzoa.OEasy.application.recipe.DTO.GetRecipeResponseBoardDTO;
-import com.OEzoa.OEasy.application.recipe.DTO.GetRecipeResponseDTO;
-import com.OEzoa.OEasy.application.recipe.DTO.GetRecipeManualResponseDTO;
-import com.OEzoa.OEasy.application.recipe.DTO.GetRecipeResponseBoardAllDTD;
+import com.OEzoa.OEasy.application.recipe.DTO.*;
 import com.OEzoa.OEasy.domain.member.Member;
 import com.OEzoa.OEasy.domain.recipe.*;
 import com.OEzoa.OEasy.exception.GlobalException;
@@ -29,6 +26,7 @@ public class RecipeService {
 
     private final OeRecipeRepository oeRecipeRepository;
     private final OeRecipeLikeRepository oeRecipeLikeRepository;
+    private final RecipeValidator recipeValidator;
 
     @Transactional(readOnly = true)
     public List<String> getRandomImg(int limit){
@@ -43,18 +41,11 @@ public class RecipeService {
             list.add(OeRecipeManual.of(manual));
         }
 
-        return OeRecipe.of(recipe, list);
+        return GetRecipeResponseDTO.of(recipe, list);
     }
 
     @Transactional(readOnly = true)
     public Long getRandomRecipe(){
-//        OeRecipe recipe = oeRecipeRepository.findRandomRecipe();
-//        List<GetRecipeManualResponseDTO> list = new ArrayList<>();
-//        for(OeRecipeManual manual: recipe.getRecipeManuals()){
-//            list.add(OeRecipeManual.of(manual));
-//        }
-
-//        return OeRecipe.of(recipe, list);
         return oeRecipeRepository.findRandomPk();
     }
 
@@ -72,6 +63,10 @@ public class RecipeService {
         return GetRecipeResponseBoardAllDTD.of(recipe, page, total, view);
     }
 
+    public List<GetRecipeResponseBoardDTO> getRecipeLikedBoard(Member member){
+        return oeRecipeRepository.findByMyLiked(member);
+    }
+
     public boolean recipeLike(OeRecipe recipe, Member member){
         Optional<OeRecipeLike> optional = oeRecipeLikeRepository.findByRecipeAndMember(recipe, member);
         if(optional.isPresent()){
@@ -86,6 +81,21 @@ public class RecipeService {
             return true;
         }
 
+    }
+
+    public boolean recipeLikeCheck(OeRecipe recipe, Member member){
+        return oeRecipeLikeRepository.existsByRecipeAndMember(recipe, member);
+    }
+
+    public List<GetRecipeBoardLikesResponseDTO> getRecipeBoardLikes(Member member, List<Long> list){
+        List<GetRecipeBoardLikesResponseDTO> likes = new ArrayList<>();
+        for(Long id: list){
+            likes.add(GetRecipeBoardLikesResponseDTO.builder()
+                            .recipePk(id)
+                            .liked(recipeLikeCheck(recipeValidator.getRecipeById(id), member))
+                    .build());
+        }
+        return likes;
     }
 
 
