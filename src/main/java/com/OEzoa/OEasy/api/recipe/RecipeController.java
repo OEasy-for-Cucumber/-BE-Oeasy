@@ -57,11 +57,12 @@ public class RecipeController {
         return  ResponseEntity.ok(recipeService.getRecipeBoard(page, view));
     }
 
-    @PostMapping("board/like-check")
+    @GetMapping("board/like-check")
     @Operation(summary = "레시피 보드 좋아요 체크")//좋아요추가
-    public List<GetRecipeBoardLikesResponseDTO> getRecipeBoardLikes(@RequestBody GetRecipeBoardLikesRequestDTO dto) {
-        Member member = recipeValidator.getMemberById(dto.getMemberPk());
-        return recipeService.getRecipeBoardLikes(member, dto.getRecipeList());
+    public List<GetRecipeBoardLikesResponseDTO> getRecipeBoardLikes(@RequestParam long memberPk,
+                                                                    @RequestParam List<Long> recipeList) {
+        Member member = recipeValidator.getMemberById(memberPk);
+        return recipeService.getRecipeBoardLikes(member, recipeList);
     }
     @GetMapping("board/{memberPk}")
     @Operation(summary = "좋아요 누른 게시물 가져오기")
@@ -71,12 +72,12 @@ public class RecipeController {
 
     }
 
-    @GetMapping("like/{memberPk}/{recipePk}")
+    @PostMapping("like/{memberPk}/{recipePk}")
     @Operation(summary = "좋아요"
             , description = "memberPk와 recipePk를 통해서 좋아요 기록을 조회하고 있다면 삭제하고 false(좋아요 취소), 없다면 기록을 저장하고 true(좋아요)를 반환")
-    public boolean like(@PathVariable long memberPk, @PathVariable long recipePk) {
-        OeRecipe recipe = recipeValidator.getRecipeById(recipePk);
-        Member member = recipeValidator.getMemberById(memberPk);
+    public boolean like(@RequestBody RecipeLikeRequestDTO dto) {
+        OeRecipe recipe = recipeValidator.getRecipeById(dto.getRecipePk());
+        Member member = recipeValidator.getMemberById(dto.getMemberPk());
 
         return recipeService.recipeLike(recipe, member);
     }
