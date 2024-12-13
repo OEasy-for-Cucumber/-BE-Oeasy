@@ -57,10 +57,10 @@ public class RecipeController {
         return  ResponseEntity.ok(recipeService.getRecipeBoard(page, view));
     }
 
-    @GetMapping("board/like-check")
+    @GetMapping("board/like-check/{memberPk}/{recipeList}")
     @Operation(summary = "레시피 보드 좋아요 체크")//좋아요추가
-    public List<GetRecipeBoardLikesResponseDTO> getRecipeBoardLikes(@RequestParam long memberPk,
-                                                                    @RequestParam List<Long> recipeList) {
+    public List<GetRecipeBoardLikesResponseDTO> getRecipeBoardLikes(@PathVariable long memberPk,
+                                                                    @PathVariable List<Long> recipeList) {
         Member member = recipeValidator.getMemberById(memberPk);
         return recipeService.getRecipeBoardLikes(member, recipeList);
     }
