@@ -72,7 +72,7 @@ public class RecipeController {
 
     }
 
-    @PostMapping("like/{memberPk}/{recipePk}")
+    @PostMapping("like")
     @Operation(summary = "좋아요"
             , description = "memberPk와 recipePk를 통해서 좋아요 기록을 조회하고 있다면 삭제하고 false(좋아요 취소), 없다면 기록을 저장하고 true(좋아요)를 반환")
     public boolean like(@RequestBody RecipeLikeRequestDTO dto) {
