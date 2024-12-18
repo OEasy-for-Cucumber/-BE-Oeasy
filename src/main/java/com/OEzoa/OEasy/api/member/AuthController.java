@@ -40,7 +40,7 @@ public class AuthController {
             @CookieValue(name = "refreshToken", required = false) String refreshToken,
             HttpServletResponse response) {
         if (refreshToken == null) {
-            throw new GlobalException(GlobalExceptionCode.INVALID_REFRESH_TOKEN);
+            throw new GlobalException(GlobalExceptionCode.NONE_REFRESH_TOKEN);
         }
         String newAccessToken = authService.refreshAccessToken(refreshToken, response);
         return ResponseEntity.ok(new AuthTokenResponseDTO(newAccessToken));

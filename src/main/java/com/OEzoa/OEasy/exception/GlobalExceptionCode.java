@@ -56,6 +56,7 @@ public enum GlobalExceptionCode {
     DB_SAVE_FAILURE(HttpStatus.INTERNAL_SERVER_ERROR, "데이터 저장 중 오류가 발생했습니다.", "Hibernate insert 쿼리가 실패했습니다."),
     MAX_USAGE_EXCEEDED(HttpStatus.TOO_MANY_REQUESTS,"오늘 사용가능한 질문 10회를 모두 사용하셨습니다!🥒","aioe 채팅 제한"),
     //---------------auth service-------------------
+    NONE_REFRESH_TOKEN(HttpStatus.UNAUTHORIZED, "리프레시 토큰이 비어있습니다.", "리프레시 토큰을 올바르게 받지 못했습니다.."),
     INVALID_REFRESH_TOKEN(HttpStatus.UNAUTHORIZED, "유효하지 않은 리프레시 토큰입니다.", "리프레시 토큰이 만료되었거나 잘못된 형식입니다."),
     TOKEN_MEMBER_NOT_FOUND(HttpStatus.NOT_FOUND, "회원 정보를 찾을 수 없습니다.", "리프레시 토큰에서 추출한 사용자 ID가 존재하지 않음"),
     //---------------recipe-------------------
