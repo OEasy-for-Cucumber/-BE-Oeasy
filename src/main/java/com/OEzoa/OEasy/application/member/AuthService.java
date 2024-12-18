@@ -28,6 +28,8 @@ public class AuthService {
 
     @Transactional
     public String refreshAccessToken(String refreshToken, HttpServletResponse response) {
+        jwtTokenProvider.validateRefreshToken(refreshToken);
+
         Long memberId = jwtTokenProvider.getMemberIdFromToken(refreshToken);
         MemberToken memberToken = memberTokenRepository.findByMemberPk(memberId)
                 .orElseThrow(() -> new GlobalException(GlobalExceptionCode.MEMBER_NOT_FOUND));
@@ -35,6 +37,7 @@ public class AuthService {
         String newAccessToken = jwtTokenProvider.generateToken(memberId);
         MemberToken updatedToken = memberTokenMapper.updateToken(memberToken, newAccessToken );
         memberTokenRepository.save(updatedToken);
+
         log.info("액세스 토큰 갱신 성공 유저 email : {}", updatedToken.getMember().getEmail());
         return refreshToken;
     }

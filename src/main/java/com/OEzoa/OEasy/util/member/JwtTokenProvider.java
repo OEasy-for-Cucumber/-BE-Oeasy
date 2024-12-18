@@ -1,5 +1,7 @@
 package com.OEzoa.OEasy.util.member;
 
+import com.OEzoa.OEasy.exception.GlobalException;
+import com.OEzoa.OEasy.exception.GlobalExceptionCode;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
@@ -102,7 +104,6 @@ public class JwtTokenProvider {
     // Refresh Token을 HttpOnly 쿠키로 설정
     public void createRefreshTokenCookie(Long userId, HttpServletResponse response) {
         String refreshToken = generateRefreshToken(userId);
-
         ResponseCookie refreshCookie = ResponseCookie.from("refreshToken", refreshToken)
                 .httpOnly(true)
                 .secure(true)
@@ -112,5 +113,20 @@ public class JwtTokenProvider {
                 .build();
         response.addHeader(HttpHeaders.SET_COOKIE, refreshCookie.toString());
         log.info("Refresh Token 쿠키 생성 완료: {}", refreshCookie);
+    }
+
+    public void validateRefreshToken(String refreshToken) {
+        try {
+            Jwts.parserBuilder()
+                    .setSigningKey(secretKey)
+                    .build()
+                    .parseClaimsJws(refreshToken);
+        } catch (ExpiredJwtException e) {
+            log.warn("Refresh Token 만료: {}", e.getMessage());
+            throw new GlobalException(GlobalExceptionCode.REFRESH_TOKEN_EXPIRED); // 401 예외
+        } catch (Exception e) {
+            log.error("Refresh Token 검증 실패: {}", e.getMessage());
+            throw new GlobalException(GlobalExceptionCode.INVALID_REFRESH_TOKEN); // 400 예외
+        }
     }
 }

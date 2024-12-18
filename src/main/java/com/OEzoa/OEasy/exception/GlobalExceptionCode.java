@@ -33,6 +33,7 @@ public enum GlobalExceptionCode {
     EXPIRED_ACCESS_TOKEN(HttpStatus.UNAUTHORIZED, "액세스 토큰이 만료되었습니다.", "JWT 액세스 토큰 만료"),
     UNSUPPORTED_TOKEN(HttpStatus.BAD_REQUEST, "지원하지 않는 토큰입니다.", "지원하지 않는 JWT 토큰 형식"),
     MALFORMED_TOKEN(HttpStatus.BAD_REQUEST, "잘못된 토큰 형식입니다.", "JWT 토큰 형식 오류"),
+    REFRESH_TOKEN_EXPIRED(HttpStatus.UNAUTHORIZED, "리프레시 토큰이 만료되었습니다.", "JWT 리프레시 토큰 만료"),
 
     //---------------sign up-------------------
     INVALID_SIGNUP_FLOW(HttpStatus.BAD_REQUEST, "회원 가입 데이터를 확인해 주십시오", "이메일 PW 닉네임 중 누락"),
