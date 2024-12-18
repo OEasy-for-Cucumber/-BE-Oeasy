@@ -2,10 +2,14 @@ package com.OEzoa.OEasy.api.member;
 
 import com.OEzoa.OEasy.application.member.AuthService;
 import com.OEzoa.OEasy.application.member.dto.AuthTokenResponseDTO;
+import com.OEzoa.OEasy.exception.GlobalException;
+import com.OEzoa.OEasy.exception.GlobalExceptionCode;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -14,15 +18,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("/auth")
 @Tag(name = "Member Auth API", description = "회원 인증을 관리합니다.")
 public class AuthController {
 
-    private final AuthService authService;
-
-    public AuthController(AuthService authService) {
-        this.authService = authService;
-    }
+    @Autowired
+    private AuthService authService;
 
     @PostMapping("/refresh")
     @Operation(
@@ -37,6 +39,9 @@ public class AuthController {
     public ResponseEntity<AuthTokenResponseDTO> refreshAccessToken(
             @CookieValue(name = "refreshToken", required = false) String refreshToken,
             HttpServletResponse response) {
+        if (refreshToken == null) {
+            throw new GlobalException(GlobalExceptionCode.INVALID_REFRESH_TOKEN);
+        }
         String newAccessToken = authService.refreshAccessToken(refreshToken, response);
         return ResponseEntity.ok(new AuthTokenResponseDTO(newAccessToken));
     }

@@ -50,8 +50,9 @@ public class KakaoMemberService {
         }
 
         // JWT 액세스 토큰 및 리프레시 토큰 발급
-        String jwtAccessToken = jwtTokenProvider.generateToken(member.getMemberPk());
-        jwtTokenProvider.createRefreshTokenCookie(member.getMemberPk(), response);
+        Long memberPk = member.getMemberPk();
+        String jwtAccessToken = jwtTokenProvider.generateToken(memberPk);
+        jwtTokenProvider.createRefreshTokenCookie(memberPk, response);
         log.info("카카오 로그인 성공. 생성된 액세스 토큰: {}", jwtAccessToken);
 
         // MemberToken 저장 및 업데이트
@@ -72,8 +73,6 @@ public class KakaoMemberService {
         }
         memberTokenRepository.save(memberToken);
         log.info("MemberToken 저장 완료: {}", memberToken);
-
-        log.info("카카오 로그인 성공. 생성된 액세스 토큰: {}", jwtAccessToken);
         return MemberLoginResponseDTO.builder()
                 .accessToken(jwtAccessToken)
                 .email(member.getEmail())
