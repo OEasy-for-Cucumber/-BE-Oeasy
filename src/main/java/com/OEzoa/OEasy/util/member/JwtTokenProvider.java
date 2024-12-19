@@ -28,7 +28,7 @@ public class JwtTokenProvider {
 
     private final long TOKEN_VALIDITY = 1000L * 60 * 1;  // 액세스 토큰 유효 시간: 2시간
     private final long LOGIN_TOKEN_VALIDITY = 1000L * 60 * 10;  // 회원가입 토큰 유효 시간: 10분
-    private final long REFRESH_TOKEN_VALIDITY = 1000L * 60 * 60 * 3;  // 리프레시 토큰 유효 시간: 7일
+    private final long REFRESH_TOKEN_VALIDITY = 1000L * 60 * 3;  // 리프레시 토큰 유효 시간: 7일
     private SecretKey secretKey;  // 실제 서명 및 검증에 사용할 인코딩된 비밀 키
 
     @PostConstruct
