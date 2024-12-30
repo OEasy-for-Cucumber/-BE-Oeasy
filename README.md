@@ -7,7 +7,7 @@
 
 - [🎀 사이트로 이동해보세요!](https://oeasy.world/)
 - 카카오톡으로 로그인 가능합니다.
-- 저희와 함께 빠르게 오이와 가까워져 보세요 💚
+- 저희와 함께 빠르게 오이와 가까워져 보세요, 💚
   
 ![image](https://github.com/user-attachments/assets/b883a868-f189-44bf-a6bb-be12a70cd101)
 
