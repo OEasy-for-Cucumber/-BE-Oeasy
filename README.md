@@ -77,43 +77,97 @@
 
 ---
 
-#### `domain`
-- Entity, Repository  
-- 데이터 모델과 관련된 로직 처리  
+# 📌 OEasy 프로젝트 폴더 구조
 
-#### `global`
-- 공통 유틸, JSON 처리 등 전역 설정 관련 코드  
+<details>
+<summary> 🔽 </summary>
 
-#### `log`
-- 시간 추적 로깅  
+## 📂 `src/main/java/com/OEzoa/OEasy`
 
-#### `notification`
-- 알림(Notification) 관련 API  
+### 📌 `api` (컨트롤러 계층)
+🚀 **역할:**  
+- HTTP 요청을 받아 해당 기능의 서비스 로직을 실행  
+- REST API 엔드포인트 제공  
 
-#### `study` (핵심 도메인)
-- 스터디 관련 기능  
-  - `attendance` : 출석 관리  
-  - `calendar` : 일정 관리  
-  - `chatting` : 채팅 시스템  
-  - `dashboard` : 스터디 대시보드  
-  - `enter` : 스터디 가입  
-  - `management` : 스터디 관리  
-  - `notice` : 공지사항  
-  - `problem` : 문제 출제 및 문제 은행 관리  
-  - `studyCRUD` : 스터디 생성/수정/삭제  
-  - `todo` : 스터디 TODO 리스트  
+🔹 **주요 기능:**  
+- 사용자 인증 (`member/login`)  
+- 게시판 관리 (`community`, `tip`)  
+- 채팅 시스템 (`chatting`)  
+- 투표 기능 (`vote`)  
+- 레시피 관리 (`recipe`)  
 
-#### `user` (사용자 관련)
-- 사용자 인증 및 관리 기능  
-  - `login` : 로그인 관련 API  
-  - `mypage` : 마이페이지 관리  
-  - `mystudy` : 사용자가 속한 스터디 관리  
+---
 
-## ✨ 특징
-- 기능 단위 패키지 구성, 유지보수성 및 확장성 고려  
-- DTO, Controller, Service, Validator 역할 구분  
-- AOP 기반 인증/인가 처리 (`user/login/util/aop`)  
+### 📌 `application` (서비스 계층)
+💡 **역할:**  
+- 도메인 로직을 조합하여 애플리케이션의 주요 기능 수행  
+- DTO 변환, 매퍼 및 검증 로직 포함  
 
+🔹 **주요 기능:**  
+- 회원 가입 및 로그인 처리 (`member`)  
+- 데이터 가공 및 검증 (`validator`, `mapper`)  
+- 비즈니스 로직 수행  
+
+---
+
+### 📌 `domain` (도메인 계층)
+📌 **역할:**  
+- 핵심 비즈니스 로직을 포함하는 엔티티 및 도메인 모델 관리  
+- JPA 엔티티 및 관련 연산 정의  
+
+🔹 **주요 기능:**  
+- 회원 데이터 관리 (`member`)  
+- 게시글 및 댓글 (`community`, `tip`)  
+- 투표 시스템 (`vote`)  
+- 이미지 및 파일 데이터 (`image`)  
+- 알림 시스템 (`notification`)  
+
+---
+
+### 📌 `exception` (예외 처리 계층)
+⚠️ **역할:**  
+- 전역 및 도메인별 예외 정의 및 관리  
+- 일관된 예외 처리 정책 제공  
+
+🔹 **주요 기능:**  
+- 공통 예외 처리  
+- 사용자 인증 및 데이터 검증 예외 관리  
+
+---
+
+### 📌 `infra` (인프라 계층)
+🛠 **역할:**  
+- 외부 API 연동 및 설정 관련 클래스 포함  
+- 데이터베이스, 외부 서비스 통신, 설정 정보 관리  
+
+🔹 **주요 기능:**  
+- Kakao API 연동 (`api/aioe`)  
+- AWS S3 파일 업로드  
+- Redis 캐싱  
+- SMTP 이메일 전송  
+
+---
+
+### 📌 `util` (유틸리티 계층)
+🛠 **역할:**  
+- 공통적으로 사용되는 기능 제공 (파일 업로드, 시간 관리 등)  
+
+🔹 **주요 기능:**  
+- S3 업로드 (`s3Bucket`)  
+- 스케줄러 (`scheduler`)  
+- 시간 변환 및 추적 (`timeTrace`)  
+- 인증 보조 기능  
+
+---
+
+✅ **특징:**  
+- 기능 단위 패키지 구성으로 유지보수성 및 확장성 향상  
+- DTO, Controller, Service, Validator 역할 명확한 분리  
+- AOP 기반 인증/인가 처리
+-
+
+</details>
+ 
 <br>
 
 ## 팀원 구성
