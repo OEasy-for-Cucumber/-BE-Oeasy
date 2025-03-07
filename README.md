@@ -70,7 +70,9 @@
 
 <details>
 <summary> ERD 🔽 </summary>
+
 ![OEasy - ERD](https://github.com/user-attachments/assets/ed49980e-138f-46ee-a10f-6b37e39f752d)
+
 </details>
 
 ---
